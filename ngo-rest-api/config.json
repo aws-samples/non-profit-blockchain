@@ -1,0 +1,17 @@
+{
+    "host":"localhost",
+    "port":"3000",
+    "channelName":"mychannel",
+    "chaincodeName":"ngo",
+    "eventWaitTime":"30000",
+    "peers":[
+        "peer0.org1.example.com",
+        "peer0.org2.example.com"
+    ],
+    "admins":[
+       {
+          "username":"admin",
+          "secret":"adminpw"
+       }
+    ]
+ }

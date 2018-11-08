@@ -1,0 +1,101 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Write your model definitions here
+ */
+
+namespace org.mcldg.ngo
+
+/* a Donation is monetary value exchanged between two parties, in this case, 
+a Donor participant, and an NGO participant. Since it has value and can be exchanged
+between parties, it is represented as an Asset */
+asset Donation identified by donationId {
+    o String donationId
+    o Double donationAmount
+    o DateTime donationDate
+    --> Donor donor
+    --> NGO ngo
+}
+/* a Rating is virtual value exchanged between two parties, in this case, 
+a Donor participant, and an NGO participant. Since it has value and can be exchanged
+between parties, it is represented as an Asset */
+asset Rating identified by ratingId {
+    o String ratingId
+    o Integer rating
+    o DateTime ratingDate
+    --> Donor donor
+    --> NGO ngo
+}
+/* NGOSpend records money paid out by the NGO for services, expenses, etc. */
+asset NGOSpend identified by spendId {
+    o String spendId
+    o String spendDescription
+    o Double spendAmount
+    o DateTime spendDate
+    --> NGO ngo
+}
+/* NGOSpendDonorAllocation records the breakdown of how much each Donor's Donation has contributed towards 
+an NGOSpend item. This allows a Donor to track how the funds they donated are being spent */
+asset NGOSpendDonationAllocation identified by spendAllocationId {
+    o String spendAllocationId
+    o Double spendAllocationAmount
+    o DateTime spendAllocationDate
+    --> NGOSpend NGOSpend
+    --> Donation donation
+}
+participant NGO identified by ngoRegistrationNumber {
+    o String ngoRegistrationNumber
+    o String ngoName
+    o String ngoDescription
+    o String address
+    o String contactNumber
+    o String contactEmail
+}
+participant Donor identified by donorUserName {
+    o String donorUserName
+    o String email
+    o DateTime registeredDate
+}
+transaction donate {
+    --> Donor donor
+    --> NGO ngo
+    o String donationId
+    o Double donationAmount
+}
+transaction spend {
+    --> NGO ngo
+    o String spendId
+    o String spendDescription
+    o Double spendAmount
+}
+transaction rate {
+    --> Donor donor
+    --> NGO ngo
+    o String ratingId
+    o Integer rating
+}
+event DonationNotification {
+    --> Donation donation
+    o Double donationAmount
+    o String ngoRegistrationNumber
+    o String ngoName
+    o String donorUserName
+}
+event SpendNotification {
+    --> NGOSpend spend
+    o Double spendAmount
+    o String spendDescription
+    o String ngoName
+}

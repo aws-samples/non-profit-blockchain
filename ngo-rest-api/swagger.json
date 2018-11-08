@@ -1,0 +1,1831 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "OpenAPI Specification for NGO",
+        "description": "OpenAPI Specification for NGO"
+    },
+    "host": "localhost:10010",
+    "basePath": "/api",
+    "paths": {
+        "/queries/getDonationsForNGO": {
+            "get": {
+                "tags": [
+                    "Query"
+                ],
+                "summary": "Select all donations for an NGO",
+                "operationId": "Query.getDonationsForNGO",
+                "parameters": [
+                    {
+                        "name": "ngo",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Donation"
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/queries/getSpendByDonation": {
+            "get": {
+                "tags": [
+                    "Query"
+                ],
+                "summary": "Select all spend by Donation",
+                "operationId": "Query.getSpendByDonation",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/NGOSpendDonationAllocation"
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/Donation": {
+            "post": {
+                "tags": [
+                    "Donation"
+                ],
+                "summary": "Create a new instance of the model and persist it into the data source.",
+                "operationId": "Donation.create",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/Donation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/Donation"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "Donation"
+                ],
+                "summary": "Find all instances of the model matched by filter from the data source.",
+                "operationId": "Donation.find",
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Donation"
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/Donation/{id}": {
+            "head": {
+                "tags": [
+                    "Donation"
+                ],
+                "summary": "Check whether a model instance exists in the data source.",
+                "operationId": "Donation.exists",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "exists": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "Donation"
+                ],
+                "summary": "Find a model instance by {{id}} from the data source.",
+                "operationId": "Donation.findById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields and include - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/Donation"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "put": {
+                "tags": [
+                    "Donation"
+                ],
+                "summary": "Replace attributes for a model instance and persist it into the data source.",
+                "operationId": "Donation.replaceById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/Donation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/Donation"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "delete": {
+                "tags": [
+                    "Donation"
+                ],
+                "summary": "Delete a model instance by {{id}} from the data source.",
+                "operationId": "Donation.deleteById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/Rating": {
+            "post": {
+                "tags": [
+                    "Rating"
+                ],
+                "summary": "Create a new instance of the model and persist it into the data source.",
+                "operationId": "Rating.create",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/Rating"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/Rating"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "Rating"
+                ],
+                "summary": "Find all instances of the model matched by filter from the data source.",
+                "operationId": "Rating.find",
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Rating"
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/Rating/{id}": {
+            "head": {
+                "tags": [
+                    "Rating"
+                ],
+                "summary": "Check whether a model instance exists in the data source.",
+                "operationId": "Rating.exists",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "exists": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "Rating"
+                ],
+                "summary": "Find a model instance by {{id}} from the data source.",
+                "operationId": "Rating.findById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields and include - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/Rating"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "put": {
+                "tags": [
+                    "Rating"
+                ],
+                "summary": "Replace attributes for a model instance and persist it into the data source.",
+                "operationId": "Rating.replaceById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/Rating"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/Rating"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "delete": {
+                "tags": [
+                    "Rating"
+                ],
+                "summary": "Delete a model instance by {{id}} from the data source.",
+                "operationId": "Rating.deleteById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/NGOSpend": {
+            "post": {
+                "tags": [
+                    "NGOSpend"
+                ],
+                "summary": "Create a new instance of the model and persist it into the data source.",
+                "operationId": "NGOSpend.create",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/NGOSpend"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/NGOSpend"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "NGOSpend"
+                ],
+                "summary": "Find all instances of the model matched by filter from the data source.",
+                "operationId": "NGOSpend.find",
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/NGOSpend"
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/NGOSpend/{id}": {
+            "head": {
+                "tags": [
+                    "NGOSpend"
+                ],
+                "summary": "Check whether a model instance exists in the data source.",
+                "operationId": "NGOSpend.exists",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "exists": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "NGOSpend"
+                ],
+                "summary": "Find a model instance by {{id}} from the data source.",
+                "operationId": "NGOSpend.findById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields and include - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/NGOSpend"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "put": {
+                "tags": [
+                    "NGOSpend"
+                ],
+                "summary": "Replace attributes for a model instance and persist it into the data source.",
+                "operationId": "NGOSpend.replaceById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/NGOSpend"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/NGOSpend"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "delete": {
+                "tags": [
+                    "NGOSpend"
+                ],
+                "summary": "Delete a model instance by {{id}} from the data source.",
+                "operationId": "NGOSpend.deleteById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/NGOSpendDonationAllocation": {
+            "post": {
+                "tags": [
+                    "NGOSpendDonationAllocation"
+                ],
+                "summary": "Create a new instance of the model and persist it into the data source.",
+                "operationId": "NGOSpendDonationAllocation.create",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/NGOSpendDonationAllocation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/NGOSpendDonationAllocation"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "NGOSpendDonationAllocation"
+                ],
+                "summary": "Find all instances of the model matched by filter from the data source.",
+                "operationId": "NGOSpendDonationAllocation.find",
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/NGOSpendDonationAllocation"
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/NGOSpendDonationAllocation/{id}": {
+            "head": {
+                "tags": [
+                    "NGOSpendDonationAllocation"
+                ],
+                "summary": "Check whether a model instance exists in the data source.",
+                "operationId": "NGOSpendDonationAllocation.exists",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "exists": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "NGOSpendDonationAllocation"
+                ],
+                "summary": "Find a model instance by {{id}} from the data source.",
+                "operationId": "NGOSpendDonationAllocation.findById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields and include - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/NGOSpendDonationAllocation"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "put": {
+                "tags": [
+                    "NGOSpendDonationAllocation"
+                ],
+                "summary": "Replace attributes for a model instance and persist it into the data source.",
+                "operationId": "NGOSpendDonationAllocation.replaceById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/NGOSpendDonationAllocation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/NGOSpendDonationAllocation"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "delete": {
+                "tags": [
+                    "NGOSpendDonationAllocation"
+                ],
+                "summary": "Delete a model instance by {{id}} from the data source.",
+                "operationId": "NGOSpendDonationAllocation.deleteById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/NGO": {
+            "post": {
+                "tags": [
+                    "NGO"
+                ],
+                "summary": "Create a new instance of the model and persist it into the data source.",
+                "operationId": "NGO.create",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/NGO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/NGO"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "NGO"
+                ],
+                "summary": "Find all instances of the model matched by filter from the data source.",
+                "operationId": "NGO.find",
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/NGO"
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/NGO/{id}": {
+            "head": {
+                "tags": [
+                    "NGO"
+                ],
+                "summary": "Check whether a model instance exists in the data source.",
+                "operationId": "NGO.exists",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "exists": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "NGO"
+                ],
+                "summary": "Find a model instance by {{id}} from the data source.",
+                "operationId": "NGO.findById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields and include - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/NGO"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "put": {
+                "tags": [
+                    "NGO"
+                ],
+                "summary": "Replace attributes for a model instance and persist it into the data source.",
+                "operationId": "NGO.replaceById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/NGO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/NGO"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "delete": {
+                "tags": [
+                    "NGO"
+                ],
+                "summary": "Delete a model instance by {{id}} from the data source.",
+                "operationId": "NGO.deleteById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/Donor": {
+            "post": {
+                "tags": [
+                    "Donor"
+                ],
+                "summary": "Create a new instance of the model and persist it into the data source.",
+                "operationId": "Donor.create",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/Donor"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/Donor"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "Donor"
+                ],
+                "summary": "Find all instances of the model matched by filter from the data source.",
+                "operationId": "Donor.find",
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Donor"
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/Donor/{id}": {
+            "head": {
+                "tags": [
+                    "Donor"
+                ],
+                "summary": "Check whether a model instance exists in the data source.",
+                "operationId": "Donor.exists",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "exists": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "Donor"
+                ],
+                "summary": "Find a model instance by {{id}} from the data source.",
+                "operationId": "Donor.findById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields and include - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/Donor"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "put": {
+                "tags": [
+                    "Donor"
+                ],
+                "summary": "Replace attributes for a model instance and persist it into the data source.",
+                "operationId": "Donor.replaceById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/Donor"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/Donor"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "delete": {
+                "tags": [
+                    "Donor"
+                ],
+                "summary": "Delete a model instance by {{id}} from the data source.",
+                "operationId": "Donor.deleteById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/donate": {
+            "post": {
+                "tags": [
+                    "donate"
+                ],
+                "summary": "Create a new instance of the model and persist it into the data source.",
+                "operationId": "donate.create",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/donate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/donate"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "donate"
+                ],
+                "summary": "Find all instances of the model matched by filter from the data source.",
+                "operationId": "donate.find",
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/donate"
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/donate/{id}": {
+            "get": {
+                "tags": [
+                    "donate"
+                ],
+                "summary": "Find a model instance by {{id}} from the data source.",
+                "operationId": "donate.findById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields and include - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/donate"
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/spend": {
+            "post": {
+                "tags": [
+                    "spend"
+                ],
+                "summary": "Create a new instance of the model and persist it into the data source.",
+                "operationId": "spend.create",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/spend"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/spend"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "spend"
+                ],
+                "summary": "Find all instances of the model matched by filter from the data source.",
+                "operationId": "spend.find",
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/spend"
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/spend/{id}": {
+            "get": {
+                "tags": [
+                    "spend"
+                ],
+                "summary": "Find a model instance by {{id}} from the data source.",
+                "operationId": "spend.findById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields and include - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/spend"
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rate": {
+            "post": {
+                "tags": [
+                    "rate"
+                ],
+                "summary": "Create a new instance of the model and persist it into the data source.",
+                "operationId": "rate.create",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "description": "Model instance data",
+                        "required": false,
+                        "schema": {
+                            "description": "Model instance data",
+                            "$ref": "#/definitions/rate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/rate"
+                        }
+                    }
+                },
+                "deprecated": false
+            },
+            "get": {
+                "tags": [
+                    "rate"
+                ],
+                "summary": "Find all instances of the model matched by filter from the data source.",
+                "operationId": "rate.find",
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields, where, include, order, offset, and limit - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/rate"
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rate/{id}": {
+            "get": {
+                "tags": [
+                    "rate"
+                ],
+                "summary": "Find a model instance by {{id}} from the data source.",
+                "operationId": "rate.findById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Model id",
+                        "required": true,
+                        "type": "string",
+                        "format": "JSON"
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filter defining fields and include - must be a JSON-encoded string ({\"something\":\"value\"})",
+                        "required": false,
+                        "type": "string",
+                        "format": "JSON"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request was successful",
+                        "schema": {
+                            "$ref": "#/definitions/rate"
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Query",
+            "description": "Named queries"
+        },
+        {
+            "name": "Donation",
+            "description": "An asset named Donation"
+        },
+        {
+            "name": "Rating",
+            "description": "An asset named Rating"
+        },
+        {
+            "name": "NGOSpend",
+            "description": "An asset named NGOSpend"
+        },
+        {
+            "name": "NGOSpendDonationAllocation",
+            "description": "An asset named NGOSpendDonationAllocation"
+        },
+        {
+            "name": "NGO",
+            "description": "A participant named NGO"
+        },
+        {
+            "name": "Donor",
+            "description": "A participant named Donor"
+        },
+        {
+            "name": "donate",
+            "description": "A transaction named donate"
+        },
+        {
+            "name": "spend",
+            "description": "A transaction named spend"
+        },
+        {
+            "name": "rate",
+            "description": "A transaction named rate"
+        }
+    ],
+    "consumes": [
+        "application/json",
+        "application/x-www-form-urlencoded",
+        "application/xml",
+        "text/xml"
+    ],
+    "produces": [
+        "application/json",
+        "application/xml",
+        "text/xml",
+        "application/javascript",
+        "text/javascript"
+    ],
+    "definitions": {
+        "Donation": {
+            "description": "An asset named Donation",
+            "properties": {
+                "donationId": {
+                    "description": "The instance identifier for this type",
+                    "type": "string"
+                },
+                "donationAmount": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "donationDate": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "donor": {
+                    "description": "The identifier of an instance of donor",
+                    "$ref": "#/definitions/x-any"
+                },
+                "ngo": {
+                    "description": "The identifier of an instance of ngo",
+                    "$ref": "#/definitions/x-any"
+                }
+            },
+            "required": [
+                "donationId",
+                "donationAmount",
+                "donationDate",
+                "donor",
+                "ngo"
+            ],
+            "additionalProperties": false
+        },
+        "x-any": {
+            "properties": {}
+        },
+        "Rating": {
+            "description": "An asset named Rating",
+            "properties": {
+                "ratingId": {
+                    "description": "The instance identifier for this type",
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "ratingDate": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "donor": {
+                    "description": "The identifier of an instance of donor",
+                    "$ref": "#/definitions/x-any"
+                },
+                "ngo": {
+                    "description": "The identifier of an instance of ngo",
+                    "$ref": "#/definitions/x-any"
+                }
+            },
+            "required": [
+                "ratingId",
+                "rating",
+                "ratingDate",
+                "donor",
+                "ngo"
+            ],
+            "additionalProperties": false
+        },
+        "NGOSpend": {
+            "description": "An asset named NGOSpend",
+            "properties": {
+                "spendId": {
+                    "description": "The instance identifier for this type",
+                    "type": "string"
+                },
+                "spendDescription": {
+                    "type": "string"
+                },
+                "spendAmount": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "spendDate": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "ngo": {
+                    "description": "The identifier of an instance of ngo",
+                    "$ref": "#/definitions/x-any"
+                }
+            },
+            "required": [
+                "spendId",
+                "spendDescription",
+                "spendAmount",
+                "spendDate",
+                "ngo"
+            ],
+            "additionalProperties": false
+        },
+        "NGOSpendDonationAllocation": {
+            "description": "An asset named NGOSpendDonationAllocation",
+            "properties": {
+                "spendAllocationId": {
+                    "description": "The instance identifier for this type",
+                    "type": "string"
+                },
+                "spendAllocationAmount": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "spendAllocationDate": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "NGOSpend": {
+                    "description": "The identifier of an instance of NGOSpend",
+                    "$ref": "#/definitions/x-any"
+                },
+                "donation": {
+                    "description": "The identifier of an instance of donation",
+                    "$ref": "#/definitions/x-any"
+                }
+            },
+            "required": [
+                "spendAllocationId",
+                "spendAllocationAmount",
+                "spendAllocationDate",
+                "NGOSpend",
+                "donation"
+            ],
+            "additionalProperties": false
+        },
+        "NGO": {
+            "description": "A participant named NGO",
+            "properties": {
+                "ngoRegistrationNumber": {
+                    "description": "The instance identifier for this type",
+                    "type": "string"
+                },
+                "ngoName": {
+                    "type": "string"
+                },
+                "ngoDescription": {
+                    "type": "string"
+                },
+                "address": {
+                    "type": "string"
+                },
+                "contactNumber": {
+                    "type": "string"
+                },
+                "contactEmail": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "ngoRegistrationNumber",
+                "ngoName",
+                "ngoDescription",
+                "address",
+                "contactNumber",
+                "contactEmail"
+            ],
+            "additionalProperties": false
+        },
+        "Donor": {
+            "description": "A participant named Donor",
+            "properties": {
+                "$class": {
+                    "default": "Donor",
+                    "description": "The class identifier for this type",
+                    "type": "string"
+                },
+                "donorUserName": {
+                    "description": "The instance identifier for this type",
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "registeredDate": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            },
+            "required": [
+                "donorUserName",
+                "email",
+                "registeredDate"
+            ],
+            "additionalProperties": false
+        },
+        "donate": {
+            "description": "A transaction named donate",
+            "properties": {
+                "donor": {
+                    "description": "The identifier of an instance of donor",
+                    "$ref": "#/definitions/x-any"
+                },
+                "ngo": {
+                    "description": "The identifier of an instance of ngo",
+                    "$ref": "#/definitions/x-any"
+                },
+                "donationId": {
+                    "type": "string"
+                },
+                "donationAmount": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "transactionId": {
+                    "description": "The instance identifier for this type",
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            },
+            "required": [
+                "donor",
+                "ngo",
+                "donationId",
+                "donationAmount"
+            ],
+            "additionalProperties": false
+        },
+        "spend": {
+            "description": "A transaction named spend",
+            "properties": {
+                "ngo": {
+                    "description": "The identifier of an instance of ngo",
+                    "$ref": "#/definitions/x-any"
+                },
+                "spendId": {
+                    "type": "string"
+                },
+                "spendDescription": {
+                    "type": "string"
+                },
+                "spendAmount": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "transactionId": {
+                    "description": "The instance identifier for this type",
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            },
+            "required": [
+                "ngo",
+                "spendId",
+                "spendDescription",
+                "spendAmount"
+            ],
+            "additionalProperties": false
+        },
+        "rate": {
+            "description": "A transaction named rate",
+            "properties": {
+                "donor": {
+                    "description": "The identifier of an instance of donor",
+                    "$ref": "#/definitions/x-any"
+                },
+                "ngo": {
+                    "description": "The identifier of an instance of ngo",
+                    "$ref": "#/definitions/x-any"
+                },
+                "ratingId": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "transactionId": {
+                    "description": "The instance identifier for this type",
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            },
+            "required": [
+                "donor",
+                "ngo",
+                "ratingId",
+                "rating"
+            ],
+            "additionalProperties": false
+        }
+    }
+}

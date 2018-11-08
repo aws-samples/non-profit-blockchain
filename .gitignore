@@ -1,0 +1,6 @@
+tmp
+archive
+.vscode
+.idea
+ngo-rest-api/node_modules
+ngo-rest-api/fabric-client-kv-org1
