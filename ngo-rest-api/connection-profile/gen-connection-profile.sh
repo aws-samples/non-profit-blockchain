@@ -6,7 +6,7 @@
 REPODIR=~/non-profit-blockchain
 #CERTDIR points to the location of the fabric-samples repo. If you are using this to run Fabric, the crypto information
 #would have been generated in the balance-transfer/crypto-config folder.
-CERTDIR=~/fabric-samples/first-network
+CERTDIR=~/fabric-samples
 
 # Installing gawk. It should already exist on Linux, but probably not on Mac
 # ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null
