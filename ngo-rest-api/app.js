@@ -109,6 +109,11 @@ wss.on('connection', function connection(ws) {
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////// REST ENDPOINTS START HERE ///////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
+// Health check
+app.post('/health', awaitHandler(async (req, res) => {
+	res.sendStatus(200);
+}));
+
 // Register and enroll user
 app.post('/users', awaitHandler(async (req, res) => {
 	username = req.body.username;
@@ -138,7 +143,6 @@ app.post('/users', awaitHandler(async (req, res) => {
 		logger.error('##### End point : /users - Failed to register the username %s for organization %s with::%s',username,orgName,response);
 		res.json({success: false, message: response});
 	}
-
 }));
 // Query on chaincode on target peers
 app.get('/channels/:channelName/chaincodes/:chaincodeName', awaitHandler(async (req, res) => {
