@@ -40,7 +40,7 @@ var query = require('./query.js');
 var invoke = require('./invoke.js');
 var blockListener = require('./blocklistener.js');
 
-//hfc.addConfigFile('config.json');
+hfc.addConfigFile('config.json');
 var host = 'localhost';
 var port = 3000;
 var username = "";
