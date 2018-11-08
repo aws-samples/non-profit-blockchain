@@ -114,7 +114,8 @@ app.get('/health', awaitHandler(async (req, res) => {
 	res.sendStatus(200);
 }));
 
-// Register and enroll user
+// Register and enroll user. A user must be registered and enrolled before any queries 
+// or transactions can be invoked
 app.post('/users', awaitHandler(async (req, res) => {
 	username = req.body.username;
 	orgName = req.body.orgName;

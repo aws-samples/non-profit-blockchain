@@ -4,8 +4,8 @@ set +e
 echo To test, run the API server as per the instructions in the README, then execute this script on the command line
 export ENDPOINT=Fabric-ELB-205962472.us-west-2.elb.amazonaws.com
 export PORT=80
-export ENDPOINT=localhost
-export PORT=3000
+#export ENDPOINT=localhost
+#export PORT=3000
 echo connecting to server: $ENDPOINT:$PORT
 echo
 echo 'Register User'
