@@ -43,8 +43,8 @@ var blockListener = require('./blocklistener.js');
 
 //hfc.addConfigFile('config.json');
 logger.info('hfc: ' + util.inspect(hfc));
-var host = hfc.getConfigSetting('host') || process.env.HOST; 
-var port = hfc.getConfigSetting('port') || process.env.PORT;
+var host = 'localhost';
+var port = 3000;
 logger.info('host: ' + host);
 logger.info('port: ' + port);
 var username = "";
