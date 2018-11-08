@@ -110,7 +110,7 @@ wss.on('connection', function connection(ws) {
 ///////////////////////// REST ENDPOINTS START HERE ///////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 // Health check
-app.post('/health', awaitHandler(async (req, res) => {
+app.get('/health', awaitHandler(async (req, res) => {
 	res.sendStatus(200);
 }));
 
