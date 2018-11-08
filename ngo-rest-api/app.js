@@ -33,7 +33,6 @@ var http = require('http');
 var util = require('util');
 var app = express();
 
-require('./config.js');
 var hfc = require('fabric-client');
 
 var helper = require('./helper.js');
@@ -42,11 +41,8 @@ var invoke = require('./invoke.js');
 var blockListener = require('./blocklistener.js');
 
 //hfc.addConfigFile('config.json');
-logger.info('hfc: ' + util.inspect(hfc));
 var host = 'localhost';
 var port = 3000;
-logger.info('host: ' + host);
-logger.info('port: ' + port);
 var username = "";
 var orgName = "";
 var channelName = hfc.getConfigSetting('channelName');
