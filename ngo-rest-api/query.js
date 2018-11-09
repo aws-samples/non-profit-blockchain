@@ -48,8 +48,14 @@ var queryChaincode = async function(peers, channelName, chaincodeName, args, fcn
             }
             // we will only use the first response. We strip out the Fabric key and just return the payload
             let json = JSON.parse(response_payloads[0].toString('utf8'));
+			logger.info('##### queryChaincode - Query json %s', util.inspect(json));
             for (let key in json) {
-                ret.push(json[key]['Record']);         
+				if (json[key]['Record']) {
+					ret.push(json[key]['Record']); 
+				}
+				else {
+					ret.push(json); 
+				}                
             }
  			return ret;
 		} else {
