@@ -14,6 +14,7 @@
   "dependencies": {
     "body-parser": "^1.17.1",
     "cookie-parser": "^1.4.3",
+    "cors": "^2.8.3",
     "express": "^4.15.2",
     "express-session": "^1.15.2",
     "fabric-ca-client": "1.3.0",

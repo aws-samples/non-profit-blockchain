@@ -45,9 +45,13 @@ node app.js &
 # REST API 
 Once the app is running you can register an identity, and then start to execute chaincode
 
-### Register/enroll a user:
+## Register/enroll a user:
 
+request:
 curl -s -X POST http://localhost:3000/users -H "content-type: application/x-www-form-urlencoded" -d 'username=michael&orgName=Org1'
+
+response:
+{"success":true,"secret":"","message":"michael enrolled Successfully"}
 
 ## GET methods
 
