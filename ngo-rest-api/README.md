@@ -187,6 +187,10 @@ d5b8bc766e0ada43db013643fc17f397eacdb3e95e22ef48271ad5fb33e5abe7
 
 curl -s -X GET   "http://localhost:3000/channels/mychannel"  -H "content-type: application/json"
 
+# Testing
+We can test the node application locally or on an EC2 instance. When testing on an EC2 instance 
+we need to keep the REST API node application running after we exit the SSH session. I use PM2 to do 
+this. `pm2 start app.js` will keep the app running, and logs can be found in `~/.pm2/logs`
 
 # Troubleshooting
 

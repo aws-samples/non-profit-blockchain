@@ -3,10 +3,10 @@
 # for the organisations in the Fabric network.
 
 #REPODIR points to this repo.
-REPODIR=~/non-profit-blockchain
+REPODIR=~/Documents/apps/non-profit-blockchain
 #CERTDIR points to the location of the fabric-samples repo. If you are using this to run Fabric, the crypto information
 #would have been generated in the balance-transfer/crypto-config folder.
-CERTDIR=~/fabric-samples
+CERTDIR=~/Documents/apps/fabric-samples
 
 # Installing gawk. It should already exist on Linux, but probably not on Mac
 # ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null
@@ -34,6 +34,10 @@ cp client-org2.yaml $REPODIR/tmp/connection-profile/org2
 # sed -e "s/%INSERT_ORG%/Org1/g" -e "s/%INSERT_ORG_LOWERCASE%/org1/g" $REPODIR/tmp/connection-profile/client-ngo-connection-profile.json > $REPODIR/tmp/connection-profile/org1/client-ngo-connection-profile-org1.json
 # sed -e "s/%INSERT_ORG%/Org2/g" -e "s/%INSERT_ORG_LOWERCASE%/org2/g" $REPODIR/tmp/connection-profile/client-ngo-connection-profile.json > $REPODIR/tmp/connection-profile/org2/client-ngo-connection-profile-org2.json
 
-sed -i "s|%REPODIR%|$CERTDIR|g"  $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -e "s|%REPODIR%|$CERTDIR|g" ngo-connection-profile.yaml > $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
+else
+    sed -i "s|%REPODIR%|$CERTDIR|g"  $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
+fi 
 
 ls -lR $REPODIR/tmp/connection-profile

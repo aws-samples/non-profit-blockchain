@@ -4,8 +4,8 @@ set +e
 echo To test, run the API server as per the instructions in the README, then execute this script on the command line
 export ENDPOINT=Fabric-ELB-205962472.us-west-2.elb.amazonaws.com
 export PORT=80
-#export ENDPOINT=localhost
-#export PORT=3000
+export ENDPOINT=localhost
+export PORT=3000
 echo connecting to server: $ENDPOINT:$PORT
 echo
 echo 'Register User'
@@ -37,6 +37,9 @@ echo 'Query all donors'
 echo
 curl -s -X GET http://${ENDPOINT}:${PORT}/donor -H 'content-type: application/json'
 echo
+echo 'Query specific donors'
+echo
+curl -s -X GET http://${ENDPOINT}:${PORT}/donor/${DONOR1} -H 'content-type: application/json'
 echo
 echo 'Create NGO'
 echo
@@ -285,4 +288,4 @@ echo "Transaction ID is $TRX_ID"
 echo
 echo 'Query SpendAllocations for Donation'
 echo
-curl -s -X GET http://${ENDPOINT}:${PORT}/spendallocation -H 'content-type: application/json'
+curl -s -X GET http://${ENDPOINT}:${PORT}/spendallocation?donationId=${DONATION1} -H 'content-type: application/json'

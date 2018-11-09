@@ -757,7 +757,15 @@ let Chaincode = class {
    * Retrieves the Fabric block and transaction details for a key or an array of keys
    * 
    * @param {*} stub 
-   * @param {*} args 
+   * @param {*} args - JSON as follows:
+   * [
+   *    {"spendAllocationIds":[
+   *          "a207aa1e124cc7cb350e9261018a9bd05fb4e0f7dcac5839bdcd0266af7e531d-1",
+   *          "b368be1c26a9da0db1088faca912fdbc3c7d99312e4d01a3f9ba955b2e8c5d1e-1",
+   *          "e09d47c3d08c3f68b9a8253bea87061a1245f35cdd2a21b7401ba268854c5b89-1"
+   *    ]}
+   * ]
+   * 
    */
   async queryHistoryForKey(stub, args) {
     console.log('============= START : queryHistoryForKey ===========');
@@ -768,10 +776,22 @@ let Chaincode = class {
     let key = 'spendAllocation' + json['spendAllocationIds'][0];
     console.log('##### queryHistoryForKey key: ' + key);
     let historyIterator = await stub.getHistoryForKey(key);
+    let history = [];
     while (true) {
       let historyRecord = await historyIterator.next();
-      console.log(util.inspect(historyRecord));
-      let history = "";
+      console.log('##### queryHistoryForKey historyRecord: ' + util.inspect(historyRecord));
+      if (historyRecord.value && historyRecord.value.value.toString()) {
+        let jsonRes = {};
+        console.log('##### queryHistoryForKey historyRecord.value.value: ' + historyRecord.value.value.toString('utf8'));
+        jsonRes.Key = historyRecord.value.key;
+        try {
+          jsonRes.Record = JSON.parse(historyRecord.value.value.toString('utf8'));
+        } catch (err) {
+          console.log('##### queryHistoryForKey error: ' + err);
+          jsonRes.Record = historyRecord.value.value.toString('utf8');
+        }
+        history.push(jsonRes);
+      }
       if (historyRecord.done) {
         await historyIterator.close();
         console.log('##### queryHistoryForKey all results: ' + JSON.stringify(history));
@@ -793,6 +813,5 @@ let Chaincode = class {
     let queryString = '{"selector": {"docType": "spendAllocation"}}';
     return queryByString(stub, queryString);
   }
-
 }
 shim.start(new Chaincode());

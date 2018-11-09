@@ -19,11 +19,11 @@ var helper = require('./helper.js');
 var logger = helper.getLogger('startBlockListener');
 
 var startBlockListener = async function(channelName, username, orgName, websocketServer) {
-	logger.debug(util.format('\n============ START startBlockListener on channel %s ============\n', channelName));
+	logger.info(util.format('\n============ START startBlockListener on channel %s ============\n', channelName));
 	try {
 		// first setup the client for this org
 		var client = await helper.getClientForOrg(orgName, username);
-		logger.debug('##### startBlockListener - Successfully got the fabric client for the organization "%s"', orgName);
+		logger.info('##### startBlockListener - Successfully got the fabric client for the organization "%s"', orgName);
 		var channel = client.getChannel(channelName);
 		if(!channel) {
 			let message = util.format('##### startBlockListener - Channel %s was not defined in the connection profile', channelName);
@@ -38,7 +38,7 @@ var startBlockListener = async function(channelName, username, orgName, websocke
 		// of the connection profile. Peers defined in the organization that have the eventSource 
 		// set to true will be added to the list.
 		let eventHubs = channel.getChannelEventHubsForOrg();
-		logger.debug('##### startBlockListener - found %s eventhubs for organization %s', eventHubs.length, orgName);
+		logger.info('##### startBlockListener - found %s eventhubs for organization %s', eventHubs.length, orgName);
 
 		eventHubs.forEach((eh) => {
 			eh.registerBlockEvent((block) => {
@@ -74,7 +74,7 @@ var startBlockListener = async function(channelName, username, orgName, websocke
 			});
 			eh.connect(true);
 		})
-		logger.debug(util.format('\n============ END startBlockListener - listener on channel %s started ============\n', channelName));
+		logger.info(util.format('\n============ END startBlockListener - listener on channel %s started ============\n', channelName));
 
 	} catch (error) {
 		logger.error('##### startBlockListener - Error setting up client and registering block listener: ' + error.stack ? error.stack : error);

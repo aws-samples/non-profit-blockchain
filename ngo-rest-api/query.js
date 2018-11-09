@@ -21,7 +21,7 @@ var queryChaincode = async function(peers, channelName, chaincodeName, args, fcn
 	try {
 		// first setup the client for this org
 		var client = await helper.getClientForOrg(org_name, username);
-		logger.debug('============ START queryChaincode - Successfully got the fabric client for the organization "%s"', org_name);
+		logger.info('============ START queryChaincode - Successfully got the fabric client for the organization "%s"', org_name);
 		var channel = client.getChannel(channelName);
 		if(!channel) {
 			let message = util.format('##### queryChaincode - Channel %s was not defined in the connection profile', channelName);
@@ -37,7 +37,7 @@ var queryChaincode = async function(peers, channelName, chaincodeName, args, fcn
 			args: [JSON.stringify(args)]
 		};
 
-		logger.debug('##### queryChaincode - Query request to Fabric %s', JSON.stringify(request));
+		logger.info('##### queryChaincode - Query request to Fabric %s', JSON.stringify(request));
 		let response_payloads = await channel.queryByChaincode(request);
         let ret = [];
 		if (response_payloads) {
@@ -65,7 +65,7 @@ var getBlockByNumber = async function(peer, channelName, blockNumber, username, 
 	try {
 		// first setup the client for this org
 		var client = await helper.getClientForOrg(org_name, username);
-		logger.debug('Successfully got the fabric client for the organization "%s"', org_name);
+		logger.info('Successfully got the fabric client for the organization "%s"', org_name);
 		var channel = client.getChannel(channelName);
 		if(!channel) {
 			let message = util.format('Channel %s was not defined in the connection profile', channelName);
@@ -75,7 +75,7 @@ var getBlockByNumber = async function(peer, channelName, blockNumber, username, 
 
 		let response_payload = await channel.queryBlock(parseInt(blockNumber, peer));
 		if (response_payload) {
-			logger.debug(response_payload);
+			logger.info(response_payload);
 			return response_payload;
 		} else {
 			logger.error('response_payload is null');
@@ -90,7 +90,7 @@ var getTransactionByID = async function(peer, channelName, trxnID, username, org
 	try {
 		// first setup the client for this org
 		var client = await helper.getClientForOrg(org_name, username);
-		logger.debug('Successfully got the fabric client for the organization "%s"', org_name);
+		logger.info('Successfully got the fabric client for the organization "%s"', org_name);
 		var channel = client.getChannel(channelName);
 		if(!channel) {
 			let message = util.format('Channel %s was not defined in the connection profile', channelName);
@@ -100,7 +100,7 @@ var getTransactionByID = async function(peer, channelName, trxnID, username, org
 
 		let response_payload = await channel.queryTransaction(trxnID, peer);
 		if (response_payload) {
-			logger.debug(response_payload);
+			logger.info(response_payload);
 			return response_payload;
 		} else {
 			logger.error('response_payload is null');
@@ -115,7 +115,7 @@ var getBlockByHash = async function(peer, channelName, hash, username, org_name)
 	try {
 		// first setup the client for this org
 		var client = await helper.getClientForOrg(org_name, username);
-		logger.debug('Successfully got the fabric client for the organization "%s"', org_name);
+		logger.info('Successfully got the fabric client for the organization "%s"', org_name);
 		var channel = client.getChannel(channelName);
 		if(!channel) {
 			let message = util.format('Channel %s was not defined in the connection profile', channelName);
@@ -125,7 +125,7 @@ var getBlockByHash = async function(peer, channelName, hash, username, org_name)
 
 		let response_payload = await channel.queryBlockByHash(Buffer.from(hash,'hex'), peer);
 		if (response_payload) {
-			logger.debug(response_payload);
+			logger.info(response_payload);
 			return response_payload;
 		} else {
 			logger.error('response_payload is null');
@@ -140,7 +140,7 @@ var getChainInfo = async function(peer, channelName, username, org_name) {
 	try {
 		// first setup the client for this org
 		var client = await helper.getClientForOrg(org_name, username);
-		logger.debug('Successfully got the fabric client for the organization "%s"', org_name);
+		logger.info('Successfully got the fabric client for the organization "%s"', org_name);
 		var channel = client.getChannel(channelName);
 		if(!channel) {
 			let message = util.format('Channel %s was not defined in the connection profile', channelName);
@@ -150,7 +150,7 @@ var getChainInfo = async function(peer, channelName, username, org_name) {
 
 		let response_payload = await channel.queryInfo();
 		if (response_payload) {
-			logger.debug(response_payload);
+			logger.info(response_payload);
 			return response_payload;
 		} else {
 			logger.error('response_payload is null');
@@ -166,7 +166,7 @@ var getInstalledChaincodes = async function(peer, channelName, type, username, o
 	try {
 		// first setup the client for this org
 		var client = await helper.getClientForOrg(org_name, username);
-		logger.debug('Successfully got the fabric client for the organization "%s"', org_name);
+		logger.info('Successfully got the fabric client for the organization "%s"', org_name);
 
 		let response = null
 		if (type === 'installed') {
@@ -182,13 +182,13 @@ var getInstalledChaincodes = async function(peer, channelName, type, username, o
 		}
 		if (response) {
 			if (type === 'installed') {
-				logger.debug('<<< Installed Chaincodes >>>');
+				logger.info('<<< Installed Chaincodes >>>');
 			} else {
-				logger.debug('<<< Instantiated Chaincodes >>>');
+				logger.info('<<< Instantiated Chaincodes >>>');
 			}
 			var details = [];
 			for (let i = 0; i < response.chaincodes.length; i++) {
-				logger.debug('name: ' + response.chaincodes[i].name + ', version: ' +
+				logger.info('name: ' + response.chaincodes[i].name + ', version: ' +
 					response.chaincodes[i].version + ', path: ' + response.chaincodes[i].path
 				);
 				details.push('name: ' + response.chaincodes[i].name + ', version: ' +
@@ -209,16 +209,16 @@ var getChannels = async function(peer, username, org_name) {
 	try {
 		// first setup the client for this org
 		var client = await helper.getClientForOrg(org_name, username);
-		logger.debug('Successfully got the fabric client for the organization "%s"', org_name);
+		logger.info('Successfully got the fabric client for the organization "%s"', org_name);
 
 		let response = await client.queryChannels(peer);
 		if (response) {
-			logger.debug('<<< channels >>>');
+			logger.info('<<< channels >>>');
 			var channelNames = [];
 			for (let i = 0; i < response.channels.length; i++) {
 				channelNames.push('channel id: ' + response.channels[i].channel_id);
 			}
-			logger.debug(channelNames);
+			logger.info(channelNames);
 			return response;
 		} else {
 			logger.error('response_payloads is null');

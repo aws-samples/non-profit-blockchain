@@ -49,7 +49,7 @@ async function getClient (userOrg, username) {
 		if(!user) {
 			throw new Error(util.format('##### getClient - User was not found :', username));
 		} else {
-			logger.debug('##### getClient - User %s was found to be registered and enrolled', username);
+			logger.info('##### getClient - User %s was found to be registered and enrolled', username);
 		}
 	}
     logger.info('============ END getClient for user org %s, user %s', userOrg, username);
@@ -75,9 +75,9 @@ var getRegisteredUser = async function(username, userOrg) {
 				enrollmentID: username,
 				affiliation: userOrg.toLowerCase() + '.department1'
 			}, adminUserObj);
-			logger.debug('##### getRegisteredUser - Successfully got the secret for user %s',username);
+			logger.info('##### getRegisteredUser - Successfully got the secret for user %s',username);
 			user = await client.setUserContext({username:username, password:secret});
-			logger.debug('##### getRegisteredUser - Successfully enrolled username %s  and setUserContext on the client object', username);
+			logger.info('##### getRegisteredUser - Successfully enrolled username %s  and setUserContext on the client object', username);
 		}
 		if(user && user.isEnrolled) {
             var response = {

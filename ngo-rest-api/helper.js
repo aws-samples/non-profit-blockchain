@@ -24,7 +24,7 @@ var hfc = require('fabric-client');
 hfc.setLogger(logger);
 
 async function getClientForOrg (userorg, username) {
-	logger.debug('============ START getClientForOrg for org %s and user %s', userorg, username);
+	logger.info('============ START getClientForOrg for org %s and user %s', userorg, username);
     let config = '../tmp/connection-profile/ngo-connection-profile.yaml';
     let orgLower = userorg.toLowerCase();
     let clientConfig = '../tmp/connection-profile/' + orgLower + '/client-' + orgLower + '.yaml';
@@ -49,10 +49,10 @@ async function getClientForOrg (userorg, username) {
 		if(!user) {
 			throw new Error(util.format('##### getClient - User was not found :', username));
 		} else {
-			logger.debug('##### getClient - User %s was found to be registered and enrolled', username);
+			logger.info('##### getClient - User %s was found to be registered and enrolled', username);
 		}
 	}
-	logger.debug('============ END getClientForOrg for org %s and user %s \n\n', userorg, username);
+	logger.info('============ END getClientForOrg for org %s and user %s \n\n', userorg, username);
 
 	return client;
 }
@@ -60,7 +60,7 @@ async function getClientForOrg (userorg, username) {
 var getRegisteredUser = async function(username, userOrg, isJson) {
 	try {
 		var client = await getClientForOrg(userOrg);
-		logger.debug('============ START getRegisteredUser - Successfully initialized the credential stores');
+		logger.info('============ START getRegisteredUser - Successfully initialized the credential stores');
 			// client can now act as an agent for organization Org1
 			// first check to see if the user is already enrolled
 		var user = await client.getUserContext(username, true);
@@ -80,9 +80,9 @@ var getRegisteredUser = async function(username, userOrg, isJson) {
 				enrollmentID: username,
 				affiliation: userOrg.toLowerCase() + '.department1'
 			}, adminUserObj);
-			logger.debug('##### getRegisteredUser - Successfully got the secret for user %s',username);
+			logger.info('##### getRegisteredUser - Successfully got the secret for user %s',username);
 			user = await client.setUserContext({username:username, password:secret});
-			logger.debug('##### getRegisteredUser - Successfully enrolled username %s  and setUserContext on the client object', username);
+			logger.info('##### getRegisteredUser - Successfully enrolled username %s  and setUserContext on the client object', username);
 		}
 		if(user && user.isEnrolled) {
 			if (isJson && isJson === true) {

@@ -19,14 +19,14 @@ var helper = require('./helper.js');
 var logger = helper.getLogger('invoke-chaincode');
 
 var invokeChaincode = async function(peerNames, channelName, chaincodeName, args, fcn, username, org_name) {
-	logger.debug(util.format('\n============ invokeChaincode - chaincode %s on the channel \'%s\' for org: &s and transaction ID: %s\n',
+	logger.info(util.format('\n============ invokeChaincode - chaincode %s on the channel \'%s\' for org: &s and transaction ID: %s\n',
 		chaincodeName, channelName, org_name, tx_id_string));
 	var error_message = null;
 	var tx_id_string = null;
 	try {
 		// first setup the client for this org
 		var client = await helper.getClientForOrg(org_name, username);
-		logger.debug('##### invokeChaincode - Successfully got the fabric client for the organization "%s"', org_name);
+		logger.info('##### invokeChaincode - Successfully got the fabric client for the organization "%s"', org_name);
 		var channel = client.getChannel(channelName);
 		if(!channel) {
 			let message = util.format('##### invokeChaincode - Channel %s was not defined in the connection profile', channelName);
@@ -47,7 +47,7 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, args
 			txId: tx_id
 		};
 
-		logger.debug('##### invokeChaincode - Invoke transaction request to Fabric %s', JSON.stringify(request));
+		logger.info('##### invokeChaincode - Invoke transaction request to Fabric %s', JSON.stringify(request));
 		let results = await channel.sendTransactionProposal(request);
 
 		// the returned object has both the endorsement results
@@ -82,7 +82,7 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, args
 			var promises = [];
 			let event_hubs = channel.getChannelEventHubsForOrg();
 			event_hubs.forEach((eh) => {
-				logger.debug('##### invokeChaincode - invokeEventPromise - setting up event');
+				logger.info('##### invokeChaincode - invokeEventPromise - setting up event');
 				let invokeEventPromise = new Promise((resolve, reject) => {
 					let event_timeout = setTimeout(() => {
 						let message = 'REQUEST_TIMEOUT:' + eh.getPeerAddr();
@@ -129,25 +129,25 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, args
 			// are ready for the orderering and committing
 			promises.push(sendPromise);
 			let results = await Promise.all(promises);
-			logger.debug(util.format('##### invokeChaincode ------->>> R E S P O N S E : %j', results));
+			logger.info(util.format('##### invokeChaincode ------->>> R E S P O N S E : %j', results));
 			let response = results.pop(); //  orderer results are last in the results
 			if (response.status === 'SUCCESS') {
 				logger.info('##### invokeChaincode - Successfully sent transaction to the orderer.');
 			} else {
 				error_message = util.format('##### invokeChaincode - Failed to order the transaction. Error code: %s',response.status);
-				logger.debug(error_message);
+				logger.info(error_message);
 			}
 
 			// now see what each of the event hubs reported
 			for(let i in results) {
 				let event_hub_result = results[i];
 				let event_hub = event_hubs[i];
-				logger.debug('##### invokeChaincode - Event results for event hub :%s',event_hub.getPeerAddr());
+				logger.info('##### invokeChaincode - Event results for event hub :%s',event_hub.getPeerAddr());
 				if(typeof event_hub_result === 'string') {
-					logger.debug('##### invokeChaincode - ' + event_hub_result);
+					logger.info('##### invokeChaincode - ' + event_hub_result);
 				} else {
 					if(!error_message) error_message = event_hub_result.toString();
-					logger.debug('##### invokeChaincode - ' + event_hub_result.toString());
+					logger.info('##### invokeChaincode - ' + event_hub_result.toString());
 				}
 			}
 		} else {
@@ -155,7 +155,7 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, args
 				proposalResponses[0].status + ', ' + 
 				proposalResponses[0].message + '\n' +  
 				proposalResponses[0].stack);
-			logger.debug(error_message);
+			logger.info(error_message);
 		}
 	} catch (error) {
 		logger.error('##### invokeChaincode - Failed to invoke due to error: ' + error.stack ? error.stack : error);
