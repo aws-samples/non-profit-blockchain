@@ -52,13 +52,13 @@ var startBlockListener = async function(channelName, username, orgName, websocke
 				logger.info('##### startBlockListener - Number of transactions in block: %s', block.data.data.length);
 				var blockMsg = {
 					blockNumber: block.header.number,
-					txInBlock: block.data.data.length,
-					txCount: []
+					txCount: block.data.data.length,
+					txInBlock: []
 				}
 				let txCount = 0;
 				block.data.data.forEach((tx) => {
 					logger.info('##### startBlockListener - Transaction ID: %s', tx.payload.header.channel_header.tx_id);
-					blockMsg['txCount'][txCount] = tx.payload.header.channel_header.tx_id;
+					blockMsg['txInBlock'][txCount] = tx.payload.header.channel_header.tx_id;
 					txCount++;
 				})
 				// Broadcast the new block to all websocket listeners

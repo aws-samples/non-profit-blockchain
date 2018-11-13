@@ -19,11 +19,11 @@ var util = require('util');
 var helper = require('./connection.js');
 var logger = helper.getLogger('Query');
 
-var queryChaincode = async function(peers, channelName, chaincodeName, args, fcn, username, org_name) {
+var queryChaincode = async function(peers, channelName, chaincodeName, args, fcn, username, orgName) {
 	try {
-		// first setup the client for this org
-		var client = await helper.getClientForOrg(org_name, username);
-		logger.info('============ START queryChaincode - Successfully got the fabric client for the organization "%s"', org_name);
+		// setup the client for this org
+		var client = await helper.getClientForOrg(orgName, username);
+		logger.info('============ START queryChaincode - Successfully got the fabric client for the organization "%s"', orgName);
 		var channel = client.getChannel(channelName);
 		if(!channel) {
 			let message = util.format('##### queryChaincode - Channel %s was not defined in the connection profile', channelName);
@@ -40,16 +40,24 @@ var queryChaincode = async function(peers, channelName, chaincodeName, args, fcn
 		};
 
 		logger.info('##### queryChaincode - Query request to Fabric %s', JSON.stringify(request));
-		let response_payloads = await channel.queryByChaincode(request);
+		let responses = await channel.queryByChaincode(request);
         let ret = [];
-		if (response_payloads) {
-            // you may received multiple response_payloads if you passed in multiple peers. For example,
+		if (responses) {
+            // you may receive multiple responses if you passed in multiple peers. For example,
             // if the targets : peers in the request above contained 2 peers, you should get 2 responses
-			for (let i = 0; i < response_payloads.length; i++) {
-                logger.info('##### queryChaincode - result of query: ' + response_payloads[i].toString('utf8') + '\n');
-            }
+			for (let i = 0; i < responses.length; i++) {
+                logger.info('##### queryChaincode - result of query: ' + responses[i].toString('utf8') + '\n');
+			}
+			// check for error
+			let response = responses[0].toString('utf8');
+			logger.info('##### queryChaincode - type of response %s', typeof response);
+			if (responses[0].toString('utf8').indexOf("Error: transaction returned with failure") != -1) {
+				let message = util.format('##### queryChaincode - error in query result: %s', responses[0].toString('utf8'));
+				logger.error(message);
+				throw new Error(message);	
+			}
             // we will only use the first response. We strip out the Fabric key and just return the payload
-            let json = JSON.parse(response_payloads[0].toString('utf8'));
+            let json = JSON.parse(responses[0].toString('utf8'));
 			logger.info('##### queryChaincode - Query json %s', util.inspect(json));
 			if (Array.isArray(json)) {
 				for (let key in json) {
@@ -65,11 +73,13 @@ var queryChaincode = async function(peers, channelName, chaincodeName, args, fcn
 				ret.push(json); 
 			}
  			return ret;
-		} else {
-			logger.error('##### queryChaincode - result of query, response_payloads is null');
-			return 'response_payloads is null';
+		} 
+		else {
+			logger.error('##### queryChaincode - result of query, responses is null');
+			return 'responses is null';
 		}
-	} catch(error) {
+	} 
+	catch(error) {
 		logger.error('##### queryChaincode - Failed to query due to error: ' + error.stack ? error.stack : error);
 		return error.toString();
 	}

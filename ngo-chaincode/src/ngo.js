@@ -719,6 +719,22 @@ let Chaincode = class {
   }
 
   /**
+   * Retrieves spend for a specfic ngo
+   * 
+   * @param {*} stub 
+   * @param {*} args 
+   */
+  async querySpendForNGO(stub, args) {
+    console.log('============= START : querySpendForNGO ===========');
+    console.log('##### querySpendForNGO arguments: ' + JSON.stringify(args));
+
+    // args is passed as a JSON string
+    let json = JSON.parse(args);
+    let queryString = '{"selector": {"docType": "spend", "ngoRegistrationNumber": "' + json['ngoRegistrationNumber'] + '"}}';
+    return queryByString(stub, queryString);
+  }
+
+  /**
    * Retrieves all spend
    * 
    * @param {*} stub 
@@ -869,7 +885,7 @@ let Chaincode = class {
     console.log('##### queryDonorRatingsForNGO key: ' + key);
     return queryByKey(stub, key);
   }
-  
+
   /************************************************************************************************
    * 
    * Blockchain related functions 

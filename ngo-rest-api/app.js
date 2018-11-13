@@ -35,7 +35,7 @@ var app = express();
 var cors = require('cors');
 var hfc = require('fabric-client');
 
-var helper = require('./connection.js');
+var connection = require('./connection.js');
 var query = require('./query.js');
 var invoke = require('./invoke.js');
 var blockListener = require('./blocklistener.js');
@@ -123,7 +123,7 @@ app.post('/users', awaitHandler(async (req, res) => {
 	logger.info('##### End point : /users');
 	logger.info('##### POST on Users- username : ' + username);
 	logger.info('##### POST on Users - userorg  : ' + orgName);
-	let response = await helper.getRegisteredUser(username, orgName, true);
+	let response = await connection.getRegisteredUser(username, orgName, true);
 	logger.info('##### POST on Users - returned from registering the username %s for organization %s', username, orgName);
     logger.info('##### POST on Users - getRegisteredUser response secret %s', response.secret);
     logger.info('##### POST on Users - getRegisteredUser response secret %s', response.message);
@@ -515,9 +515,9 @@ app.post('/ratings', awaitHandler(async (req, res) => {
 }));
 
 // GET a specific Rating
-app.get('/ratings/', awaitHandler(async (req, res) => {
+app.get('/ratings/:ngoRegistrationNumber/:donorUserName', awaitHandler(async (req, res) => {
 	logger.info('================ GET on Rating by ID');
-	logger.info('Rating ID : ' + req.params);
+	logger.info('Rating ID : ' + util.inspect(req.params));
 	let args = req.params;
 	let fcn = "queryDonorRatingsForNGO";
 

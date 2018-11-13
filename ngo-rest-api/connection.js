@@ -52,10 +52,10 @@ async function getClientForOrg (userorg, username) {
 	return client;
 }
 
-var getRegisteredUser = async function(username, userOrg, isJson) {
+var getRegisteredUser = async function(username, userorg, isJson) {
 	try {
 		logger.info('============ START getRegisteredUser - for org %s and user %s', userorg, username);
-		var client = await getClientForOrg(userOrg);
+		var client = await getClientForOrg(userorg);
 		var user = await client.getUserContext(username, true);
 		if (user && user.isEnrolled()) {
 			logger.info('##### getRegisteredUser - User %s already enrolled', username);
@@ -71,7 +71,7 @@ var getRegisteredUser = async function(username, userOrg, isJson) {
 			logger.info('##### getRegisteredUser - Got caClient %s', util.inspect(admins));
 			let secret = await caClient.register({
 				enrollmentID: username,
-				affiliation: userOrg.toLowerCase() + '.department1'
+				affiliation: userorg.toLowerCase() + '.department1'
 			}, adminUserObj);
 			logger.info('##### getRegisteredUser - Successfully got the secret for user %s', username);
 			user = await client.setUserContext({username:username, password:secret});
