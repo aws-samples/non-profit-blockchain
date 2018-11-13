@@ -1,7 +1,7 @@
 ---
-name: "balance-transfer-org2"
+name: "ngo-org2"
 x-type: "hlfv1"
-description: "Balance Transfer Network - client definition for Org2"
+description: "NGO client definition for Org2"
 version: "1.0"
 client:
   organization: Org2

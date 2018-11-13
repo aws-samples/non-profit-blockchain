@@ -65,7 +65,8 @@ async function queryByString(stub, queryString) {
       jsonRes.Key = res.value.key;
       try {
         jsonRes.Record = JSON.parse(res.value.value.toString('utf8'));
-      } catch (err) {
+      } 
+      catch (err) {
         console.log('##### queryByString error: ' + err);
         jsonRes.Record = res.value.value.toString('utf8');
       }
@@ -93,40 +94,40 @@ async function queryByString(stub, queryString) {
  *    - Allocate the spend between all the donations and create SPENDALLOCATION records
  * 
  * @param {*} spend - the spend amount to be recorded. This will be JSON, as follows:
- * 
+ * {
  *   "docType": "spend",
  *   "spendId": "1234",
  *   "spendAmount": 100,
  *   "spendDate": "ß2018-09-20T12:41:59.582Z",
  *   "spendDescription": "Delias Dainty Delights",
- *   "ngo": "1234"
- * 
+ *   "ngoRegistrationNumber": "1234"
+ * }
  */
 async function allocateSpend(stub, spend) {
   console.log('============= START : allocateSpend ===========');
   console.log('##### allocateSpend - Spend received: ' + JSON.stringify(spend));
 
-  // validate we have a valid SPEND object
+  // validate we have a valid SPEND object and a valid amount
   if (!(spend && spend['spendAmount'] && typeof spend['spendAmount'] === 'number' && isFinite(spend['spendAmount']))) {
     throw new Error('##### allocateSpend - Spend Amount is not a valid number: ' + spend['spendAmount']);   
   }
-  // validate we have a valid SPEND object
+  // validate we have a valid SPEND object and a valid SPEND ID
   if (!(spend && spend['spendId'])) {
     throw new Error('##### allocateSpend - Spend Id is required but does not exist in the spend message');   
   }
 
   // validate that we have a valid NGO
-  let ngo = spend['ngo'];
+  let ngo = spend['ngoRegistrationNumber'];
   let ngoKey = 'ngo' + ngo;
   let ngoQuery = await queryByKey(stub, ngoKey);
   if (!ngoQuery.toString()) {
-    throw new Error('##### allocateSpend - Cannot create spend allocation record as the NGO does not exist: ' + json['ngo']);
+    throw new Error('##### allocateSpend - Cannot create spend allocation record as the NGO does not exist: ' + json['ngoRegistrationNumber']);
   }
 
   // first, get the total amount of donations donated to this NGO
   let totalDonations = 0;
   const donationMap = new Map();
-  let queryString = '{"selector": {"docType": "donation", "ngo": "' + ngo + '"}}';
+  let queryString = '{"selector": {"docType": "donation", "ngoRegistrationNumber": "' + ngo + '"}}';
   let donationsForNGO = await queryByString(stub, queryString);
   console.log('##### allocateSpend - allocateSpend - getDonationsForNGO: ' + donationsForNGO);
   donationsForNGO = JSON.parse(donationsForNGO.toString());
@@ -134,7 +135,7 @@ async function allocateSpend(stub, spend) {
 
   // store all donations for the NGO in a map. Each entry in the map will look as follows:
   //
-  // {"Key":"donation2211","Record":{"docType":"donation","donationAmount":100,"donationDate":"2018-09-20T12:41:59.582Z","donationId":"2211","donor":"edge","ngo":"6322"}}
+  // {"Key":"donation2211","Record":{"docType":"donation","donationAmount":100,"donationDate":"2018-09-20T12:41:59.582Z","donationId":"2211","donorUserName":"edge","ngoRegistrationNumber":"6322"}}
   for (let n = 0; n < donationsForNGO.length; n++) {
     let donation = donationsForNGO[n];
     console.log('##### allocateSpend - getDonationsForNGO Donation: ' + JSON.stringify(donation));
@@ -151,22 +152,22 @@ async function allocateSpend(stub, spend) {
   // next, get the spend by Donation, i.e. the amount of each Donation that has already been spent
   let totalSpend = 0;
   const donationSpendMap = new Map();
-  queryString = '{"selector": {"docType": "spendAllocation", "ngo": "' + ngo + '"}}';
+  queryString = '{"selector": {"docType": "spendAllocation", "ngoRegistrationNumber": "' + ngo + '"}}';
   let spendAllocations = await queryByString(stub, queryString);
   spendAllocations = JSON.parse(spendAllocations.toString());
   for (let n = 0; n < spendAllocations.length; n++) {
     let spendAllocation = spendAllocations[n]['Record'];
     totalSpend += spendAllocation['spendAllocationAmount'];
     // store the spend made per Donation
-    if (donationSpendMap.has(spendAllocation['donation'])) {
-      let spendAmt = donationSpendMap.get(spendAllocation['donation']);
+    if (donationSpendMap.has(spendAllocation['donationId'])) {
+      let spendAmt = donationSpendMap.get(spendAllocation['donationId']);
       spendAmt += spendAllocation['spendAllocationAmount'];
-      donationSpendMap.set(spendAllocation['donation'], spendAmt);
-      console.log('##### allocateSpend - donationSpendMap - updating donation entry for donation ID: ' + spendAllocation['donation'] + ' amount: ' + spendAllocation['spendAllocationAmount'] + ' total amt: ' + spendAmt);
+      donationSpendMap.set(spendAllocation['donationId'], spendAmt);
+      console.log('##### allocateSpend - donationSpendMap - updating donation entry for donation ID: ' + spendAllocation['donationId'] + ' amount: ' + spendAllocation['spendAllocationAmount'] + ' total amt: ' + spendAmt);
     }
     else {
-      donationSpendMap.set(spendAllocation['donation'], spendAllocation['spendAllocationAmount']);
-      console.log('##### allocateSpend - donationSpendMap - adding new donation entry for donation ID: ' + spendAllocation['donation'] + ' amount: ' + spendAllocation['spendAllocationAmount']);
+      donationSpendMap.set(spendAllocation['donationId'], spendAllocation['spendAllocationAmount']);
+      console.log('##### allocateSpend - donationSpendMap - adding new donation entry for donation ID: ' + spendAllocation['donationId'] + ' amount: ' + spendAllocation['spendAllocationAmount']);
     }
   }
   console.log('##### allocateSpend - Total spend for this ngo is: ' + totalSpend);
@@ -221,7 +222,7 @@ async function allocateSpend(stub, spend) {
     // 
     // all donations for the NGO are in donationMap. Each entry in the map will look as follows:
     //
-    // {"Key":"donation2211","Record":{"docType":"donation","donationAmount":100,"donationDate":"2018-09-20T12:41:59.582Z","donationId":"2211","donor":"edge","ngo":"6322"}}
+    // {"Key":"donation2211","Record":{"docType":"donation","donationAmount":100,"donationDate":"2018-09-20T12:41:59.582Z","donationId":"2211","donorUserName":"edge","ngoRegistrationNumber":"6322"}}
     numberOfDonations = 0;
     for (let donation of donationMap) {
       console.log('##### allocateSpend - Donation record, key is: ' +  donation[0] + ' value is: ' + JSON.stringify(donation[1]));
@@ -262,8 +263,8 @@ async function allocateSpend(stub, spend) {
     //   "spendAllocationAmount":38.5,
     //   "spendAllocationDate":"2018-09-20T12:41:59.582Z",
     //   "spendAllocationDescription":"Peter Pipers Poulty Portions for Pets",
-    //   "donation":"FFF6A68D-DB19-4CD3-97B0-01C1A793ED3B",
-    //   "ngo":"D0884B20-385D-489E-A9FD-2B6DBE5FEA43"
+    //   "donationId":"FFF6A68D-DB19-4CD3-97B0-01C1A793ED3B",
+    //   "ngoRegistrationNumber":"D0884B20-385D-489E-A9FD-2B6DBE5FEA43"
     // }
 
     for (let donation of donationMap) {
@@ -311,8 +312,8 @@ async function allocateSpend(stub, spend) {
         spendAllocationAmount: amountAllocatedToDonation,
         spendAllocationDate: spend['spendDate'],
         spendAllocationDescription: spend['spendDescription'],
-        donation: donationId,
-        ngo: ngo
+        donationId: donationId,
+        ngoRegistrationNumber: ngo
       }; 
 
       console.log('##### allocateSpend - creating spendAllocationRecord record: ' + JSON.stringify(spendAllocationRecord));
@@ -550,8 +551,8 @@ let Chaincode = class {
    *    "donationId":"2211",
    *    "donationAmount":100,
    *    "donationDate":"2018-09-20T12:41:59.582Z",
-   *    "donor":"edge",
-   *    "ngo":"6322"
+   *    "donorUserName":"edge",
+   *    "ngoRegistrationNumber":"6322"
    * }
    */
   async createDonation(stub, args) {
@@ -566,17 +567,17 @@ let Chaincode = class {
     console.log('##### createDonation donation: ' + JSON.stringify(json));
 
     // Confirm the NGO exists
-    let ngoKey = 'ngo' + json['ngo'];
+    let ngoKey = 'ngo' + json['ngoRegistrationNumber'];
     let ngoQuery = await stub.getState(ngoKey);
     if (!ngoQuery.toString()) {
-      throw new Error('##### createDonation - Cannot create donation as the NGO does not exist: ' + json['ngo']);
+      throw new Error('##### createDonation - Cannot create donation as the NGO does not exist: ' + json['ngoRegistrationNumber']);
     }
 
     // Confirm the donor exists
-    let donorKey = 'donor' + json['donor'];
+    let donorKey = 'donor' + json['donorUserName'];
     let donorQuery = await stub.getState(donorKey);
     if (!donorQuery.toString()) {
-      throw new Error('##### createDonation - Cannot create donation as the Donor does not exist: ' + json['donor']);
+      throw new Error('##### createDonation - Cannot create donation as the Donor does not exist: ' + json['donorUserName']);
     }
 
     // Check if the Donation already exists
@@ -607,6 +608,38 @@ let Chaincode = class {
   }
 
   /**
+   * Retrieves donations for a specfic donor
+   * 
+   * @param {*} stub 
+   * @param {*} args 
+   */
+  async queryDonationsForDonor(stub, args) {
+    console.log('============= START : queryDonationsForDonor ===========');
+    console.log('##### queryDonationsForDonor arguments: ' + JSON.stringify(args));
+
+    // args is passed as a JSON string
+    let json = JSON.parse(args);
+    let queryString = '{"selector": {"docType": "donation", "donorUserName": "' + json['donorUserName'] + '"}}';
+    return queryByString(stub, queryString);
+  }
+
+  /**
+   * Retrieves donations for a specfic ngo
+   * 
+   * @param {*} stub 
+   * @param {*} args 
+   */
+  async queryDonationsForNGO(stub, args) {
+    console.log('============= START : queryDonationsForNGO ===========');
+    console.log('##### queryDonationsForNGO arguments: ' + JSON.stringify(args));
+
+    // args is passed as a JSON string
+    let json = JSON.parse(args);
+    let queryString = '{"selector": {"docType": "donation", "ngoRegistrationNumber": "' + json['ngoRegistrationNumber'] + '"}}';
+    return queryByString(stub, queryString);
+  }
+
+  /**
    * Retrieves all donations
    * 
    * @param {*} stub 
@@ -631,7 +664,7 @@ let Chaincode = class {
    * @param {*} stub 
    * @param {*} args - JSON as follows:
    * {
-   *    "ngo":"6322",
+   *    "ngoRegistrationNumber":"6322",
    *    "spendId":"2",
    *    "spendDescription":"Peter Pipers Poulty Portions for Pets",
    *    "spendDate":"2018-09-20T12:41:59.582Z",
@@ -650,10 +683,10 @@ let Chaincode = class {
     console.log('##### createSpend spend: ' + JSON.stringify(json));
 
     // Confirm the NGO exists
-    let ngoKey = 'ngo' + json['ngo'];
+    let ngoKey = 'ngo' + json['ngoRegistrationNumber'];
     let ngoQuery = await stub.getState(ngoKey);
     if (!ngoQuery.toString()) {
-      throw new Error('##### createDonation - Cannot create spend record as the NGO does not exist: ' + json['ngo']);
+      throw new Error('##### createDonation - Cannot create spend record as the NGO does not exist: ' + json['ngoRegistrationNumber']);
     }
 
     // Check if the Spend already exists
@@ -686,12 +719,12 @@ let Chaincode = class {
   }
 
   /**
-   * Retrieves all spends
+   * Retrieves all spend
    * 
    * @param {*} stub 
    * @param {*} args 
    */
-  async queryAllSpends(stub, args) {
+  async queryAllSpend(stub, args) {
     console.log('============= START : queryAllSpends ===========');
     console.log('##### queryAllSpends arguments: ' + JSON.stringify(args)); 
     let queryString = '{"selector": {"docType": "spend"}}';
@@ -715,8 +748,8 @@ let Chaincode = class {
    *   "spendAllocationAmount":38.5,
    *   "spendAllocationDate":"2018-09-20T12:41:59.582Z",
    *   "spendAllocationDescription":"Peter Pipers Poulty Portions for Pets",
-   *   "donation":"FFF6A68D-DB19-4CD3-97B0-01C1A793ED3B",
-   *   "ngo":"D0884B20-385D-489E-A9FD-2B6DBE5FEA43"
+   *   "donationId":"FFF6A68D-DB19-4CD3-97B0-01C1A793ED3B",
+   *   "ngoRegistrationNumber":"D0884B20-385D-489E-A9FD-2B6DBE5FEA43"
    * }
    */
 
@@ -749,58 +782,10 @@ let Chaincode = class {
 
     // args is passed as a JSON string
     let json = JSON.parse(args);
-    let queryString = '{"selector": {"docType": "spendAllocation", "donation": "' + json['donationId'] + '"}}';
+    let queryString = '{"selector": {"docType": "spendAllocation", "donationId": "' + json['donationId'] + '"}}';
     return queryByString(stub, queryString);
   }
 
-  /**
-   * Retrieves the Fabric block and transaction details for a key or an array of keys
-   * 
-   * @param {*} stub 
-   * @param {*} args - JSON as follows:
-   * [
-   *    {"spendAllocationIds":[
-   *          "a207aa1e124cc7cb350e9261018a9bd05fb4e0f7dcac5839bdcd0266af7e531d-1",
-   *          "b368be1c26a9da0db1088faca912fdbc3c7d99312e4d01a3f9ba955b2e8c5d1e-1",
-   *          "e09d47c3d08c3f68b9a8253bea87061a1245f35cdd2a21b7401ba268854c5b89-1"
-   *    ]}
-   * ]
-   * 
-   */
-  async queryHistoryForKey(stub, args) {
-    console.log('============= START : queryHistoryForKey ===========');
-    console.log('##### queryHistoryForKey arguments: ' + JSON.stringify(args));
-
-    // args is passed as a JSON string
-    let json = JSON.parse(args);
-    let key = 'spendAllocation' + json['spendAllocationIds'][0];
-    console.log('##### queryHistoryForKey key: ' + key);
-    let historyIterator = await stub.getHistoryForKey(key);
-    let history = [];
-    while (true) {
-      let historyRecord = await historyIterator.next();
-      console.log('##### queryHistoryForKey historyRecord: ' + util.inspect(historyRecord));
-      if (historyRecord.value && historyRecord.value.value.toString()) {
-        let jsonRes = {};
-        console.log('##### queryHistoryForKey historyRecord.value.value: ' + historyRecord.value.value.toString('utf8'));
-        jsonRes.Key = historyRecord.value.key;
-        try {
-          jsonRes.Record = JSON.parse(historyRecord.value.value.toString('utf8'));
-        } catch (err) {
-          console.log('##### queryHistoryForKey error: ' + err);
-          jsonRes.Record = historyRecord.value.value.toString('utf8');
-        }
-        history.push(jsonRes);
-      }
-      if (historyRecord.done) {
-        await historyIterator.close();
-        console.log('##### queryHistoryForKey all results: ' + JSON.stringify(history));
-        console.log('============= END : queryHistoryForKey ===========');
-        return Buffer.from(JSON.stringify(history));
-      }
-    }
-  }
-  
   /**
    * Retrieves all spendAllocations
    * 
@@ -812,6 +797,132 @@ let Chaincode = class {
     console.log('##### queryAllSpendAllocations arguments: ' + JSON.stringify(args)); 
     let queryString = '{"selector": {"docType": "spendAllocation"}}';
     return queryByString(stub, queryString);
+  }
+
+  /************************************************************************************************
+   * 
+   * Ratings functions 
+   * 
+   ************************************************************************************************/
+
+  /**
+   * Creates a new Rating
+   * 
+   * @param {*} stub 
+   * @param {*} args - JSON as follows:
+   * {
+   *    "ngoRegistrationNumber":"6322",
+   *    "donorUserName":"edge",
+   *    "rating":1,
+   * }
+   */
+  async createRating(stub, args) {
+    console.log('============= START : createRating ===========');
+    console.log('##### createRating arguments: ' + JSON.stringify(args));
+
+    // args is passed as a JSON string
+    let json = JSON.parse(args);
+    let key = 'rating' + json['ngoRegistrationNumber'] + json['donorUserName'];
+    json['docType'] = 'rating';
+
+    console.log('##### createRating payload: ' + JSON.stringify(json));
+
+    // Check if the Rating already exists
+    let ratingQuery = await stub.getState(key);
+    if (ratingQuery.toString()) {
+      throw new Error('##### createRating - Rating by donor: ' +  json['donorUserName'] + ' for NGO: ' + json['ngoRegistrationNumber'] + ' already exists');
+    }
+
+    await stub.putState(key, Buffer.from(JSON.stringify(json)));
+    console.log('============= END : createRating ===========');
+  }
+
+  /**
+   * Retrieves ratings for a specfic ngo
+   * 
+   * @param {*} stub 
+   * @param {*} args 
+   */
+  async queryRatingsForNGO(stub, args) {
+    console.log('============= START : queryRatingsForNGO ===========');
+    console.log('##### queryRatingsForNGO arguments: ' + JSON.stringify(args));
+
+    // args is passed as a JSON string
+    let json = JSON.parse(args);
+    let queryString = '{"selector": {"docType": "rating", "ngoRegistrationNumber": "' + json['ngoRegistrationNumber'] + '"}}';
+    return queryByString(stub, queryString);
+  }
+
+  /**
+   * Retrieves ratings for an ngo made by a specific donor
+   * 
+   * @param {*} stub 
+   * @param {*} args 
+   */
+  async queryDonorRatingsForNGO(stub, args) {
+    console.log('============= START : queryDonorRatingsForNGO ===========');
+    console.log('##### queryDonorRatingsForNGO arguments: ' + JSON.stringify(args));
+
+    // args is passed as a JSON string
+    let json = JSON.parse(args);
+    let key = 'rating' + json['ngoRegistrationNumber'] + json['donorUserName'];
+    console.log('##### queryDonorRatingsForNGO key: ' + key);
+    return queryByKey(stub, key);
+  }
+  
+  /************************************************************************************************
+   * 
+   * Blockchain related functions 
+   * 
+   ************************************************************************************************/
+
+  /**
+   * Retrieves the Fabric block and transaction details for a key or an array of keys
+   * 
+   * @param {*} stub 
+   * @param {*} args - JSON as follows:
+   * [
+   *    {"key": "a207aa1e124cc7cb350e9261018a9bd05fb4e0f7dcac5839bdcd0266af7e531d-1"}
+   * ]
+   * 
+   */
+  async queryHistoryForKey(stub, args) {
+    console.log('============= START : queryHistoryForKey ===========');
+    console.log('##### queryHistoryForKey arguments: ' + JSON.stringify(args));
+
+    // args is passed as a JSON string
+    let json = JSON.parse(args);
+    let key = json['key'];
+    let docType = json['docType']
+    console.log('##### queryHistoryForKey key: ' + key);
+    let historyIterator = await stub.getHistoryForKey(docType + key);
+    console.log('##### queryHistoryForKey historyIterator: ' + util.inspect(historyIterator));
+    let history = [];
+    while (true) {
+      let historyRecord = await historyIterator.next();
+      console.log('##### queryHistoryForKey historyRecord: ' + util.inspect(historyRecord));
+      if (historyRecord.value && historyRecord.value.value.toString()) {
+        let jsonRes = {};
+        console.log('##### queryHistoryForKey historyRecord.value.value: ' + historyRecord.value.value.toString('utf8'));
+        jsonRes.TxId = historyRecord.value.tx_id;
+        jsonRes.Timestamp = historyRecord.value.timestamp;
+        jsonRes.IsDelete = historyRecord.value.is_delete.toString();
+      try {
+          jsonRes.Record = JSON.parse(historyRecord.value.value.toString('utf8'));
+        } catch (err) {
+          console.log('##### queryHistoryForKey error: ' + err);
+          jsonRes.Record = historyRecord.value.value.toString('utf8');
+        }
+        console.log('##### queryHistoryForKey json: ' + util.inspect(jsonRes));
+        history.push(jsonRes);
+      }
+      if (historyRecord.done) {
+        await historyIterator.close();
+        console.log('##### queryHistoryForKey all results: ' + JSON.stringify(history));
+        console.log('============= END : queryHistoryForKey ===========');
+        return Buffer.from(JSON.stringify(history));
+      }
+    }
   }
 }
 shim.start(new Chaincode());
