@@ -42,9 +42,9 @@ else
 fi
 echo $response | jq ".message" | grep "$USERID enrolled Successfully"
 echo
-echo ***************************************************************************************
+echo '---------------------------------------'
 echo Donors
-echo ***************************************************************************************
+echo '---------------------------------------'
 echo 'Create Donor'
 echo
 DONOR1=$(uuidgen)
@@ -71,9 +71,9 @@ echo 'Query specific donors'
 echo
 curl -s -X GET http://${ENDPOINT}:${PORT}/donors/${DONOR1} -H 'content-type: application/json'
 echo
-echo ***************************************************************************************
+echo '---------------------------------------'
 echo NGO
-echo ***************************************************************************************
+echo '---------------------------------------'
 echo 'Create NGO'
 echo
 NGO1=$(uuidgen)
@@ -108,9 +108,9 @@ echo 'Query specific NGOs'
 echo
 curl -s -X GET http://${ENDPOINT}:${PORT}/ngos/${NGO1} -H 'content-type: application/json'
 echo
-echo ***************************************************************************************
+echo '---------------------------------------'
 echo Rating
-echo ***************************************************************************************
+echo '---------------------------------------'
 echo 'Create Rating'
 echo
 RATING1=$(uuidgen)
@@ -137,9 +137,9 @@ echo 'Query ratings for an NGO'
 echo
 curl -s -X GET http://${ENDPOINT}:${PORT}/ngos/${NGO2}/ratings -H 'content-type: application/json'
 echo
-echo ***************************************************************************************
+echo '---------------------------------------'
 echo Donation
-echo ***************************************************************************************
+echo '---------------------------------------'
 echo
 echo 'Create Donation'
 echo
@@ -189,9 +189,9 @@ echo 'Query Donations for an NGO'
 echo
 curl -s -X GET http://${ENDPOINT}:${PORT}/ngos/${NGO1}/donations/ -H 'content-type: application/json'
 echo
-echo ***************************************************************************************
+echo '---------------------------------------'
 echo Spend
-echo ***************************************************************************************
+echo '---------------------------------------'
 echo 'Create Spend'
 echo
 SPENDID=$(uuidgen)
