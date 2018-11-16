@@ -27,13 +27,13 @@ orderers:
   orderer.com:
     url: grpcs://orderer.uqz2f2xakfd7vcfewqhckr7q5m.taiga.us-east-1.amazonaws.com:30001
     tlsCACerts:
-      path: /opt/home/taiga-tls.pem
+      path: /home/ec2-user/taiga-tls.pem
 
 peers:
   peer0.org1.example.com:
     url: 3p5k6tloxrgchjvz6lt2rmyhta.esxh3vewtnhsrldv5du3p52zpq.uqz2f2xakfd7vcfewqhckr7q5m.taiga.us-east-1.amazonaws.com:30003
     tlsCACerts:
-      path: /opt/home/taiga-tls.pem
+      path: /home/ec2-user/taiga-tls.pem
 
 certificateAuthorities:
   ca-org1:
@@ -41,7 +41,7 @@ certificateAuthorities:
     httpOptions:
       verify: false
     tlsCACerts:
-      path: /opt/home/taiga-tls.pem
+      path: /home/ec2-user/taiga-tls.pem
     registrar:
       - enrollId: admin
         enrollSecret: adminpw
