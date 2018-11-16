@@ -4,6 +4,38 @@ The REST API is a Node.js application that uses the Fabric SDK to interact with 
 and exposes the chaincode functions as REST APIs. This allows separate between the UI application
 and the underlying Fabric chaincode.
 
+## Running on an EC2 instance
+### Install Node
+```
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
+```
+
+```
+. ~/.nvm/nvm.sh
+nvm install lts/carbon
+nvm use lts/carbon
+```
+
+Amazon Linux seems to be missing g++, so:
+
+```
+sudo yum install gcc-c++
+```
+
+### Clone the repo
+
+```
+git clone https://github.com/aws-samples/non-profit-blockchain.git
+```
+
+### Npm install
+
+```
+cd non-profit-blockchain
+npm install
+```
+
+
 ## Generate a connection profile
 
 The REST API needs a connection profile to connect to the Fabric network. The instructions below will create

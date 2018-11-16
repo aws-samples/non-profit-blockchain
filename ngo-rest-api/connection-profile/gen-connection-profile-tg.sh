@@ -23,7 +23,7 @@ REPODIR=~/non-profit-blockchain
 #copy the connection profiles
 mkdir -p $REPODIR/tmp/connection-profile/org1
 mkdir -p $REPODIR/tmp/connection-profile/org2
-cp ngo-connection-profile-tg.yaml $REPODIR/tmp/connection-profile
+cp ngo-connection-profile-tg.yaml $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
 cp client-org1.yaml $REPODIR/tmp/connection-profile/org1
 cp client-org2.yaml $REPODIR/tmp/connection-profile/org2
 

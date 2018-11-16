@@ -31,13 +31,13 @@ orderers:
 
 peers:
   peer0.org1.example.com:
-    url: 3p5k6tloxrgchjvz6lt2rmyhta.esxh3vewtnhsrldv5du3p52zpq.uqz2f2xakfd7vcfewqhckr7q5m.taiga.us-east-1.amazonaws.com:30003
+    url: grpcs://3p5k6tloxrgchjvz6lt2rmyhta.esxh3vewtnhsrldv5du3p52zpq.uqz2f2xakfd7vcfewqhckr7q5m.taiga.us-east-1.amazonaws.com:30003
     tlsCACerts:
       path: /home/ec2-user/taiga-tls.pem
 
 certificateAuthorities:
   ca-org1:
-    url: ca.esxh3vewtnhsrldv5du3p52zpq.uqz2f2xakfd7vcfewqhckr7q5m.taiga.us-east-1.amazonaws.com:30002
+    url: https://ca.esxh3vewtnhsrldv5du3p52zpq.uqz2f2xakfd7vcfewqhckr7q5m.taiga.us-east-1.amazonaws.com:30002
     httpOptions:
       verify: false
     tlsCACerts:
