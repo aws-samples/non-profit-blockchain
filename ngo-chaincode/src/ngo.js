@@ -46,14 +46,39 @@ async function queryByKey(stub, key) {
 /**
  * Executes a query based on a provided queryString
  * 
+ * I originally wrote this function to handle rich queries via CouchDB, but subsequently needed
+ * to support LevelDB range queries where CouchDB was not available.
+ * 
  * @param {*} queryString - the query string to execute
  */
 async function queryByString(stub, queryString) {
   console.log('============= START : queryByString ===========');
   console.log("##### queryByString queryString: " + queryString);
 
-  let iterator = await stub.getQueryResult(queryString);
+  // CouchDB Query
+  // let iterator = await stub.getQueryResult(queryString);
 
+  // Equivalent LevelDB Query. We need to parse queryString to determine what is being queried
+  // In this chaincode, all queries will either query ALL records for a specific docType, or
+  // they will filter ALL the records looking for a specific NGO, Donor, Donation, etc. So far, 
+  // in this chaincode there is a maximum of one filter parameter in addition to the docType.
+  let docType = "";
+  let startKey = "";
+  let endKey = "";
+  let jsonQueryString = JSON.parse(queryString);
+  if (jsonQueryString['selector'] && jsonQueryString['selector']['docType']) {
+    docType = jsonQueryString['selector']['docType'];
+    startKey = docType + "0";
+    endKey = docType + "z";
+  }
+  else {
+    throw new Error('##### queryByString - Cannot call queryByString without a docType element: ' + queryString);   
+  }
+
+  let iterator = await stub.getStateByRange(startKey, endKey);
+
+  // Iterator handling is identical for both CouchDB and LevelDB result sets, with the 
+  // exception of the filter handling in the commented section below
   let allResults = [];
   while (true) {
     let res = await iterator.next();
@@ -70,7 +95,34 @@ async function queryByString(stub, queryString) {
         console.log('##### queryByString error: ' + err);
         jsonRes.Record = res.value.value.toString('utf8');
       }
-      allResults.push(jsonRes);
+      // ******************* LevelDB filter handling ******************************************
+      // LevelDB: additional code required to filter out records we don't need
+      // Check that each filter condition in jsonQueryString can be found in the iterator json
+      // If we are using CouchDB, this isn't required as rich query supports selectors
+      let jsonRecord = jsonQueryString['selector'];
+      // If there is only a docType, no need to filter, just return all
+      console.log('##### queryByString jsonRecord - number of JSON keys: ' + Object.keys(jsonRecord).length);
+      if (Object.keys(jsonRecord).length == 1) {
+        allResults.push(jsonRes);
+        continue;
+      }
+      for (var key in jsonRecord) {
+        if (jsonRecord.hasOwnProperty(key)) {
+          console.log('##### queryByString jsonRecord key: ' + key + " value: " + jsonRecord[key]);
+          if (key == "docType") {
+            continue;
+          }
+          console.log('##### queryByString json iterator has key: ' + jsonRes.Record[key]);
+          if (!(jsonRes.Record[key] && jsonRes.Record[key] == jsonRecord[key])) {
+            // we do not want this record as it does not match the filter criteria
+            continue;
+          }
+          allResults.push(jsonRes);
+        }
+      }
+      // ******************* End LevelDB filter handling ******************************************
+      // For CouchDB, push all results
+      // allResults.push(jsonRes);
     }
     if (res.done) {
       await iterator.close();
@@ -98,7 +150,7 @@ async function queryByString(stub, queryString) {
  *   "docType": "spend",
  *   "spendId": "1234",
  *   "spendAmount": 100,
- *   "spendDate": "ß2018-09-20T12:41:59.582Z",
+ *   "spendDate": "2018-09-20T12:41:59.582Z",
  *   "spendDescription": "Delias Dainty Delights",
  *   "ngoRegistrationNumber": "1234"
  * }
@@ -264,7 +316,8 @@ async function allocateSpend(stub, spend) {
     //   "spendAllocationDate":"2018-09-20T12:41:59.582Z",
     //   "spendAllocationDescription":"Peter Pipers Poulty Portions for Pets",
     //   "donationId":"FFF6A68D-DB19-4CD3-97B0-01C1A793ED3B",
-    //   "ngoRegistrationNumber":"D0884B20-385D-489E-A9FD-2B6DBE5FEA43"
+    //   "ngoRegistrationNumber":"D0884B20-385D-489E-A9FD-2B6DBE5FEA43",
+    //   "spendId": "1234"
     // }
 
     for (let donation of donationMap) {
@@ -313,7 +366,8 @@ async function allocateSpend(stub, spend) {
         spendAllocationDate: spend['spendDate'],
         spendAllocationDescription: spend['spendDescription'],
         donationId: donationId,
-        ngoRegistrationNumber: ngo
+        ngoRegistrationNumber: ngo,
+        spendId: spend['spendId']
       }; 
 
       console.log('##### allocateSpend - creating spendAllocationRecord record: ' + JSON.stringify(spendAllocationRecord));
@@ -765,7 +819,8 @@ let Chaincode = class {
    *   "spendAllocationDate":"2018-09-20T12:41:59.582Z",
    *   "spendAllocationDescription":"Peter Pipers Poulty Portions for Pets",
    *   "donationId":"FFF6A68D-DB19-4CD3-97B0-01C1A793ED3B",
-   *   "ngoRegistrationNumber":"D0884B20-385D-489E-A9FD-2B6DBE5FEA43"
+   *   "ngoRegistrationNumber":"D0884B20-385D-489E-A9FD-2B6DBE5FEA43",
+   *   "spendId": "1234"
    * }
    */
 
@@ -799,6 +854,22 @@ let Chaincode = class {
     // args is passed as a JSON string
     let json = JSON.parse(args);
     let queryString = '{"selector": {"docType": "spendAllocation", "donationId": "' + json['donationId'] + '"}}';
+    return queryByString(stub, queryString);
+  }
+
+  /**
+   * Retrieves the spendAllocation records for a specific Spend record
+   * 
+   * @param {*} stub 
+   * @param {*} args 
+   */
+  async querySpendAllocationForSpend(stub, args) {
+    console.log('============= START : querySpendAllocationForSpend ===========');
+    console.log('##### querySpendAllocationForSpend arguments: ' + JSON.stringify(args));
+
+    // args is passed as a JSON string
+    let json = JSON.parse(args);
+    let queryString = '{"selector": {"docType": "spendAllocation", "spendId": "' + json['spendId'] + '"}}';
     return queryByString(stub, queryString);
   }
 

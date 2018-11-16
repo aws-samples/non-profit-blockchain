@@ -452,6 +452,26 @@ app.get('/spend/:spendId', awaitHandler(async (req, res) => {
  	res.send(message);
 }));
 
+// GET the SpendAllocation records for a specific Spend
+app.get('/donations/:spendId/spendallocations', awaitHandler(async (req, res) => {
+	logger.info('================ GET on SpendAllocation for Spend');
+	logger.info('Donation ID : ' + req.params);
+	let args = req.params;
+	let fcn = "querySpendAllocationForSpend";
+
+    logger.info('##### GET on SpendAllocation for Spend - username : ' + username);
+	logger.info('##### GET on SpendAllocation for Spend - userOrg : ' + orgName);
+	logger.info('##### GET on SpendAllocation for Spend - channelName : ' + channelName);
+	logger.info('##### GET on SpendAllocation for Spend - chaincodeName : ' + chaincodeName);
+	logger.info('##### GET on SpendAllocation for Spend - fcn : ' + fcn);
+	logger.info('##### GET on SpendAllocation for Spend - args : ' + JSON.stringify(args));
+	logger.info('##### GET on SpendAllocation for Spend - peers : ' + peers);
+
+    let message = await query.queryChaincode(peers, channelName, chaincodeName, args, fcn, username, orgName);
+ 	res.send(message);
+}));
+
+
 // POST Spend
 app.post('/spend', awaitHandler(async (req, res) => {
 	logger.info('================ POST on Spend');

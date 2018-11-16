@@ -37,7 +37,7 @@ peers:
 
 certificateAuthorities:
   ca-org1:
-    url: https://ca.zcilccjf4bcipfj6mwp7qjbikm.px57spuirnezhki32d7m2c32dq.taiga.amazonaws.com:30002
+    url: https://ca.zcilccjf4bcipfj6mwp7qjbikm.px57spuirnezhki32d7m2c32dq.taiga.us-east-1.amazonaws.com:30002
     httpOptions:
       verify: false
     tlsCACerts:
