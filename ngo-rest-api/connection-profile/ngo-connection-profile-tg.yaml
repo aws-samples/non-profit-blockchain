@@ -25,24 +25,24 @@ organizations:
 
 orderers:
   orderer.com:
-    url: grpcs://orderer.px57spuirnezhki32d7m2c32dq.taiga.us-east-1.amazonaws.com:30001
+    url: grpcs://orderer.uqz2f2xakfd7vcfewqhckr7q5m.taiga.us-east-1.amazonaws.com:30001
     tlsCACerts:
       path: /opt/home/taiga-tls.pem
 
 peers:
   peer0.org1.example.com:
-    url: grpcs://47xttqggz5fp5kgn4uco3ix5pa.zcilccjf4bcipfj6mwp7qjbikm.px57spuirnezhki32d7m2c32dq.taiga.us-east-1.amazonaws.com:30003 
+    url: 3p5k6tloxrgchjvz6lt2rmyhta.esxh3vewtnhsrldv5du3p52zpq.uqz2f2xakfd7vcfewqhckr7q5m.taiga.us-east-1.amazonaws.com:30003
     tlsCACerts:
       path: /opt/home/taiga-tls.pem
 
 certificateAuthorities:
   ca-org1:
-    url: https://ca.zcilccjf4bcipfj6mwp7qjbikm.px57spuirnezhki32d7m2c32dq.taiga.us-east-1.amazonaws.com:30002
+    url: ca.esxh3vewtnhsrldv5du3p52zpq.uqz2f2xakfd7vcfewqhckr7q5m.taiga.us-east-1.amazonaws.com:30002
     httpOptions:
       verify: false
     tlsCACerts:
       path: /opt/home/taiga-tls.pem
     registrar:
       - enrollId: admin
-        enrollSecret: adminpw!
+        enrollSecret: adminpw
     caName: ca-org1

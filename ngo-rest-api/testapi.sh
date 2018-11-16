@@ -25,8 +25,8 @@ echo the REST API server is running
 echo
 export ENDPOINT=Fabric-ELB-205962472.us-west-2.elb.amazonaws.com
 export PORT=80
-export ENDPOINT=localhost
-export PORT=3000
+#export ENDPOINT=localhost
+#export PORT=3000
 RED='\033[0;31m'
 RESTORE='\033[0m'
 echo connecting to server: $ENDPOINT:$PORT
