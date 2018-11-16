@@ -453,7 +453,7 @@ app.get('/spend/:spendId', awaitHandler(async (req, res) => {
 }));
 
 // GET the SpendAllocation records for a specific Spend
-app.get('/donations/:spendId/spendallocations', awaitHandler(async (req, res) => {
+app.get('/spend/:spendId/spendallocations', awaitHandler(async (req, res) => {
 	logger.info('================ GET on SpendAllocation for Spend');
 	logger.info('Donation ID : ' + req.params);
 	let args = req.params;

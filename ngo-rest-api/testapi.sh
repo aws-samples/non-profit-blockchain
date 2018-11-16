@@ -274,7 +274,7 @@ TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/spend -H 'content-type: appl
         "spendId": "'"${SPENDID}"'",
         "spendDescription": "Peter Pipers Poulty Portions for Pets",
         "spendDate": "2018-09-20T12:41:59.582Z",
-        "spendAmount": 444
+        "spendAmount": 1000
 }')
 echo "Transaction ID is $TRX_ID"
 echo
@@ -284,7 +284,7 @@ TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/spend -H 'content-type: appl
         "spendId": "'"${SPENDID}"'",
         "spendDescription": "Peter Pipers Poulty Portions for Pets",
         "spendDate": "2018-09-20T12:41:59.582Z",
-        "spendAmount": 1000
+        "spendAmount": 23
 }')
 echo "Transaction ID is $TRX_ID"
 echo ${SPENDID}
