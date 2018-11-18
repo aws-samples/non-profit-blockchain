@@ -1,0 +1,56 @@
+################################################################################
+#
+#   Section: Organizations
+#
+#   - This section defines the different organizational identities which will
+#   be referenced later in the configuration.
+#
+################################################################################
+Organizations:
+    - &Org1
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: <REPLACE WITH NETWORK_MEMBER_ID> ## This is just a network-member-id
+
+        # ID to load the MSP definition as
+        ID: <REPLACE WITH NETWORK_MEMBER_ID>
+
+        MSPDir: /opt/home/admin-msp
+
+        AnchorPeers:
+            # AnchorPeers defines the location of peers which can be used
+            # for cross org gossip communication.  Note, this value is only
+            # encoded in the genesis block in the Application section context
+            - Host: 
+              Port: 
+
+################################################################################
+#
+#   SECTION: Application
+#
+#   - This section defines the values to encode into a config transaction or
+#   genesis block for application related parameters
+#
+################################################################################
+Application: &ApplicationDefaults
+
+    # Organizations is the list of orgs which are defined as participants on
+    # the application side of the network
+    Organizations:
+
+################################################################################
+#
+#   Profile
+#
+#   - Different configuration profiles may be encoded here to be specified
+#   as parameters to the configtxgen tool
+#
+################################################################################
+Profiles:
+
+    OneOrgChannel:
+        Consortium: AWSSystemConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1

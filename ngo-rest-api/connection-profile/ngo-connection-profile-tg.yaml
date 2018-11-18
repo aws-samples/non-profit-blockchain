@@ -30,7 +30,7 @@ orderers:
       path: /home/ec2-user/taiga-tls.pem
 
 peers:
-  peer0.org1.example.com:
+  peer0.org1.com:
     url: grpcs://3p5k6tloxrgchjvz6lt2rmyhta.esxh3vewtnhsrldv5du3p52zpq.uqz2f2xakfd7vcfewqhckr7q5m.taiga.us-east-1.amazonaws.com:30003
     tlsCACerts:
       path: /home/ec2-user/taiga-tls.pem
@@ -45,4 +45,4 @@ certificateAuthorities:
     registrar:
       - enrollId: admin
         enrollSecret: adminpw
-    caName: ca-org1
+    caName: esxh3vewtnhsrldv5du3p52zpq

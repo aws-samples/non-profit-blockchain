@@ -35,8 +35,9 @@ cd non-profit-blockchain
 npm install
 ```
 
-
 ## Generate a connection profile
+
+NOTE: for TG, the connection profile CA name is the network member id.
 
 The REST API needs a connection profile to connect to the Fabric network. The instructions below will create
 the connection profile for the first-network provided by fabric-samples. To create the connection profile do the 
@@ -230,3 +231,8 @@ Error: [2018-11-06T11:44:51.485] [ERROR] Helper - ##### getRegisteredUser - Fail
 
 Solution: make sure the certificate stores are removed before starting the REST api. Using `./start.sh` will remove these. The 
 error is caused by using the wrong certificate - probably an old one from the cert store.
+
+
+[2018-11-16T10:25:40.240] [ERROR] Connection - ##### getRegisteredUser - Failed to get registered user: 5742cbbe-03b6-449d-ab65-3c885b6bfee1 with error: Error: Enrollment failed with errors [[{"code":19,"message":"CA 'ca.esxh3vewtnhsrldv5du3p52zpq' does not exist"}]]
+
+We need to the name of the Fabric CA, as set in the CA, in FABRIC_CA_SERVER_CA_NAME
