@@ -45,7 +45,7 @@ echo Useful information
 echo
 echo Node ID: $nodeID
 echo Peer Service Endpoint: $endpoint
-\
+
 # Export these values
 export PEERNODEID=$nodeID
 export PEERSERVICEENDPOINT=$endpoint
