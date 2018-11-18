@@ -18,7 +18,7 @@
 echo Create the Fabric Peer node
 token=$(uuidgen)
 echo Creating Fabric peer for network $networkname
-result=$(aws taiga create-node --ENDPOINT-url $ENDPOINT \
+result=$(aws taiga create-node --endpoint-url $ENDPOINT --region $REGION \
         --client-request-token $token \
         --node-configuration '{"InstanceType":"bc.t3.small","AvailabilityZone":"us-east-1a"}' \
         --network-id $NETWORKID \
@@ -29,7 +29,7 @@ echo Peer Node ID: $nodeID
 
 echo Waiting for peer node to become HEALTHY
 while (true); do
-    STATUS=$(aws taiga get-node --ENDPOINT-url $ENDPOINT --REGION $REGION --network-id $NETWORKID --network-member-id $NETWORKID --node-id $nodeID --query 'Node.Status' --output text)
+    STATUS=$(aws taiga get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKID --node-id $nodeID --query 'Node.Status' --output text)
     if  [[ "$STATUS" == "HEALTHY" ]]; then
         echo Status of Fabric node $nodeID is $STATUS
         break
@@ -39,8 +39,8 @@ while (true); do
     fi
 done
 
-AvailabilityZone=$(aws taiga get-node --ENDPOINT-url $ENDPOINT --REGION $REGION --network-id $NETWORKID --network-member-id $NETWORKID --node-id $nodeID --query 'Node.AvailabilityZone' --output text)
-endpoint=$(aws taiga get-node --ENDPOINT-url $ENDPOINT --REGION $REGION --network-id $NETWORKID --network-member-id $NETWORKID --node-id $nodeID --query 'Node.Endpoint' --output text)
+AvailabilityZone=$(aws taiga get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKID --node-id $nodeID --query 'Node.AvailabilityZone' --output text)
+endpoint=$(aws taiga get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKID --node-id $nodeID --query 'Node.Endpoint' --output text)
 echo Useful information
 echo
 echo Node ID: $nodeID
