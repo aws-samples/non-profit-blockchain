@@ -15,6 +15,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+# Update these values to create a new Fabric network
 export REGION=us-east-1
 export ENDPOINT=https://taiga-beta.us-east-1.amazonaws.com
 export NETWORKNAME=ngo
@@ -23,17 +24,17 @@ export ADMINUSER=admin
 export ADMINPWD=adminpwd
 export ORGNAME=org1
 
-# If you need to re-export after creating the Fabric network, you'll need to update the Fabric network ID below
+# If you need to re-export after creating the Fabric network, you'll need to update the Fabric network IDs below
 export NETWORKID=hnyvgusrnnh7lcgcn5whj7buju
 export NETWORKMEMBERID=3wtoplvu35hv7oeuwvbbcb5gjm
 
+# No need to change anything below here
 VpcEndpointServiceName=$(aws taiga get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
 OrderingServiceEndpoint=$(aws taiga get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.FrameworkAttributes.Fabric.OrderingServiceEndpoint' --output text)
 CaEndpoint=$(aws taiga get-network-member --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKMEMBERID --query 'NetworkMember.FrameworkAttributes.Fabric.CaEndpoint' --output text)
-nodeID=$(aws taiga list-nodes --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKID --query 'Nodes[0].Id' --output text)
-ndpoint=$(aws taiga get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKID --node-id $nodeID --query 'Node.Endpoint' --output text)
+nodeID=$(aws taiga list-nodes --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKMEMBERID --query 'Nodes[0].Id' --output text)
+endpoint=$(aws taiga get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKMEMBERID --node-id $nodeID --query 'Node.Endpoint' --output text)
 
-# Export these values
 export ORDERINGSERVICEENDPOINT=$OrderingServiceEndpoint
 export VPCENDPOINTSERVICENAME=$VpcEndpointServiceName
 export CASERVICEENDPOINT=$CaEndpoint

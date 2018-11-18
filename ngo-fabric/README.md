@@ -20,7 +20,14 @@ git clone https://github.com/aws-samples/non-profit-blockchain.git
 ## Step 0 - in Cloud9
 Configure your Fabric network name and other items.
 
-Edit the file that contains the config:
+The config for your Fabric network can be configured in the file `0-exports.sh`. This file
+exports ENV vars used by the other scripts. If you exit your session and need to restart,
+you can source this file again. Some statements in the file may fail, depending on how far along
+the process your are of creating your Fabic network (I.e. some components may not exist yet), but
+the script will export the values it can find.
+
+You may need to edit this file and add in the `NETWORKID` and `NETWORKMEMBERID`, if you have
+already created the Fabric network.
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
