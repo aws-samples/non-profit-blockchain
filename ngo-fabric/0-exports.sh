@@ -25,8 +25,8 @@ export ADMINPWD=adminpwd
 export ORGNAME=org1
 
 # If you need to re-export after creating the Fabric network, you'll need to update the Fabric network IDs below
-export NETWORKID=hnyvgusrnnh7lcgcn5whj7buju
-export NETWORKMEMBERID=3wtoplvu35hv7oeuwvbbcb5gjm
+export NETWORKID=
+export NETWORKMEMBERID=
 
 # No need to change anything below here
 VpcEndpointServiceName=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
