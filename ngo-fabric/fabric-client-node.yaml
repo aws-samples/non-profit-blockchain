@@ -160,4 +160,4 @@ Outputs:
   BlockchainVPCEndpointDNS: 
     Description: A list of the DNS entries for the VPC endpoint
     Value:
-      !Join [ ",", [ !GetAtt BlockchainWSVPCEndpoint.DnsEntries ] ] 
+      !Join [ ",", [ Fn::GetAtt: [ BlockchainWSVPCEndpoint, DnsEntries ] ] ]
