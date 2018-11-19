@@ -17,25 +17,146 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: This template creates a Fabric client node, which will run the Fabric CLI and
 interact with a Fabric network. The client node is an EC2 instance, and will be created in
 its own VPC. Private VPC Endpoints will also be created, pointing to the Fabric service.
+
 Parameters:
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Name of an existing EC2 key pair to enable SSH access to the EC2 instance
- Resources:
- Outputs:
+  TaigaVpcEndpointServiceName:
+    Type: String
+    Description: Name of the Taiga VPC Endpoint. Obtained from running 'aws taiga get-network'
+
+Resources:
+  TaigaWorkshopVPC:
+    Type:                                    AWS::EC2::VPC
+    Properties:
+      CidrBlock:                             10.0.0.0/16
+      EnableDnsSupport:                      True
+      EnableDnsHostnames:                    True
+      InstanceTenancy:                       default
+      Tags:
+        - Key:                               Name
+          Value:                             TaigaWSVPC
+
+  TaigaWSPublicSubnet:
+    Type:                                    AWS::EC2::Subnet
+    Properties:
+        VpcId:                               !Ref TaigaWorkshopVPC
+        MapPublicIpOnLaunch:                 false
+        CidrBlock:                           10.0.0.16/28
+        Tags:
+        - Key:                               Name
+          Value:                             TaigaWSPublicSubnet
+
+  TaigaWSSecurityGroupBase:
+        Type:                                AWS::EC2::SecurityGroup
+        Properties:
+          GroupDescription:                  Base Security Group
+          VpcId:                             !Ref TaigaWorkshopVPC
+          SecurityGroupIngress:
+          - IpProtocol:                      tcp
+            CidrIp:                          0.0.0.0/0
+            FromPort:                        22
+            ToPort:                          22
+          Tags:
+          - Key:                             Name
+            Value:                           TaigaWSSecurityGroupBase
+
+  TaigaWSSecurityGroupBaseIngress:
+    Type:                                    AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol:                            -1
+      FromPort:                              -1
+      GroupId:                               !GetAtt TaigaWSSecurityGroupBase.GroupId
+      ToPort:                                -1
+      SourceSecurityGroupId:                 !GetAtt TaigaWSSecurityGroupBase.GroupId
+      Tags:
+      - Key:                                 Name
+        Value:                               TaigaWSSecurityGroupBaseIngress
+
+  TaigaWorkshopInternetGateway:
+    Type:                                    "AWS::EC2::InternetGateway"
+    Properties:
+      Tags:
+      - Key:                                 Name
+        Value:                               TaigaWorkshopInternetGateway
+
+  TaigaWorkshopAttachGateway:
+    Type:                                    AWS::EC2::VPCGatewayAttachment
+    Properties:
+       VpcId:                                !Ref TaigaWorkshopVPC
+       InternetGatewayId:                    !Ref TaigaWorkshopInternetGateway
+
+  TaigaWorkshopRouteTable:
+    Type:                                    AWS::EC2::RouteTable
+    Properties:
+        VpcId:                               !Ref TaigaWorkshopVPC
+        Tags:
+          - Key:                             Name
+            Value:                           TaigaWorkshopRouteTable
+
+  TaigaWorkshopRoute:
+    Type:                                    AWS::EC2::Route
+    Properties:
+        RouteTableId:                        !Ref TaigaWorkshopRouteTable
+        DestinationCidrBlock:                0.0.0.0/0
+        GatewayId:                           !Ref TaigaWorkshopInternetGateway
+
+  TaigaWorkshopSubnetRouteTableAssociation:
+    Type:                                    AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+        SubnetId:                            !Ref TaigaWSPublicSubnet
+        RouteTableId:                        !Ref TaigaWorkshopRouteTable
+
+  TaigaWSVPCEndpoint:
+    Type:                                    AWS::EC2::VPCEndpoint
+    Properties:
+        VpcId:                               !Ref TaigaWorkshopVPC
+        PrivateDnsEnabled:                   True
+        ServiceName:                         !Ref TaigaVpcEndpointServiceName
+        VpcEndpointType:                     Interface
+        SubnetIds:                           [!Ref TaigaWSPublicSubnet]
+        SecurityGroupIds:                    [!Ref TaigaWSSecurityGroupBase]
+
+
+  TaigaWorkshopEC2:
+    Type:                                    AWS::EC2::Instance
+    Properties:
+        KeyName:                             !Ref KeyName
+        ImageId:                             'ami-0ff8a91507f77f867'
+        InstanceType:                        't2.small'
+        NetworkInterfaces:
+        - AssociatePublicIpAddress:          true
+          DeviceIndex:                       0
+          PrivateIpAddress:                  10.0.0.26
+          GroupSet:                          [!Ref TaigaWSSecurityGroupBase]
+          SubnetId:                          !Ref TaigaWSPublicSubnet
+        Tags:
+          - Key:                             Name
+            Value:                           TaigaWorkshopEC2
+
+Outputs:
   VPCID:
     Description: VPC ID
     Value:
-      Ref: VPCID
-  SubnetID:
-    Description: Subnet ID
+      Ref: TaigaWorkshopVPC
+  PublicSubnetID:
+    Description: Public Subnet ID
     Value:
-      Ref: SubnetID
-  VPCEndpoint:
-    Description: VPC Endpoint
+      Ref: TaigaWSPublicSubnet
+  SecurityGroupID:
+    Description: Security Group ID
     Value:
-      Ref: VPCEndpoint
+      !GetAtt TaigaWSSecurityGroupBase.GroupId
   EC2URL:
     Description: Public DNS of the EC2 instance
     Value:
-      Ref: EC2URL
+      Ref: !GetAtt TaigaWorkshopEC2.PublicDnsName
+  TaigaVPCEndpoint:
+    Description: VPC Endpoint ID
+    Value:
+      Ref: TaigaWSVPCEndpoint
+  TaigaVPCEndpointDNS: 
+    Description: A list of the DNS entries for the VPC endpoint
+    Value:
+      !GetAtt TaigaWSVPCEndpoint.DnsEntries
