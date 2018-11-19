@@ -29,11 +29,11 @@ export NETWORKID=hnyvgusrnnh7lcgcn5whj7buju
 export NETWORKMEMBERID=3wtoplvu35hv7oeuwvbbcb5gjm
 
 # No need to change anything below here
-VpcEndpointServiceName=$(aws taiga get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
-OrderingServiceEndpoint=$(aws taiga get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.FrameworkAttributes.Fabric.OrderingServiceEndpoint' --output text)
-CaEndpoint=$(aws taiga get-network-member --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKMEMBERID --query 'NetworkMember.FrameworkAttributes.Fabric.CaEndpoint' --output text)
-nodeID=$(aws taiga list-nodes --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKMEMBERID --query 'Nodes[0].Id' --output text)
-endpoint=$(aws taiga get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKMEMBERID --node-id $nodeID --query 'Node.Endpoint' --output text)
+VpcEndpointServiceName=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
+OrderingServiceEndpoint=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.FrameworkAttributes.Fabric.OrderingServiceEndpoint' --output text)
+CaEndpoint=$(aws managedblockchain get-network-member --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKMEMBERID --query 'NetworkMember.FrameworkAttributes.Fabric.CaEndpoint' --output text)
+nodeID=$(aws managedblockchain list-nodes --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKMEMBERID --query 'Nodes[0].Id' --output text)
+endpoint=$(aws managedblockchain get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKMEMBERID --node-id $nodeID --query 'Node.Endpoint' --output text)
 
 export ORDERINGSERVICEENDPOINT=$OrderingServiceEndpoint
 export VPCENDPOINTSERVICENAME=$VpcEndpointServiceName
