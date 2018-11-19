@@ -152,7 +152,7 @@ Outputs:
   EC2URL:
     Description: Public DNS of the EC2 instance
     Value:
-      Ref: !GetAtt BlockchainWorkshopEC2.PublicDnsName
+      !GetAtt BlockchainWorkshopEC2.PublicDnsName
   BlockchainVPCEndpoint:
     Description: VPC Endpoint ID
     Value:
