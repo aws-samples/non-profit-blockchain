@@ -26,10 +26,10 @@ aws configure add-model --service-model file://service-2.json --service-name man
 
 token=$(uuidgen)
 echo Creating Fabric network $NETWORKNAME
-echo Executing command: aws managedblockchain create-network --region $REGION --endpoint-url $ENDPOINT  \
+echo Executing command: aws managedblockchain create-network --region $REGION --endpoint-url $ENDPOINT \
  --client-request-token $token \
- --network-configuration Name="${NETWORKNAME},Description=NGO,Framework=HYPERLEDGER_FABRIC,FrameworkVersion=${NETWORKVERSION}" \
- --network-member-configuration "Name=${ORGNAME},Description=nm,FrameworkConfiguration={Fabric={CaAdminUsername=${ADMINUSER},CaAdminPassword=${ADMINPWD}}}"
+ --network-configuration "Name=${NETWORKNAME},Description=NGO,Framework=HYPERLEDGER_FABRIC,FrameworkVersion=${NETWORKVERSION}" \
+ --member-configuration "Name=${ORGNAME},Description=nm,FrameworkConfiguration={Fabric={CaAdminUsername=${ADMINUSER},CaAdminPassword=${ADMINPWD}}}"
 
 
 
