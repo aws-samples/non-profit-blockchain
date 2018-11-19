@@ -68,7 +68,8 @@ Check the progress in the AWS CloudFormation console
 ## Step 3 - SSH into the EC2 Fabric client node
 Setup the Fabric client node. This step installs the necessary packages.
 
-SSH into the Fabric client node. The key should be in your home directory.
+SSH into the Fabric client node. The key should be in your home directory. The DNS of the
+EC2 instance can be found in the output of the CloudFormation stack.
 
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem

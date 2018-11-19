@@ -81,5 +81,5 @@ docker-compose -f docker-compose-cli.yaml up &
 ## The variables needed below are exported from step1/2. 
 export PATH=$PATH:/home/ec2-user/go/src/github.com/hyperledger/fabric-ca/bin
 cd
-fabric-ca-client enroll -u https://<network-member-admin>:<network-member-password>@<nodedns>:<ca-port> --tls.certfiles /home/ec2-user/taiga-tls.pem -M /home/ec2-user/admin-msp 
+fabric-ca-client enroll -u https://$ADMINUSER:$ADMINPWD@$CASERVICEENDPOINT --tls.certfiles /home/ec2-user/taiga-tls.pem -M /home/ec2-user/admin-msp 
 cp -r admin-msp/signcerts admin-msp/admincerts
