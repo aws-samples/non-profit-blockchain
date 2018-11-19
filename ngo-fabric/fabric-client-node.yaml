@@ -140,11 +140,11 @@ Outputs:
   VPCID:
     Description: VPC ID
     Value:
-      !Ref: BlockchainWorkshopVPC
+      !Ref BlockchainWorkshopVPC
   PublicSubnetID:
     Description: Public Subnet ID
     Value:
-      !Ref: BlockchainWSPublicSubnet
+      !Ref BlockchainWSPublicSubnet
   SecurityGroupID:
     Description: Security Group ID
     Value:
@@ -156,7 +156,7 @@ Outputs:
   BlockchainVPCEndpoint:
     Description: VPC Endpoint ID
     Value:
-      !Ref: BlockchainWSVPCEndpoint
+      !Ref BlockchainWSVPCEndpoint
   BlockchainVPCEndpointDNS: 
     Description: A list of the DNS entries for the VPC endpoint
     Value:
