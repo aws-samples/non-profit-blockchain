@@ -124,7 +124,7 @@ Resources:
     Type:                                    AWS::EC2::Instance
     Properties:
         KeyName:                             !Ref KeyName
-        ImageId:                             'ami-0ff8a91507f77f867'
+        ImageId:                             'ami-051fb05bb164a0247'
         InstanceType:                        't2.small'
         NetworkInterfaces:
         - AssociatePublicIpAddress:          true

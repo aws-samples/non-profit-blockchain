@@ -22,14 +22,14 @@ result=$(aws managedblockchain create-node --endpoint-url $ENDPOINT --region $RE
         --client-request-token $token \
         --node-configuration '{"InstanceType":"bc.t3.small","AvailabilityZone":"us-east-1a"}' \
         --network-id $NETWORKID \
-        --network-member-id $NETWORKMEMBERID)
+        --member-id $MEMBERID)
   
 nodeID=$(jq -r '.NodeId' <<< $result)
 echo Peer Node ID: $nodeID
 
 echo Waiting for peer node to become HEALTHY
 while (true); do
-    STATUS=$(aws managedblockchain get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKID --node-id $nodeID --query 'Node.Status' --output text)
+    STATUS=$(aws managedblockchain get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID --query 'Node.Status' --output text)
     if  [[ "$STATUS" == "HEALTHY" ]]; then
         echo Status of Fabric node $nodeID is $STATUS
         break
@@ -39,8 +39,8 @@ while (true); do
     fi
 done
 
-AvailabilityZone=$(aws managedblockchain get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKID --node-id $nodeID --query 'Node.AvailabilityZone' --output text)
-endpoint=$(aws managedblockchain get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKID --node-id $nodeID --query 'Node.Endpoint' --output text)
+AvailabilityZone=$(aws managedblockchain get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID --query 'Node.AvailabilityZone' --output text)
+endpoint=$(aws managedblockchain get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID --query 'Node.Endpoint' --output text)
 echo Useful information
 echo
 echo Node ID: $nodeID

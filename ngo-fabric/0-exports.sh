@@ -30,15 +30,15 @@ export ADMINPWD=adminpwd
 export ORGNAME=org1
 
 # If you need to re-export after creating the Fabric network, you'll need to update the Fabric network IDs below
-export NETWORKID=
-export NETWORKMEMBERID=
+export NETWORKID=n-PGVKO3H3RFH75PLI3DBMLUQ66M
+export MEMBERID=m-U2UK2RBNQBBMFAZVJPAACYQOEQ
 
 # No need to change anything below here
 VpcEndpointServiceName=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
 OrderingServiceEndpoint=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.FrameworkAttributes.Fabric.OrderingServiceEndpoint' --output text)
-CaEndpoint=$(aws managedblockchain get-network-member --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKMEMBERID --query 'NetworkMember.FrameworkAttributes.Fabric.CaEndpoint' --output text)
-nodeID=$(aws managedblockchain list-nodes --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKMEMBERID --query 'Nodes[0].Id' --output text)
-endpoint=$(aws managedblockchain get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --network-member-id $NETWORKMEMBERID --node-id $nodeID --query 'Node.Endpoint' --output text)
+CaEndpoint=$(aws managedblockchain get-member --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --member-id $MEMBERID --query 'Member.FrameworkAttributes.Fabric.CaEndpoint' --output text)
+nodeID=$(aws managedblockchain list-nodes --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --member-id $MEMBERID --query 'Nodes[0].Id' --output text)
+endpoint=$(aws managedblockchain get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID --query 'Node.Endpoint' --output text)
 
 export ORDERINGSERVICEENDPOINT=$OrderingServiceEndpoint
 export VPCENDPOINTSERVICENAME=$VpcEndpointServiceName
@@ -55,7 +55,7 @@ echo ADMINUSER: $ADMINUSER
 echo ADMINPWD: $ADMINPWD
 echo ORGNAME: $ORGNAME
 echo NETWORKID: $NETWORKID
-echo NETWORKMEMBERID: $NETWORKMEMBERID
+echo MEMBERID: $MEMBERID
 echo ORDERINGSERVICEENDPOINT: $ORDERINGSERVICEENDPOINT
 echo VPCENDPOINTSERVICENAME: $VPCENDPOINTSERVICENAME
 echo CASERVICEENDPOINT: $CASERVICEENDPOINT

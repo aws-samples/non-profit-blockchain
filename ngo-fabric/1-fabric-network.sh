@@ -38,10 +38,11 @@ result=$(aws managedblockchain create-network --region $REGION --endpoint-url $E
     --network-configuration "{\"Name\":\"${NETWORKNAME}\",\"Description\":\"NGO Fabric network\",\"Framework\":\"HYPERLEDGER_FABRIC\",\"FrameworkVersion\": \"${NETWORKVERSION}\"}" \
     --member-configuration "{\"Name\":\"${ORGNAME}\",\"Description\":\"NGO Fabric member\",\"FrameworkConfiguration\":{\"Fabric\":{\"CaAdminUsername\":\"${ADMINUSER}\",\"CaAdminPassword\":\"${ADMINPWD}\"}}}")
 
+echo Result is: $result
 networkID=$(jq -r '.NetworkId' <<< $result)
-networkMemberID=$(jq -r '.NetworkMemberId'<<< $result)
+memberID=$(jq -r '.MemberId'<<< $result)
 echo Network ID: $networkID
-echo Network Member ID: $networkMemberID
+echo Member ID: $memberID
 
 echo Waiting for network to become ACTIVE
 while (true); do
@@ -57,18 +58,18 @@ done
 
 VpcEndpointServiceName=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $networkID --query 'Network.VpcEndpointServiceName' --output text)
 OrderingServiceEndpoint=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $networkID --query 'Network.FrameworkAttributes.Fabric.OrderingServiceEndpoint' --output text)
-CaEndpoint=$(aws managedblockchain get-network-member --endpoint-url $ENDPOINT --region $REGION --network-id $networkID --network-member-id $networkMemberID --query 'NetworkMember.FrameworkAttributes.Fabric.CaEndpoint' --output text)
+CaEndpoint=$(aws managedblockchain get-member --endpoint-url $ENDPOINT --region $REGION --network-id $networkID --member-id $memberID --query 'NetworkMember.FrameworkAttributes.Fabric.CaEndpoint' --output text)
 echo Useful information
 echo
 echo Network ID: $networkID
-echo Network Member ID: $networkMemberID
+echo Member ID: $memberID
 echo Ordering Service Endpoint: $OrderingServiceEndpoint
 echo Vpc Endpoint Service Name: $VpcEndpointServiceName
 echo CA Service Endpoint: $CaEndpoint
 
 # Export these values
 export NETWORKID=$networkID
-export NETWORKMEMBERID=$networkMemberID
+export MEMBERID=$memberID
 export ORDERINGSERVICEENDPOINT=$OrderingServiceEndpoint
 export VPCENDPOINTSERVICENAME=$VpcEndpointServiceName
 export CASERVICEENDPOINT=$CaEndpoint
