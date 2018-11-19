@@ -14,20 +14,21 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 AWSTemplateFormatVersion: '2010-09-09'
-Description: This template creates a Fabric client node, which will run the Fabric CLI and
-interact with a Fabric network. The client node is an EC2 instance, and will be created in
-its own VPC. Private VPC Endpoints will also be created, pointing to the Fabric service.
+Description: >
+  This template creates a Fabric client node, which will run the Fabric CLI and
+  interact with a Fabric network. The client node is an EC2 instance, and will be created in
+  its own VPC. Private VPC Endpoints will also be created, pointing to the Fabric service.
 
 Parameters:
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Name of an existing EC2 key pair to enable SSH access to the EC2 instance
-  TaigaVpcEndpointServiceName:
+  BlockchainVpcEndpointServiceName:
     Type: String
-    Description: Name of the Taiga VPC Endpoint. Obtained from running 'aws taiga get-network'
+    Description: Name of the Blockchain VPC Endpoint. Obtained from running 'aws taiga get-network'
 
 Resources:
-  TaigaWorkshopVPC:
+  BlockchainWorkshopVPC:
     Type:                                    AWS::EC2::VPC
     Properties:
       CidrBlock:                             10.0.0.0/16
@@ -36,23 +37,23 @@ Resources:
       InstanceTenancy:                       default
       Tags:
         - Key:                               Name
-          Value:                             TaigaWSVPC
+          Value:                             BlockchainWSVPC
 
-  TaigaWSPublicSubnet:
+  BlockchainWSPublicSubnet:
     Type:                                    AWS::EC2::Subnet
     Properties:
-        VpcId:                               !Ref TaigaWorkshopVPC
+        VpcId:                               !Ref BlockchainWorkshopVPC
         MapPublicIpOnLaunch:                 false
         CidrBlock:                           10.0.0.16/28
         Tags:
         - Key:                               Name
-          Value:                             TaigaWSPublicSubnet
+          Value:                             BlockchainWSPublicSubnet
 
-  TaigaWSSecurityGroupBase:
+  BlockchainWSSecurityGroupBase:
         Type:                                AWS::EC2::SecurityGroup
         Properties:
           GroupDescription:                  Base Security Group
-          VpcId:                             !Ref TaigaWorkshopVPC
+          VpcId:                             !Ref BlockchainWorkshopVPC
           SecurityGroupIngress:
           - IpProtocol:                      tcp
             CidrIp:                          0.0.0.0/0
@@ -60,66 +61,66 @@ Resources:
             ToPort:                          22
           Tags:
           - Key:                             Name
-            Value:                           TaigaWSSecurityGroupBase
+            Value:                           BlockchainWSSecurityGroupBase
 
-  TaigaWSSecurityGroupBaseIngress:
+  BlockchainWSSecurityGroupBaseIngress:
     Type:                                    AWS::EC2::SecurityGroupIngress
     Properties:
       IpProtocol:                            -1
       FromPort:                              -1
-      GroupId:                               !GetAtt TaigaWSSecurityGroupBase.GroupId
+      GroupId:                               !GetAtt BlockchainWSSecurityGroupBase.GroupId
       ToPort:                                -1
-      SourceSecurityGroupId:                 !GetAtt TaigaWSSecurityGroupBase.GroupId
+      SourceSecurityGroupId:                 !GetAtt BlockchainWSSecurityGroupBase.GroupId
       Tags:
       - Key:                                 Name
-        Value:                               TaigaWSSecurityGroupBaseIngress
+        Value:                               BlockchainWSSecurityGroupBaseIngress
 
-  TaigaWorkshopInternetGateway:
+  BlockchainWorkshopInternetGateway:
     Type:                                    "AWS::EC2::InternetGateway"
     Properties:
       Tags:
       - Key:                                 Name
-        Value:                               TaigaWorkshopInternetGateway
+        Value:                               BlockchainWorkshopInternetGateway
 
-  TaigaWorkshopAttachGateway:
+  BlockchainWorkshopAttachGateway:
     Type:                                    AWS::EC2::VPCGatewayAttachment
     Properties:
-       VpcId:                                !Ref TaigaWorkshopVPC
-       InternetGatewayId:                    !Ref TaigaWorkshopInternetGateway
+       VpcId:                                !Ref BlockchainWorkshopVPC
+       InternetGatewayId:                    !Ref BlockchainWorkshopInternetGateway
 
-  TaigaWorkshopRouteTable:
+  BlockchainWorkshopRouteTable:
     Type:                                    AWS::EC2::RouteTable
     Properties:
-        VpcId:                               !Ref TaigaWorkshopVPC
+        VpcId:                               !Ref BlockchainWorkshopVPC
         Tags:
           - Key:                             Name
-            Value:                           TaigaWorkshopRouteTable
+            Value:                           BlockchainWorkshopRouteTable
 
-  TaigaWorkshopRoute:
+  BlockchainWorkshopRoute:
     Type:                                    AWS::EC2::Route
     Properties:
-        RouteTableId:                        !Ref TaigaWorkshopRouteTable
+        RouteTableId:                        !Ref BlockchainWorkshopRouteTable
         DestinationCidrBlock:                0.0.0.0/0
-        GatewayId:                           !Ref TaigaWorkshopInternetGateway
+        GatewayId:                           !Ref BlockchainWorkshopInternetGateway
 
-  TaigaWorkshopSubnetRouteTableAssociation:
+  BlockchainWorkshopSubnetRouteTableAssociation:
     Type:                                    AWS::EC2::SubnetRouteTableAssociation
     Properties:
-        SubnetId:                            !Ref TaigaWSPublicSubnet
-        RouteTableId:                        !Ref TaigaWorkshopRouteTable
+        SubnetId:                            !Ref BlockchainWSPublicSubnet
+        RouteTableId:                        !Ref BlockchainWorkshopRouteTable
 
-  TaigaWSVPCEndpoint:
+  BlockchainWSVPCEndpoint:
     Type:                                    AWS::EC2::VPCEndpoint
     Properties:
-        VpcId:                               !Ref TaigaWorkshopVPC
+        VpcId:                               !Ref BlockchainWorkshopVPC
         PrivateDnsEnabled:                   True
-        ServiceName:                         !Ref TaigaVpcEndpointServiceName
+        ServiceName:                         !Ref BlockchainVpcEndpointServiceName
         VpcEndpointType:                     Interface
-        SubnetIds:                           [!Ref TaigaWSPublicSubnet]
-        SecurityGroupIds:                    [!Ref TaigaWSSecurityGroupBase]
+        SubnetIds:                           [!Ref BlockchainWSPublicSubnet]
+        SecurityGroupIds:                    [!Ref BlockchainWSSecurityGroupBase]
 
 
-  TaigaWorkshopEC2:
+  BlockchainWorkshopEC2:
     Type:                                    AWS::EC2::Instance
     Properties:
         KeyName:                             !Ref KeyName
@@ -129,34 +130,34 @@ Resources:
         - AssociatePublicIpAddress:          true
           DeviceIndex:                       0
           PrivateIpAddress:                  10.0.0.26
-          GroupSet:                          [!Ref TaigaWSSecurityGroupBase]
-          SubnetId:                          !Ref TaigaWSPublicSubnet
+          GroupSet:                          [!Ref BlockchainWSSecurityGroupBase]
+          SubnetId:                          !Ref BlockchainWSPublicSubnet
         Tags:
           - Key:                             Name
-            Value:                           TaigaWorkshopEC2
+            Value:                           BlockchainWorkshopEC2
 
 Outputs:
   VPCID:
     Description: VPC ID
     Value:
-      Ref: TaigaWorkshopVPC
+      Ref: BlockchainWorkshopVPC
   PublicSubnetID:
     Description: Public Subnet ID
     Value:
-      Ref: TaigaWSPublicSubnet
+      Ref: BlockchainWSPublicSubnet
   SecurityGroupID:
     Description: Security Group ID
     Value:
-      !GetAtt TaigaWSSecurityGroupBase.GroupId
+      !GetAtt BlockchainWSSecurityGroupBase.GroupId
   EC2URL:
     Description: Public DNS of the EC2 instance
     Value:
-      Ref: !GetAtt TaigaWorkshopEC2.PublicDnsName
-  TaigaVPCEndpoint:
+      Ref: !GetAtt BlockchainWorkshopEC2.PublicDnsName
+  BlockchainVPCEndpoint:
     Description: VPC Endpoint ID
     Value:
-      Ref: TaigaWSVPCEndpoint
-  TaigaVPCEndpointDNS: 
+      Ref: BlockchainWSVPCEndpoint
+  BlockchainVPCEndpointDNS: 
     Description: A list of the DNS entries for the VPC endpoint
     Value:
-      !GetAtt TaigaWSVPCEndpoint.DnsEntries
+      !GetAtt BlockchainWSVPCEndpoint.DnsEntries
