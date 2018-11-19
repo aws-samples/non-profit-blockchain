@@ -157,7 +157,3 @@ Outputs:
     Description: VPC Endpoint ID
     Value:
       !Ref BlockchainWSVPCEndpoint
-  BlockchainVPCEndpointDNS: 
-    Description: A list of the DNS entries for the VPC endpoint
-    Value:
-      Fn::Join: [ ",", [ !GetAtt BlockchainWSVPCEndpoint.DnsEntries ] ]
