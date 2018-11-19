@@ -36,7 +36,7 @@ echo Executing command: aws managedblockchain create-network --region $REGION --
 result=$(aws managedblockchain create-network --region $REGION --endpoint-url $ENDPOINT  \
     --client-request-token $token \
     --network-configuration "{\"Name\":\"${NETWORKNAME}\",\"Description\":\"NGO Fabric network\",\"Framework\":\"HYPERLEDGER_FABRIC\",\"FrameworkVersion\": \"${NETWORKVERSION}\"}" \
-    --member-configuration "{\"Name\":\"${ORGNAME}\",\"Description\":\"NGO Fabric member\",\"FrameworkConfiguration\":{\"Fabric\":{\"CaAdminUsername\":\"${ADMINUSER}\",\"CaAdminPassword\":\"${ADMINPWD}\"}}}"
+    --member-configuration "{\"Name\":\"${ORGNAME}\",\"Description\":\"NGO Fabric member\",\"FrameworkConfiguration\":{\"Fabric\":{\"CaAdminUsername\":\"${ADMINUSER}\",\"CaAdminPassword\":\"${ADMINPWD}\"}}}")
 
 networkID=$(jq -r '.NetworkId' <<< $result)
 networkMemberID=$(jq -r '.NetworkMemberId'<<< $result)
