@@ -22,18 +22,18 @@ sudo yum -y install jq
 echo Downloading and installing model file for new service
 cd ~
 aws s3 cp s3://taiga-beta-test/service-2.json .  
-aws configure add-model --service-model file://service-2.json --service-name taiga
+aws configure add-model --service-model file://service-2.json --service-name managedblockchain
 
 token=$(uuidgen)
 echo Creating Fabric network $NETWORKNAME
-echo Executing command: aws taiga create-network --region $REGION --endpoint-url $ENDPOINT  \
+echo Executing command: aws managedblockchain create-network --region $REGION --endpoint-url $ENDPOINT  \
  --client-request-token $token \
  --network-configuration Name="${NETWORKNAME},Description=NGO,Framework=HYPERLEDGER_FABRIC,FrameworkVersion=${NETWORKVERSION}" \
  --network-member-configuration "Name=${ORGNAME},Description=nm,FrameworkConfiguration={Fabric={CaAdminUsername=${ADMINUSER},CaAdminPassword=${ADMINPWD}}}"
 
 
 
-result=$(aws taiga create-network --region $REGION --endpoint-url $ENDPOINT  \
+result=$(aws managedblockchain create-network --region $REGION --endpoint-url $ENDPOINT  \
  --client-request-token $token \
  --network-configuration Name="${NETWORKNAME},Description=NGO,Framework=HYPERLEDGER_FABRIC,FrameworkVersion=${NETWORKVERSION}" \
  --network-member-configuration "Name=${ORGNAME},Description=nm,FrameworkConfiguration={Fabric={CaAdminUsername=${ADMINUSER},CaAdminPassword=${ADMINPWD}}}")
@@ -45,7 +45,7 @@ echo Network Member ID: $networkMemberID
 
 echo Waiting for network to become ACTIVE
 while (true); do
-    STATUS=$(aws taiga get-network --endpoint-url $ENDPOINT --region $REGION --network-id $networkID --query 'Network.Status' --output text)
+    STATUS=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $networkID --query 'Network.Status' --output text)
     if  [[ "$STATUS" == "ACTIVE" ]]; then
         echo Status of Fabric network $NETWORKNAME with ID $networkID is $STATUS
         break
@@ -55,9 +55,9 @@ while (true); do
     fi
 done
 
-VpcEndpointServiceName=$(aws taiga get-network --endpoint-url $ENDPOINT --region $REGION --network-id $networkID --query 'Network.VpcEndpointServiceName' --output text)
-OrderingServiceEndpoint=$(aws taiga get-network --endpoint-url $ENDPOINT --region $REGION --network-id $networkID --query 'Network.FrameworkAttributes.Fabric.OrderingServiceEndpoint' --output text)
-CaEndpoint=$(aws taiga get-network-member --endpoint-url $ENDPOINT --region $REGION --network-id $networkID --network-member-id $networkMemberID --query 'NetworkMember.FrameworkAttributes.Fabric.CaEndpoint' --output text)
+VpcEndpointServiceName=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $networkID --query 'Network.VpcEndpointServiceName' --output text)
+OrderingServiceEndpoint=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $networkID --query 'Network.FrameworkAttributes.Fabric.OrderingServiceEndpoint' --output text)
+CaEndpoint=$(aws managedblockchain get-network-member --endpoint-url $ENDPOINT --region $REGION --network-id $networkID --network-member-id $networkMemberID --query 'NetworkMember.FrameworkAttributes.Fabric.CaEndpoint' --output text)
 echo Useful information
 echo
 echo Network ID: $networkID
