@@ -24,6 +24,8 @@ git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
 ### Install Node
+On the Fabric client node.
+
 ```
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
 ```
@@ -38,13 +40,6 @@ Amazon Linux seems to be missing g++, so:
 
 ```
 sudo yum install gcc-c++
-```
-
-### Clone the repo
-
-```
-cd ~
-git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
 ### Npm install
@@ -68,14 +63,14 @@ following:
 * Run the script
 
 ```
-cd ngo-rest-api/connection-profile
+cd ~/non-profit-blockchain/ngo-rest-api/connection-profile
 ./gen-connection-profile.sh
 ```
 
 This will generate the profiles and list the directory that stores them, for example:
 
 ```
-ls -lR /Users/edgema/Documents/apps/ngo-blockchain/tmp/connection-profile/
+ls -lR ~/non-profit-blockchain/tmp/connection-profile/
 ```
 
 ## Run the REST API Node.js application
