@@ -1,7 +1,6 @@
-# Setup a Fabric network
+# Setup a Fabric network via the AWS CLI
 
-This section will create a Fabric network. A combination of the AWS Console and the AWS CLI 
-will be used.
+This section will create a Fabric network using the AWS CLI.
 
 ## Pre-requisites - Cloud9
 We will use Cloud9 to provide a Linux shell.
@@ -18,44 +17,41 @@ cd
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-## Step 1 - Create the Fabric network
-In the AWS Managed Blockchain Console.
+## Step 0 - in Cloud9
+Configure your Fabric network name and other items.
 
-Make sure you are in the correct AWS region and follow the steps below:
+The config for your Fabric network can be configured in the file `0-exports.sh`. This file
+exports ENV vars used by the other scripts. If you exit your session and need to restart,
+you can source this file again. Some statements in the file may fail, depending on how far along
+the process your are of creating your Fabic network (I.e. some components may not exist yet), but
+the script will export the values it can find.
 
-1. Click `Create a Network`
-2. Make sure `Hyperleger Fabric 1.2` is selected
-3. Enter a network name and an optional description, and click `Next`
-4. Enter a member name (e.g. this could be the name of the organisation you belong to) and an optional description
-5. Enter an admin username and password, and note this down. You will need it later. Click `Next`
-6. Check your configuration and click `Create network and member`
-7. Wait until the status of your network and your network member become ACTIVE.
-
-## Step 2 - prepare your Cloud9 environment
-In your Cloud9 terminal window.
-
-Create the file that includes the ENV export values that define your Fabric network configuration.
+You may need to edit this file and add in the `NETWORKID` and `NETWORKMEMBERID`, if you have
+already created the Fabric network.
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
-cp 0-exports-template.sh 0-exports.sh
 vi 0-exports.sh
 ```
 
-Update the export statements at the top of the file. The info you need either matches what you 
-entered when creating the Fabric network in Step 1, or can be found in the AWS Managed Blockchain Console,
-under your network.
-
-Source the file, so the exports are applied to your current Cloud9 session. If you exit the Cloud9
-session and re-enter, you'll need to source the file again.
+Execute the following script:
 
 ```
-source 0-exports.sh
+cd ~/non-profit-blockchain/ngo-fabric
+source ./0-exports.sh
 ```
 
-## Step 3 - create the Fabric client node
-In your Cloud9 terminal window.
+## Step 1 - in Cloud9
+Create the Fabric network. 
 
+Execute the following script:
+
+```
+cd ~/non-profit-blockchain/ngo-fabric
+./1-fabric-network.sh
+```
+
+## Step 2 - in Cloud9
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
 the Fabric network. The Fabric client node will be created in its own VPC, with VPC endpoints 
 pointing to the Fabric network you created in Step 1.

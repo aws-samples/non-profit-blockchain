@@ -15,23 +15,22 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+# Update these values, then `source` this script
+export REGION=us-east-1
+export NETWORKNAME=<your network name>
+export NETWORKVERSION=1.2
+export ADMINUSER=<the admin user name you entered when creating your Fabric network>
+export ADMINPWD=<the admin user name you entered when creating your Fabric network>
+export ORGNAME=<the organisation or member name you entered when creating your Fabric network>
+export NETWORKID=<your network ID, from the AWS Console>
+export MEMBERID=<your member ID, from the AWS Console>
+
 echo Downloading and installing model file for new service
 cd ~
 aws s3 cp s3://taiga-beta-test/service-2.json .  
 aws configure add-model --service-model file://service-2.json --service-name managedblockchain
 
-# Update these values to create a new Fabric network
-export REGION=us-east-1
 export ENDPOINT=https://taiga-beta.us-east-1.amazonaws.com
-export NETWORKNAME=ngo
-export NETWORKVERSION=1.2
-export ADMINUSER=admin
-export ADMINPWD=adminpwd
-export ORGNAME=org1
-
-# If you need to re-export after creating the Fabric network, you'll need to update the Fabric network IDs below
-export NETWORKID=n-PGVKO3H3RFH75PLI3DBMLUQ66M
-export MEMBERID=m-U2UK2RBNQBBMFAZVJPAACYQOEQ
 
 # No need to change anything below here
 VpcEndpointServiceName=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
