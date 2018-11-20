@@ -8,12 +8,10 @@
 ################################################################################
 Organizations:
     - &Org1
-        # DefaultOrg defines the organization which is used in the sampleconfig
-        # of the fabric.git development environment
-        Name: <REPLACE WITH NETWORK_MEMBER_ID> ## This is just a network-member-id
+        Name: <REPLACE WITH MEMBER_ID> 
 
         # ID to load the MSP definition as
-        ID: <REPLACE WITH NETWORK_MEMBER_ID>
+        ID: <REPLACE WITH MEMBER_ID>
 
         MSPDir: /opt/home/admin-msp
 

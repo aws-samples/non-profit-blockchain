@@ -107,10 +107,20 @@ cd ~/non-profit-blockchain/ngo-fabric
 ./4-enroll-member-admin.sh
 ```
 
-Now exit your SSH session.
+Exit your SSH session.
 
-## Step 4 - in Cloud9
-Make sure you are back in Cloud9.
+## Step 5 - create your Fabric Peer
+LETS do this via the console, and prior to step 4. No need for the certs when we create the peer
+
+In your Cloud9 terminal window.
+
+Make sure you have exported the necessary ENV variables, as you did in step 2. If you aren't
+sure, you can rerun the script:
+
+```
+cd ~/non-profit-blockchain/ngo-fabric
+source ./2-exports.sh
+```
 
 Create the Fabric peer.
 
@@ -118,10 +128,14 @@ Execute the following script:
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
-./4-fabric-peer.sh
+./5-fabric-peer.sh
 ```
 
-## Step 5 - first in Cloud9, then in Fabric client node
+The script will continue to check the status of the Peer node, until it becomes HEALTHY. You can
+also check the status in the AWS Managed Blockchain Console. Clicking on the member will show the
+member status and details of any peers owned by this member.
+
+## Step 5 - preparing the client node
 Prior to executing any commands in the Fabric client node, you will need to export ENV variables
 that provide a context to Hyperledger Fabric. These variables will tell the client node which peer
 node to interact with, which TLS certs to use, etc. 
@@ -132,7 +146,7 @@ the client node as explained below.
 In Cloud9:
 
 ```
-source ./0-exports.sh
+source ./2-exports.sh
 ```
 
 Find the section titled 'Exports to be used on client node'. Copy all the export commands under this 
@@ -164,6 +178,16 @@ Delete all the contents and paste the contents you copied from Cloud9. Then sour
 ```
 source ./peer-exports.sh
 ```
+
+Update the configtx channel configuration:
+
+```
+cp ~/non-profit-blockchain/ngo-fabric/configtx.yaml ~
+vi ~/configtx.yaml
+```
+
+Update the Name and ID fields with the member ID. You can obtain the member ID from the AWS 
+Managed Blockchain Console.
 
 Generate the configtx channel configuration
 
