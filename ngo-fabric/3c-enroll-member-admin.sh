@@ -22,7 +22,9 @@
 ## Enrol network member admin
 ## The variables needed below are exported from step1/2. I re-export them just in case:
 
-source 0-exports.sh
+export ADMINUSER=admin
+export ADMINPWD=adminpwd
+export CASERVICEENDPOINT=ca.m-U2UK2RBNQBBMFAZVJPAACYQOEQ.n-PGVKO3H3RFH75PLI3DBMLUQ66M.taiga.us-east-1.amazonaws.com:30002
 
 export PATH=$PATH:/home/ec2-user/go/src/github.com/hyperledger/fabric-ca/bin
 cd

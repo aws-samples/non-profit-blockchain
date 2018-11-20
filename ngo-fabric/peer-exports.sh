@@ -1,5 +1,5 @@
 export MSP_PATH=/opt/home/admin-msp
-export MSP=<network-member-id>
+export MSP=<member-id>
 export ORDERER=<orderer-dns>:<port> ## from output of get-network
 export PEER=<peer-dns>:<port> ## from output of get-node
 export CHANNEL=mychannel
