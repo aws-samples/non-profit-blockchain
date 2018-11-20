@@ -17,28 +17,24 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-# This script uses the template ngo-connection-profile.json to generate a connection profile
-# for the organisations in the Fabric network.
-
 #REPODIR points to this repo.
-REPODIR=~/Documents/apps/non-profit-blockchain
-
-#CERTDIR points to the location of the fabric-samples repo. If you are using this to run Fabric, the crypto information
-#would have been generated in the first-network/crypto-config folder.
-CERTDIR=~/Documents/apps/fabric-samples
+REPODIR=~/non-profit-blockchain
 
 #copy the connection profiles
 mkdir -p $REPODIR/tmp/connection-profile/org1
 mkdir -p $REPODIR/tmp/connection-profile/org2
-cp ngo-connection-profile.yaml $REPODIR/tmp/connection-profile
+cp ngo-connection-profile.yaml $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
 cp client-org1.yaml $REPODIR/tmp/connection-profile/org1
 cp client-org2.yaml $REPODIR/tmp/connection-profile/org2
 
-#update the connection profiles to refer to the location of the Fabric crypto information
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    sed -e "s|%REPODIR%|$CERTDIR|g" ngo-connection-profile.yaml > $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
-else
-    sed -i "s|%REPODIR%|$CERTDIR|g"  $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
-fi 
+#update the connection profiles with endpoints and other information
+sed -i "s|%PEERNODEID%|$PEERNODEID|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
+sed -i "s|%MEMBERID%|$MEMBERID|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
+sed -i "s|%CAFILE%|$CAFILE|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
+sed -i "s|%ORDERINGSERVICEENDPOINT%|$ORDERINGSERVICEENDPOINT|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
+sed -i "s|%PEERSERVICEENDPOINT%|$ORDERINGSERVICEENDPOINT|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
+sed -i "s|%CASERVICEENDPOINT%|$ORDERINGSERVICEENDPOINT|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
+sed -i "s|%ADMINUSER%|$ORDERINGSERVICEENDPOINT|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
+sed -i "s|%ADMINPWD%|$ORDERINGSERVICEENDPOINT|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
 
 ls -lR $REPODIR/tmp/connection-profile

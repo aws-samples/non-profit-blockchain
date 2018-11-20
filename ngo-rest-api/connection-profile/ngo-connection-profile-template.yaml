@@ -1,0 +1,50 @@
+---
+name: "ngo"
+x-type: "hlfv1"
+description: "NGO Network"
+version: "1.0"
+
+channels:
+  mychannel:
+    orderers:
+      - orderer.com
+    peers:
+      %PEERNODEID%:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+
+organizations:
+  Org1:
+    mspid: %MEMBERID%
+    peers:
+      - %PEERNODEID%
+    certificateAuthorities:
+      - ca-org1
+
+orderers:
+  orderer.com:
+    url: grpcs://%ORDERINGSERVICEENDPOINT%
+    tlsCACerts:
+      path: %CAFILE%
+
+peers:
+  %PEERNODEID%:
+    url: grpcs://%PEERSERVICEENDPOINT%
+    grpcOptions:
+      ssl-target-name-override: %PEERNODEID%
+    tlsCACerts:
+      path: %CAFILE%
+
+certificateAuthorities:
+  ca-org1:
+    url: https://%CASERVICEENDPOINT%
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: %CAFILE%
+    registrar:
+      - enrollId: %ADMINUSER%
+        enrollSecret: %ADMINPWD%
+    caName: %MEMBERID%

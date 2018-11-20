@@ -1,10 +1,28 @@
 # REST API to expose the Chaincode
 
 The REST API is a Node.js application that uses the Fabric SDK to interact with the Fabric chaincode
-and exposes the chaincode functions as REST APIs. This allows separate between the UI application
+and exposes the chaincode functions as REST APIs. This allows loose coupling between the UI application
 and the underlying Fabric chaincode.
 
-## Running on an EC2 instance
+## The REST API Server on the Fabric client node
+For the Fabric workshop, the REST API server will run on the Fabric client node.
+
+From Cloud9, SSH into the Fabric client node. The key should be in your home directory. The DNS of the
+EC2 instance can be found in the output of the CloudFormation stack you created when setting up the
+Fabric network.
+
+```
+ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
+```
+
+You should have already cloned the repo below. You would have done this when setting up the
+Fabric network.
+
+```
+cd
+git clone https://github.com/aws-samples/non-profit-blockchain.git
+```
+
 ### Install Node
 ```
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
@@ -25,13 +43,14 @@ sudo yum install gcc-c++
 ### Clone the repo
 
 ```
+cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
 ### Npm install
 
 ```
-cd non-profit-blockchain
+cd ~/non-profit-blockchain/ngo-rest-api
 npm install
 ```
 

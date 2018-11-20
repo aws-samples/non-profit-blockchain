@@ -98,7 +98,7 @@ that provide a context to Hyperledger Fabric. These variables will tell the clie
 node to interact with, which TLS certs to use, etc. 
 
 I will generate all the required export variables in Cloud9. You will need to copy the output to
-the client node as explained below.
+the Fabric client node as explained below.
 
 In Cloud9:
 
@@ -177,8 +177,6 @@ Execute the following script:
 cd ~/non-profit-blockchain/ngo-fabric
 ./4-enroll-member-admin.sh
 ```
-
-Exit your SSH session.
 
 ## Step 5 - update the configtx channel configuration
 On the Fabric client node.

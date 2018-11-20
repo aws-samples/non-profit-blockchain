@@ -70,8 +70,7 @@ var getRegisteredUser = async function(username, userorg, isJson) {
 			let caClient = client.getCertificateAuthority();
 			logger.info('##### getRegisteredUser - Got caClient %s', util.inspect(admins));
 			let secret = await caClient.register({
-				enrollmentID: username,
-				affiliation: userorg.toLowerCase() + '.department1'
+				enrollmentID: username
 			}, adminUserObj);
 			logger.info('##### getRegisteredUser - Successfully got the secret for user %s', username);
 			user = await client.setUserContext({username:username, password:secret});
