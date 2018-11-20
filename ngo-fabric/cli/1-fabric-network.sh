@@ -29,14 +29,14 @@ echo Creating Fabric network $NETWORKNAME
 echo Executing command: aws managedblockchain create-network --region $REGION --endpoint-url $ENDPOINT \
     --client-request-token $token \
     --network-configuration "{\"Name\":\"${NETWORKNAME}\",\"Description\":\"NGO Fabric network\",\"Framework\":\"HYPERLEDGER_FABRIC\",\"FrameworkVersion\": \"${NETWORKVERSION}\"}" \
-    --member-configuration "{\"Name\":\"${ORGNAME}\",\"Description\":\"NGO Fabric member\",\"FrameworkConfiguration\":{\"Fabric\":{\"CaAdminUsername\":\"${ADMINUSER}\",\"CaAdminPassword\":\"${ADMINPWD}\"}}}"
+    --member-configuration "{\"Name\":\"${MEMBERNAME}\",\"Description\":\"NGO Fabric member\",\"FrameworkConfiguration\":{\"Fabric\":{\"CaAdminUsername\":\"${ADMINUSER}\",\"CaAdminPassword\":\"${ADMINPWD}\"}}}"
 
 
 
 result=$(aws managedblockchain create-network --region $REGION --endpoint-url $ENDPOINT  \
     --client-request-token $token \
     --network-configuration "{\"Name\":\"${NETWORKNAME}\",\"Description\":\"NGO Fabric network\",\"Framework\":\"HYPERLEDGER_FABRIC\",\"FrameworkVersion\": \"${NETWORKVERSION}\"}" \
-    --member-configuration "{\"Name\":\"${ORGNAME}\",\"Description\":\"NGO Fabric member\",\"FrameworkConfiguration\":{\"Fabric\":{\"CaAdminUsername\":\"${ADMINUSER}\",\"CaAdminPassword\":\"${ADMINPWD}\"}}}")
+    --member-configuration "{\"Name\":\"${MEMBERNAME}\",\"Description\":\"NGO Fabric member\",\"FrameworkConfiguration\":{\"Fabric\":{\"CaAdminUsername\":\"${ADMINUSER}\",\"CaAdminPassword\":\"${ADMINPWD}\"}}}")
 
 echo Result is: $result
 networkID=$(jq -r '.NetworkId' <<< $result)

@@ -38,8 +38,8 @@ Create the file that includes the ENV export values that define your Fabric netw
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
-cp 0-exports-template.sh 0-exports.sh
-vi 0-exports.sh
+cp templates/exports-template.sh 2-exports.sh
+vi 2-exports.sh
 ```
 
 Update the export statements at the top of the file. The info you need either matches what you 
@@ -50,7 +50,7 @@ Source the file, so the exports are applied to your current Cloud9 session. If y
 session and re-enter, you'll need to source the file again.
 
 ```
-source 0-exports.sh
+source 2-exports.sh
 ```
 
 ## Step 3 - create the Fabric client node
@@ -64,15 +64,16 @@ Execute the following script:
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
-./2-vpc-client-node.sh
+./3-vpc-client-node.sh
 ```
 
 Check the progress in the AWS CloudFormation console
 
-## Step 3 - SSH into the EC2 Fabric client node
-Setup the Fabric client node. This step installs the necessary packages.
+## Step 4 - SSH into the EC2 Fabric client node
+Enroll an admin identity with the Fabric CA (certificate authority). We will use this
+identity when we create the peer node in the next step.
 
-SSH into the Fabric client node. The key should be in your home directory. The DNS of the
+From Cloud9, SSH into the Fabric client node. The key should be in your home directory. The DNS of the
 EC2 instance can be found in the output of the CloudFormation stack.
 
 ```
@@ -86,20 +87,24 @@ cd
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
+Edit the following bash script:
+
+```
+cd ~/non-profit-blockchain/ngo-fabric
+cp templates/enroll-member-admin-template.sh 4-enroll-member-admin.sh
+vi 4-enroll-member-admin.sh
+```
+
+Update the export statements at the top of the script. The admin username and password are the same
+as you used in Step 2. The CASERVICEENDPOINT can be found in the AWS Managed Blockchain Console. Go to
+Networks->your network->your member. Look for the field named: `Fabric certificate authority endpoint`.
+Copy the whole value, including the port number at the end.
+
 Execute the following script:
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
-./3a-client-node-setup.sh
-```
-
-Now exit your SSH session and reconnect.
-
-Execute the following script:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-./3b-client-node-setup.sh
+./4-enroll-member-admin.sh
 ```
 
 Now exit your SSH session.

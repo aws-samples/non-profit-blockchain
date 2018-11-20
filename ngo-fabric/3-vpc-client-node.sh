@@ -19,12 +19,13 @@ echo Creating VPC - TODO. Create the VPC, subnets, security group, EC2 client no
 echo Create a keypair
 
 echo Searching for existing keypair named $NETWORKNAME-keypair
-keyname=$(aws ec2 describe-key-pairs --key-names $NETWORKNAME-keypair --region $REGION --query 'KeyPairs[0].KeyName' --output text)
+keyname=$(aws ec2 describe-key-pairs --key-names $NETWORKNAME-keypair --region $REGION --query 'KeyPairs[0].KeyName' --output text --quiet)
 if  [[ "$keyname" == "$NETWORKNAME-keypair" ]]; then
     echo Keypair $NETWORKNAME-keypair already exists. Please choose another keypair name by editing this script
     exit 1
 fi
  
+echo Creating a keypair named $NETWORKNAME-keypair. The .pem file will be in your $HOME directory
 aws ec2 create-key-pair --key-name $NETWORKNAME-keypair --region $REGION --query 'KeyMaterial' --output text > ~/$NETWORKNAME-keypair.pem
 if [ $? -gt 0 ]; then
     echo Keypair $NETWORKNAME-keypair could not be created
