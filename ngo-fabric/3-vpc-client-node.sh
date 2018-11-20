@@ -19,7 +19,7 @@ echo Creating VPC - TODO. Create the VPC, subnets, security group, EC2 client no
 echo Create a keypair
 
 echo Searching for existing keypair named $NETWORKNAME-keypair
-keyname=$(aws ec2 describe-key-pairs --key-names $NETWORKNAME-keypair --region $REGION --query 'KeyPairs[0].KeyName' --output text --quiet)
+keyname=$(aws ec2 describe-key-pairs --key-names $NETWORKNAME-keypair --region $REGION --query 'KeyPairs[0].KeyName' --output text)
 if  [[ "$keyname" == "$NETWORKNAME-keypair" ]]; then
     echo Keypair $NETWORKNAME-keypair already exists. Please choose another keypair name by editing this script
     exit 1
