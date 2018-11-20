@@ -112,13 +112,37 @@ cd ~/non-profit-blockchain/ngo-fabric
 ./4-fabric-peer.sh
 ```
 
-## Step 5 - in Fabric client node
-Prior to executing any commands in the Fabric client node, execute the script to export the ENV values
-we need to connect to the Fabric network. This will need to be done each time you exit the SSH session and reconnect.
+## Step 5 - first in Cloud9, then in Fabric client node
+Prior to executing any commands in the Fabric client node, you will need to export ENV variables
+that provide a context to Hyperledger Fabric. These variables will tell the client node which peer
+node to interact with, which TLS certs to use, etc. 
+
+I will generate all the required export variables in Cloud9. You will need to copy the output to
+the client node as explained below.
+
+In Cloud9:
 
 ```
-./peer-exports.sh
+source ./0-exports.sh
 ```
+
+Find the section titled 'Exports to be used on client node'. Copy this section using ctrl-c.
+
+In the Fabric client node.
+
+SSH into the client node. Edit the peer export file:
+
+```
+cd ~/non-profit-blockchain/ngo-fabric
+vi peer-exports.sh
+```
+
+Delete all the contents and paste the contents you copied from Cloud9. Then source the file:
+
+```
+source peer-exports.sh
+```
+
 
 Generate the configtx channel configuration
 

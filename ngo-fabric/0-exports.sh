@@ -62,7 +62,7 @@ echo CASERVICEENDPOINT: $CASERVICEENDPOINT
 echo PEERNODEID: $PEERNODEID
 echo PEERSERVICEENDPOINT: $PEERSERVICEENDPOINT
 
-echo Peer exports to be used on client node
+echo Exports to be used on client node
 echo After step 4, create a file on the client node to contain these exports
 echo Export these values before running any Fabric commands on the client node
 echo export MSP_PATH=/opt/home/admin-msp
