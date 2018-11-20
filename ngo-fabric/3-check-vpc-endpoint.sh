@@ -20,6 +20,7 @@ while (true); do
     VpcEndpointServiceName=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
     if [[ "$VpcEndpointServiceName" == "com.amazonaws"* ]]; then 
         echo VPC endpoint $VpcEndpointServiceName has been created
+        break
     else
         echo VPC endpoint has not yet been created. Sleeping for 30s
         sleep 30
