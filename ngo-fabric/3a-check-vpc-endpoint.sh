@@ -15,7 +15,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-echo Check that the VPC endpoint has been created and is available
+echo Check that the VPC endpoint has been created
 while (true); do
     VpcEndpointServiceName=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
     if [[ "$VpcEndpointServiceName" == "com.amazonaws"* ]]; then 
@@ -26,16 +26,3 @@ while (true); do
         sleep 30
     fi
 done
-
-echo VPC endpoint has been created. Now check that the VPC endpoint is available
-while (true); do
-    status=$(aws ec2 describe-vpc-endpoints --filters Name=service-name,Values=$VpcEndpointServiceName --region $REGION --query 'VpcEndpoints[0].State' --output text)                         
-    if  [[ "$status" == "available" ]]; then
-        echo VPC endpoint $VpcEndpointServiceName is available 
-        break
-    else
-        echo VPC endpoint $VpcEndpointServiceName is NOT available. Sleeping for 30s
-        sleep 30 
-    fi
-done
- 
