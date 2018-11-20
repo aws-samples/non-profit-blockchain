@@ -117,7 +117,7 @@ Prior to executing any commands in the Fabric client node, execute the script to
 we need to connect to the Fabric network. This will need to be done each time you exit the SSH session and reconnect.
 
 ```
-./exports.sh
+./peer-exports.sh
 ```
 
 Generate the configtx channel configuration

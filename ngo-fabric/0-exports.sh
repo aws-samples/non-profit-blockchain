@@ -46,7 +46,7 @@ export CASERVICEENDPOINT=$CaEndpoint
 export PEERNODEID=$nodeID
 export PEERSERVICEENDPOINT=$endpoint
 
-echo Useful information
+echo Useful information used in Cloud9
 echo REGION: $REGION
 echo ENDPOINT: $ENDPOINT
 echo NETWORKNAME: $NETWORKNAME
@@ -61,3 +61,16 @@ echo VPCENDPOINTSERVICENAME: $VPCENDPOINTSERVICENAME
 echo CASERVICEENDPOINT: $CASERVICEENDPOINT
 echo PEERNODEID: $PEERNODEID
 echo PEERSERVICEENDPOINT: $PEERSERVICEENDPOINT
+
+echo Peer exports to be used on client node
+echo After step 4, create a file on the client node to contain these exports
+echo Export these values before running any Fabric commands on the client node
+echo export MSP_PATH=/opt/home/admin-msp
+echo export MSP=$MEMBERID
+echo export ORDERER=$ORDERINGSERVICEENDPOINT
+echo export PEER=$PEERSERVICEENDPOINT
+echo export CHANNEL=mychannel
+echo export CAFILE=/opt/home/taiga-tls.pem
+echo export CHAINCODENAME=mycc
+echo export CHAINCODEVERSION=v0
+echo export CHAINCODEDIR=github.com/chaincode_example02/go
