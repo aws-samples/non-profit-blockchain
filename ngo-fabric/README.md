@@ -43,7 +43,7 @@ In the AWS Managed Blockchain Console.
 
 We'll continue with the next steps while we wait for the peer node to become HEALTHY.
 
-## Step 3 - prepare your Cloud9 environment
+## Step 3 - create the Fabric client node
 In your Cloud9 terminal window.
 
 Create the file that includes the ENV export values that define your Fabric network configuration.
@@ -66,8 +66,13 @@ cd ~/non-profit-blockchain/ngo-fabric
 source 2-exports.sh
 ```
 
-## Step 3 - create the Fabric client node
-In your Cloud9 terminal window.
+Make sure the `VPCENDPOINTSERVICENAME` in the output of the `source 2-exports.sh` is populated
+before continuining. The script below will check this for you.
+
+```
+cd ~/non-profit-blockchain/ngo-fabric
+3-check-vpc-endpoint.sh
+```
 
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
 the Fabric network. The Fabric client node will be created in its own VPC, with VPC endpoints 
