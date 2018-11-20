@@ -71,7 +71,7 @@ before continuining. The script below will check this for you.
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
-3-check-vpc-endpoint.sh
+./3-check-vpc-endpoint.sh
 ```
 
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
