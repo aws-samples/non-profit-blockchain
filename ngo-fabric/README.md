@@ -31,7 +31,19 @@ Make sure you are in the correct AWS region and follow the steps below:
 6. Check your configuration and click `Create network and member`
 7. Wait until the status of your network and your network member become ACTIVE.
 
-## Step 2 - prepare your Cloud9 environment
+Before continuing, check to see that your Fabric network has been created and is ACTIVE. If not,
+wait for it to complete. Otherwise the steps below may fail.
+
+## Step 2 - Create the Fabric Peer
+In the AWS Managed Blockchain Console.
+
+1. In the new network you have created, select the member in the Members section.
+2. Click `Create peer node`
+3. Enter 40 for storage, accept the other defaults, and click `Create peer node`
+
+We'll continue with the next steps while we wait for the peer node to become HEALTHY.
+
+## Step 3 - prepare your Cloud9 environment
 In your Cloud9 terminal window.
 
 Create the file that includes the ENV export values that define your Fabric network configuration.
@@ -50,6 +62,7 @@ Source the file, so the exports are applied to your current Cloud9 session. If y
 session and re-enter, you'll need to source the file again.
 
 ```
+cd ~/non-profit-blockchain/ngo-fabric
 source 2-exports.sh
 ```
 
@@ -60,6 +73,11 @@ Create the Fabric client node, which will host the Fabric CLI. You will use the 
 the Fabric network. The Fabric client node will be created in its own VPC, with VPC endpoints 
 pointing to the Fabric network you created in Step 1.
 
+If you need to rerun this script, you will need to manually delete the keypair, as follows:
+
+* In the EC2 console, under Key Pairs, find the key pair in the correct region and delete it
+* In Cloud 9, in the home directory, `rm ~/<keyname>.pem`
+
 Execute the following script:
 
 ```
@@ -69,9 +87,35 @@ cd ~/non-profit-blockchain/ngo-fabric
 
 Check the progress in the AWS CloudFormation console
 
-## Step 4 - SSH into the EC2 Fabric client node
-Enroll an admin identity with the Fabric CA (certificate authority). We will use this
-identity when we create the peer node in the next step.
+## Step 4 - prepare the Fabric client node
+Prior to executing any commands in the Fabric client node, you will need to export ENV variables
+that provide a context to Hyperledger Fabric. These variables will tell the client node which peer
+node to interact with, which TLS certs to use, etc. 
+
+I will generate all the required export variables in Cloud9. You will need to copy the output to
+the client node as explained below.
+
+In Cloud9:
+
+```
+cd ~/non-profit-blockchain/ngo-fabric
+source 2-exports.sh
+```
+
+Find the section titled 'Exports to be used on client node'. Copy all the export commands under this 
+section using ctrl-c. The exports you copy should look something like this:
+
+```
+export MSP_PATH=/opt/home/admin-msp
+export MSP=m-U2UK2RBNQBBMFAZVJPAACYQOEQ
+export ORDERER=orderer.n-PGVKO3H3RFH75PLI3DBMLUQ66M.taiga.us-east-1.amazonaws.com:30001
+export PEER=nd-4727DEQV4NHYHASCYK4OXFSMEI.m-U2UK2RBNQBBMFAZVJPAACYQOEQ.n-PGVKO3H3RFH75PLI3DBMLUQ66M.taiga.us-east-1.amazonaws.com:30003
+export CHANNEL=mychannel
+export CAFILE=/opt/home/taiga-tls.pem
+export CHAINCODENAME=mycc
+export CHAINCODEVERSION=v0
+export CHAINCODEDIR=github.com/chaincode_example02/go
+```
 
 From Cloud9, SSH into the Fabric client node. The key should be in your home directory. The DNS of the
 EC2 instance can be found in the output of the CloudFormation stack.
@@ -86,6 +130,24 @@ Clone the repo:
 cd
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
+
+Edit the peer export file:
+
+```
+cd ~/non-profit-blockchain/ngo-fabric
+vi peer-exports.sh
+```
+
+Delete all the contents and paste the contents you copied from Cloud9. Then source the file:
+
+```
+source ./peer-exports.sh
+```
+
+## Step 4 - enroll an admin identity
+Enroll an admin identity with the Fabric CA (certificate authority). We will use this
+identity when we create the peer node in the next step.
+
 
 Edit the following bash script:
 
@@ -109,76 +171,7 @@ cd ~/non-profit-blockchain/ngo-fabric
 
 Exit your SSH session.
 
-## Step 5 - create your Fabric Peer
-LETS do this via the console, and prior to step 4. No need for the certs when we create the peer
-
-In your Cloud9 terminal window.
-
-Make sure you have exported the necessary ENV variables, as you did in step 2. If you aren't
-sure, you can rerun the script:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-source ./2-exports.sh
-```
-
-Create the Fabric peer.
-
-Execute the following script:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-./5-fabric-peer.sh
-```
-
-The script will continue to check the status of the Peer node, until it becomes HEALTHY. You can
-also check the status in the AWS Managed Blockchain Console. Clicking on the member will show the
-member status and details of any peers owned by this member.
-
-## Step 5 - preparing the client node
-Prior to executing any commands in the Fabric client node, you will need to export ENV variables
-that provide a context to Hyperledger Fabric. These variables will tell the client node which peer
-node to interact with, which TLS certs to use, etc. 
-
-I will generate all the required export variables in Cloud9. You will need to copy the output to
-the client node as explained below.
-
-In Cloud9:
-
-```
-source ./2-exports.sh
-```
-
-Find the section titled 'Exports to be used on client node'. Copy all the export commands under this 
-section using ctrl-c. The exports you copy should look something like this:
-
-```
-export MSP_PATH=/opt/home/admin-msp
-export MSP=m-U2UK2RBNQBBMFAZVJPAACYQOEQ
-export ORDERER=orderer.n-PGVKO3H3RFH75PLI3DBMLUQ66M.taiga.us-east-1.amazonaws.com:30001
-export PEER=nd-4727DEQV4NHYHASCYK4OXFSMEI.m-U2UK2RBNQBBMFAZVJPAACYQOEQ.n-PGVKO3H3RFH75PLI3DBMLUQ66M.taiga.us-east-1.amazonaws.com:30003
-export CHANNEL=mychannel
-export CAFILE=/opt/home/taiga-tls.pem
-export CHAINCODENAME=mycc
-export CHAINCODEVERSION=v0
-export CHAINCODEDIR=github.com/chaincode_example02/go
-```
-
-In the Fabric client node.
-
-SSH into the client node. Edit the peer export file:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-vi peer-exports.sh
-```
-
-Delete all the contents and paste the contents you copied from Cloud9. Then source the file:
-
-```
-source ./peer-exports.sh
-```
-
+## Step 5 - update the configtx channel configuration
 Update the configtx channel configuration:
 
 ```
