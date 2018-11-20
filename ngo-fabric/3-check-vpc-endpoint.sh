@@ -32,6 +32,7 @@ while (true); do
     status=$(aws ec2 describe-vpc-endpoints --filters Name=service-name,Values=$VpcEndpointServiceName --region $REGION --query 'VpcEndpoints[0].State' --output text)                         
     if  [[ "$status" == "available" ]]; then
         echo VPC endpoint $VpcEndpointServiceName is available 
+        break
     else
         echo VPC endpoint $VpcEndpointServiceName is NOT available. Sleeping for 30s
         sleep 30 
