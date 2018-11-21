@@ -21,11 +21,13 @@ export class UtilsService {
     }
 
     static jsonToMap(json) {
-        const mapObj = new Map();
-        Object.keys(json).forEach(key => {
-            mapObj.set(key, JSON.parse(json[key]));
-        });
-        return mapObj;
+        if (json) {
+            const mapObj = new Map();
+            Object.keys(json).forEach(key => {
+                mapObj.set(key, JSON.parse(json[key]));
+            });
+            return mapObj;
+        }
     }
 
     static formatFloat(floatStr: string, offset: number = 4) {
