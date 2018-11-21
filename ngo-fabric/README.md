@@ -46,83 +46,44 @@ We'll continue with the next steps while we wait for the peer node to become HEA
 ## Step 3 - create the Fabric client node
 In your Cloud9 terminal window.
 
-Create the file that includes the ENV export values that define your Fabric network configuration.
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-cp templates/exports-template.sh 2-exports.sh
-vi 2-exports.sh
-```
-
-Update the export statements at the top of the file. The info you need either matches what you 
-entered when creating the Fabric network in Step 1, or can be found in the AWS Managed Blockchain Console,
-under your network.
-
-Source the file, so the exports are applied to your current Cloud9 session. If you exit the Cloud9
-session and re-enter, you'll need to source the file again.
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-source 2-exports.sh
-```
-
-Make sure the `VPCENDPOINTSERVICENAME` in the output of the `source 2-exports.sh` is populated
-before continuining. The script below will check this for you.
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-./3a-check-vpc-endpoint.sh
-```
-
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
 the Fabric network. The Fabric client node will be created in its own VPC, with VPC endpoints 
-pointing to the Fabric network you created in Step 1.
+pointing to the Fabric network you created in Step 1. CloudFormation will be used to create the
+Fabric client node.
 
-If you need to rerun this script, you will need to manually delete the keypair, as follows:
-
-* In the EC2 console, under Key Pairs, find the key pair in the correct region and delete it
-* In Cloud 9, in the home directory, `rm ~/<keyname>.pem`
-
-Execute the following script:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-./3b-vpc-client-node.sh
-```
-
-Check the progress in the AWS CloudFormation console
-
-## Step 4 - prepare the Fabric client node
-Prior to executing any commands in the Fabric client node, you will need to export ENV variables
-that provide a context to Hyperledger Fabric. These variables will tell the client node which peer
-node to interact with, which TLS certs to use, etc. 
-
-I will generate all the required export variables in Cloud9. You will need to copy the output to
-the Fabric client node as explained below.
+The CloudFormation script requires a small number of parameter values. We'll make sure these 
+are available before running the script.
 
 In Cloud9:
 
 ```
+export ENDPOINT=https://taiga-beta.us-east-1.amazonaws.com
+export REGION=us-east-1
+export NETWORKID=<the network ID you created in Step1, from the AWS Managed Blockchain Console>
+```
+
+Make sure the VPC endpoint has been populated: 
+
+```
+aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
+```
+
+If the VPC endpoint is populated with a value, go ahead and run this script. This will create the
+CloudFormation stack:
+
+```
 cd ~/non-profit-blockchain/ngo-fabric
-source 2-exports.sh
+./3-vpc-client-node.sh
 ```
 
-Find the section titled 'Exports to be used on client node'. Make sure that all of the ENV
-variables have a value. If some of them are blank it could mean the resource has not yet
-been created. Copy all the export commands under this section using ctrl-c. The exports 
-you copy should look something like this:
+Check the progress in the AWS CloudFormation console
 
-```
-export MSP_PATH=/opt/home/admin-msp
-export MSP=m-U2UK2RBNQBBMFAZVJPAACYQOEQ
-export ORDERER=orderer.n-PGVKO3H3RFH75PLI3DBMLUQ66M.taiga.us-east-1.amazonaws.com:30001
-export PEER=nd-4727DEQV4NHYHASCYK4OXFSMEI.m-U2UK2RBNQBBMFAZVJPAACYQOEQ.n-PGVKO3H3RFH75PLI3DBMLUQ66M.taiga.us-east-1.amazonaws.com:30003
-export CHANNEL=mychannel
-export CAFILE=/opt/home/taiga-tls.pem
-export CHAINCODENAME=mycc
-export CHAINCODEVERSION=v0
-export CHAINCODEDIR=github.com/chaincode_example02/go
-```
+## Step 4 - prepare the Fabric client node and enroll and identity
+On the Fabric client node.
+
+Prior to executing any commands in the Fabric client node, you will need to export ENV variables
+that provide a context to Hyperledger Fabric. These variables will tell the client node which peer
+node to interact with, which TLS certs to use, etc. 
 
 From Cloud9, SSH into the Fabric client node. The key should be in your home directory. The DNS of the
 EC2 instance can be found in the output of the CloudFormation stack.
@@ -138,40 +99,46 @@ cd
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-Edit the peer export file:
+Create the file that includes the ENV export values that define your Fabric network configuration.
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
-vi peer-exports.sh
+cp templates/exports-template.sh fabric-exports.sh
+vi fabric-exports.sh
 ```
 
-Delete all the contents and paste the contents you copied from Cloud9. Then source the file:
+Update the export statements at the top of the file. The info you need either matches what you 
+entered when creating the Fabric network in Step 1, or can be found in the AWS Managed Blockchain Console,
+under your network.
+
+Source the file, so the exports are applied to your current session. If you exit the SSH 
+session and re-connect, you'll need to source the file again.
 
 ```
-source ./peer-exports.sh
+cd ~/non-profit-blockchain/ngo-fabric
+source fabric-exports.sh
 ```
 
-## Step 4 - enroll an admin identity
-On the Fabric client node.
+Sourcing the file will do two things:
+* export the necessary ENV variables
+* create another file which contains the export values you need to use when working with a Fabric peer node.
+This can be found in the file: peer-exports.sh. You will see how to use this in a later step.
+
+Check the `source` worked:
+
+```
+$ echo $PEERSERVICEENDPOINT
+nd-4MHB4EKFCRF7VBHXZE2ZU4F6GY.m-B7YYBFY4GREBZLPCO2SUS4GP3I.n-WDG36TTUD5HEJORZUPF4REKMBI.managedblockchain.us-east-1.amazonaws.com:30003
+```
+
+Check the peer export file exists and that is contains a number of export keys with values:
+
+```
+cat peer-exports.sh
+```
 
 Enroll an admin identity with the Fabric CA (certificate authority). We will use this
-identity when we create the peer node in the next step.
-
-
-Edit the following bash script:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-cp templates/enroll-member-admin-template.sh 4-enroll-member-admin.sh
-vi 4-enroll-member-admin.sh
-```
-
-Update the export statements at the top of the script. The admin username and password are the same
-as you used in Step 2. The CASERVICEENDPOINT can be found in the AWS Managed Blockchain Console. Go to
-Networks->your network->your member. Look for the field named: `Fabric certificate authority endpoint`.
-Copy the whole value, including the port number at the end.
-
-Execute the following script:
+identity when we create the peer node in a later step.
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric

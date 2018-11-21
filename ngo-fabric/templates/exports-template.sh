@@ -61,15 +61,15 @@ echo CASERVICEENDPOINT: $CASERVICEENDPOINT
 echo PEERNODEID: $PEERNODEID
 echo PEERSERVICEENDPOINT: $PEERSERVICEENDPOINT
 
-echo Exports to be used on client node
-echo After step 4, create a file on the client node to contain these exports
-echo Export these values before running any Fabric commands on the client node
-echo export MSP_PATH=/opt/home/admin-msp
-echo export MSP=$MEMBERID
-echo export ORDERER=$ORDERINGSERVICEENDPOINT
-echo export PEER=$PEERSERVICEENDPOINT
-echo export CHANNEL=mychannel
-echo export CAFILE=/opt/home/taiga-tls.pem
-echo export CHAINCODENAME=mycc
-echo export CHAINCODEVERSION=v0
-echo export CHAINCODEDIR=github.com/chaincode_example02/go
+echo Exports to be exported before executing any Fabric 'peer' commands via the CLI
+cat << EOF > peer-exports.sh
+export MSP_PATH=/opt/home/admin-msp
+export MSP=$MEMBERID
+export ORDERER=$ORDERINGSERVICEENDPOINT
+export PEER=$PEERSERVICEENDPOINT
+export CHANNEL=mychannel
+export CAFILE=/opt/home/taiga-tls.pem
+export CHAINCODENAME=mycc
+export CHAINCODEVERSION=v0
+export CHAINCODEDIR=github.com/chaincode_example02/go
+EOF
