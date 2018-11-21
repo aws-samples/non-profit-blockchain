@@ -109,7 +109,8 @@ vi ~/non-profit-blockchain/tmp/connection-profile/ngo-connection-profile.yaml
 ```
 NOTE: for TG, the connection profile CA name is the member id.
 
-Edit the config file used by app.js. Make sure the admin username and password is correct.
+Edit the config file used by app.js. Make sure the peer name in config.json is the same as the
+peer name in the connection profile. Also check that the admin username and password are correct.
 
 ```
 cd ~/non-profit-blockchain/ngo-rest-api
