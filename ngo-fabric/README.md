@@ -65,7 +65,7 @@ export NETWORKID=<the network ID you created in Step1, from the AWS Managed Bloc
 Make sure the VPC endpoint has been populated: 
 
 ```
-aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
+export VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
 ```
 
 If the VPC endpoint is populated with a value, go ahead and run this script. This will create the
