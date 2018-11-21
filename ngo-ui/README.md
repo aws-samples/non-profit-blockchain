@@ -8,12 +8,66 @@
 - [Thanks](#thanks)
 - [Copyright and license](#copyright-and-license)
 
-
 ## Quick start
+
+You should have already cloned the repo below. You would have done this when setting up the
+Fabric network.
+
+```
+cd
+git clone https://github.com/aws-samples/non-profit-blockchain.git
+```
+
+### Install Node
+On Cloud9
+
+```
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
+```
+
+```
+. ~/.nvm/nvm.sh
+nvm install lts/carbon
+nvm use lts/carbon
+```
+
+Amazon Linux seems to be missing g++, so:
+
+```
+sudo yum install gcc-c++
+```
+
+### Npm dependency install
+
+```
+cd ~/non-profit-blockchain/ngo-ui
+npm i
+```
+
+### Npm start
+
+```
+cd ~/non-profit-blockchain/ngo-ui
+npm start
+```
 
 **Warning**
 
-> Verify that you are running at least node 8.9.x, Angular7.x, Angualar cli and npm 5.x.x by running node -v and npm -v in a terminal/console window. Older versions produce errors, but newer versions are fine.
+To change the location of the REST API that the UI depends on, change the values in these files:
+
+```
+vi src/environments/environment.ts 
+vi src/environments/environment.prod.ts
+```
+
+The values to be changed are as follows. The trailing backslash is important.
+
+```
+  api_url: 'http://ngo4-687718776.us-east-1.elb.amazonaws.com/',
+  socket_url: 'ws://ngo4-687718776.us-east-1.elb.amazonaws.com/'
+```
+
+> Verify that you are running at least node 8.9.x, Angular7.x, Angular cli and npm 5.x.x by running node -v and npm -v in a terminal/console window. Older versions produce errors, but newer versions are fine.
 
 1. Go to project folder and install dependencies.
      ```bash
@@ -54,17 +108,4 @@ npm run build            | Build the app for production
 Thanks to all contributors and their support:
 
 ## Copyright and license
-
-
-Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License").
-You may not use this file except in compliance with the License.
-A copy of the License is located at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-or in the "license" file accompanying this file. This file is distributed
-on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-express or implied. See the License for the specific language governing
-permissions and limitations under the License.
+Enjoy :metal:
