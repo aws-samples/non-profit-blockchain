@@ -1,0 +1,188 @@
+<div class="container extra-margin-top">
+    <div class="row mb-2">
+        <div class="col-9">
+            <div class="d-flex mb-5">
+                <div class="mr-2"><i class="fa fa-check-circle text-success font-size-2rem"></i></div>
+                <div>
+                    <h2>Thank you for your donation!</h2>
+                    <p class="font-size-1rem">If you wish to continue donating more, click the 'Donate' button below.</p>
+                    <form>
+                        <div class="form-group"><a class="btn btn-warning font-size-1rem" role="button" routerLink="/ngolist">Donate</a><span
+                                class="ml-3">or</span><a class="btn btn-link font-size-1rem" role="button" routerLink="/dashboard">Return
+                                to home</a></div>
+                    </form>
+
+                    <!--
+                    <div>
+                        <p class="font-size-1rem mb-2 mt-4">NGO's who are now connected with your account</p>
+                        <div class="d-flex flex-column">
+                            <ul class="d-inline-flex flex-wrap list-unstyled mb-1">
+                                <li class="border bg-white p-1 mr-2 mb-2"><img src="assets/images/direct-relief-logo.png"
+                                        style="height: 40px; width: auto;"></li>
+                                <li class="border bg-white p-1 mr-2 mb-2"><img src="assets/images/compassion-logo.png"
+                                        style="height: 40px; width: auto;"></li>
+                                <li class="border bg-white p-1 mr-2 mb-2"><img src="assets/images/direct-relief-logo.png"
+                                        style="height: 40px; width: auto;"></li>
+                                <li class="border bg-white p-1 mr-2 mb-2"><img src="assets/images/compassion-logo.png"
+                                        style="height: 40px; width: auto;"></li>
+                                <li class="border bg-white p-1 mr-2 mb-2"><img src="assets/images/direct-relief-logo.png"
+                                        style="height: 40px; width: auto;"></li>
+                                <li class="border bg-white p-1 mr-2 mb-2"><img src="assets/images/compassion-logo.png"
+                                        style="height: 40px; width: auto;"></li>
+                                <li class="border bg-white p-1 mr-2 mb-2"><img src="assets/images/direct-relief-logo.png"
+                                        style="height: 40px; width: auto;"></li>
+                            </ul>
+                            <div class="mr-2"><a routerLink="#">View All</a></div>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <!-- <div>
+                <h4 class="m-0 mb-1">Blockchain activity</h4>
+                <div class="p-5 text-center card body login-bg">
+                    <span class="text-muted p-5">Component to be built dynamically.</span>
+                </div>
+            </div> -->
+        </div>
+        <div class="col">
+            <h5 class="pb-2">Links to explore</h5>
+            <ul class="list-unstyled">
+                <li class="d-flex align-items-center mt-2 mb-2">
+                    <i class="fa fa-chevron-right" aria-hidden="true"></i>&nbsp;&nbsp;
+                    <a routerLink="/ngolist">View all non-profit organizations</a>
+                </li>
+                <!--
+                <li class="d-flex align-items-center mt-2 mb-2">
+                    <i class="fa fa-chevron-right" aria-hidden="true"></i>&nbsp;&nbsp;
+                    <a routerLink="#">View my profile</a>
+                </li>
+              -->
+            </ul>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" role="dialog" tabindex="-1" id="gallery">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header pt-3 pb-3">
+                <h4 class="modal-title">Gallery</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body gallery mb-3 pt-0">
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+                <div><span>image&nbsp;</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" role="dialog" tabindex="-1" id="donors">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0 pt-2 pb-2">
+                <h4 class="modal-title">Donors list</h4><button type="button" class="close" data-dismiss="modal"
+                    aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body overflow-y-auto max-height-200 p-0">
+                <div class="table-responsive table-sm table-striped table-borderless">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="font-weight-normal">#</th>
+                                <th class="font-weight-normal">Donor name</th>
+                                <th class="text-right font-weight-normal">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="overflow-y-auto max-height-200">
+                            <tr>
+                                <td>1</td>
+                                <td>John Doe</td>
+                                <td class="text-right">$1000</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Brian Adams</td>
+                                <td class="text-right">$3500</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Mickey Mayer</td>
+                                <td class="text-right">$400</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Peter Joy</td>
+                                <td class="text-right">$100</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Peter Joy</td>
+                                <td class="text-right">$100</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Peter Joy</td>
+                                <td class="text-right">$100</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Peter Joy</td>
+                                <td class="text-right">$100</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Peter Joy</td>
+                                <td class="text-right">$100</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Peter Joy</td>
+                                <td class="text-right">$100</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Peter Joy</td>
+                                <td class="text-right">$100</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Peter Joy</td>
+                                <td class="text-right">$100</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Peter Joy</td>
+                                <td class="text-right">$100</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>Nicky Jones</td>
+                                <td class="text-right">$450</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

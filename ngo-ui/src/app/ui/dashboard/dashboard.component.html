@@ -1,0 +1,74 @@
+<div class="container extra-margin-top">
+    <div class="row mb-2">
+        <div class="col">
+            <h3 class="font-weight-light">Your donations dashboard</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-8 ">
+            <div class="border shadow-sm rounded p-4">
+                <h5>My Donations</h5>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="pl-0 border-top-0">#</th>
+                                <th class="font-weight-normal text-nowrap border-top-0">Non-profit organization</th>
+                                <th class="font-weight-normal border-top-0">No.of projects</th>
+                                <th class="font-weight-normal text-nowrap border-top-0">Donated on</th>
+                                <th class="font-weight-normal text-nowrap border-top-0 text-right">My doanations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let userDonation of userDonationslist; let i = index">
+                                <td class="pl-0">{{i+1}}</td>
+                                <td><a routerLink="/details/{{userDonation.ngo_id}}">{{userDonation.ngo_name}}</a></td>
+                                <td>20</td>
+                                <td>{{userDonation.date | date: 'MM/dd/yyyy'}}</td>
+                                <td class="text-right">{{userDonation.amount | currency:'USD':'symbol':'1.2-2'}}</td>
+                            </tr>
+                            <tr *ngFor="let userDonation of userDonationslist; let i = index">
+                                <td class="pl-0">{{i+1}}</td>
+                                <td><a routerLink="/details/{{userDonation.ngo_id}}">{{userDonation.ngo_name}}</a></td>
+                                <td>20</td>
+                                <td>{{userDonation.date | date: 'MM/dd/yyyy'}}</td>
+                                <td class="text-right">{{userDonation.amount | currency:'USD':'symbol':'1.2-2'}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="d-flex flex-row justify-content-between align-items-center card p-3 rounded-0 mb-3">
+                <div class="icon-circle m-0 bg-primary"><i class="fa fa-dollar"></i></div>
+                <div class="flex-fill ml-2 mr-2">
+                    <p class="m-0 p-0 text-muted">Your total donations:</p>
+                    <h3 class="m-0 p-0"> {{total_donation | currency:'USD':'symbol':'1.2-2'}}</h3>
+                </div>
+                <div><a class="btn btn-warning" role="button" routerLink="/ngolist">Donate</a></div>
+            </div>
+            <div class="d-flex flex-row justify-content-between align-items-center card p-3 rounded-0 mb-3">
+                <div class="icon-circle m-0 bg-light-green bg-jungle"><i class="fa fa-calendar"></i></div>
+                <div class="flex-fill ml-2 mr-2">
+                    <p class="m-0 p-0 text-muted">This month:</p>
+                    <h3 class="m-0 p-0">{{month_donation | currency:'USD':'symbol':'1.2-2'}}<small class="ml-2 font-size-1rem text-muted"></small></h3>
+                </div>
+            </div>
+            <div class="card rounded-0">
+                <div class="bg-light p-3 border-bottom">
+                    <h5 class="text-muted font-weight-normal m-0">Links</h5>
+                </div>
+                <div class="p-3">
+                    <ul class="list-unstyled m-0">
+                        <li class="d-flex align-items-center mt-2 mb-2">
+                            <i class="fa fa-chevron-right" aria-hidden="true"></i>&nbsp;&nbsp;
+                            <a routerLink="/ngolist">View all non-profit organizations</a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

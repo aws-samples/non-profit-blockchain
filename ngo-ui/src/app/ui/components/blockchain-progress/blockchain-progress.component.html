@@ -1,0 +1,29 @@
+<section class="cd-horizontal-blockchain border-bottom shadow-sm bg-white pt-3" [ngClass]="{'loaded': loaded}">
+  <div class="blockchain">
+    <div class="events-wrapper">
+      <h6 class="text-center text-orange">Block-chain Events</h6>
+      <div class="events" #eventsWrapper [style.width.px]="eventsWrapperWidth">
+        <ol>
+          <li *ngFor="let item of blockElements; let index = index;">
+            <a #blockEvents [ngClass]="{'selected': item.selected, 'older-event': index < selectedIndex}">
+              <img [ngClass]="{'selected': item.selected, 'older-event': index < selectedIndex}" data-toggle="tooltip"
+                data-html="true" [title]="getTransections(item)" src="/assets/images/block-dark.png"> </a> <span class="text-center">Block:
+              {{item.caption}}</span>
+          </li>
+        </ol>
+        <span class="filling-line" aria-hidden="true" #fillingLine></span>
+
+      </div>
+    </div>
+
+    <ul class="cd-blockchain-navigation">
+      <li>
+        <a href="#" (click)="onScrollClick($event, false)" class="prev" [ngClass]="{'inactive':prevLinkInactive}">Prev</a>
+      </li>
+      <li>
+        <a href="#" (click)="onScrollClick($event, true)" class="next" [ngClass]="{'inactive':nextLinkInactive}">Next</a>
+      </li>
+    </ul>
+  </div>
+
+</section>

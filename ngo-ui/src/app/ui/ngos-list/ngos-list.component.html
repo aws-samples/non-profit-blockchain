@@ -1,0 +1,229 @@
+<div class="container h-9 extra-margin-top">
+    <div class="row mb-2">
+        <div class="col">
+            <h5 class="font-weight-light">Choose an non-profit organization to make your donation</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4 h-95 display-inline-grid">
+            <div class="shadow-sm donors-list container-dynamic-height">
+                <div *ngFor="let ngo of ngolist; let i = index" [class]="selectedNGO.id===ngo.id?'active':''" (click)="onNGOSelect(ngo)">
+                    <div class="mr-3"><img src={{ngo.ngo_icon_url}} class="img-fluid">
+                        <app-star-rating class="text-center" class.disabled [rating]='ngo.ngo_rating' [itemId]='ngo.id+ngo.ngo_rating'></app-star-rating>
+                    </div>
+                    <div class="text-center mt-2">
+                    </div>
+                    <div>
+                        <h5 class="m-0 font-weight-normal">{{ngo.ngo_name}}</h5>
+                        <p class="m-0 mt-1">Total donations: {{ngo.ngo_donations | currency:'USD':'symbol':'1.2-2'}}
+                            USD</p>
+                        <p class="m-0 mt-1">My donation: {{ngo.ngo_user_donations | currency:'USD':'symbol':'1.2-2'}}
+                            USD</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-8">
+            <div class="border p-3 shadow-sm rounded h-100 container-dynamic-height">
+                <div class="d-flex flex-row justify-content-between mb-4 ">
+                    <div class="d-flex">
+                        <div class="d-flex flex-column align-items-center mr-3">
+                            <img src={{selectedNGO.ngo_icon_url}} class="img-fluid wdth-150">
+                            <div class="text-center mt-2">
+                                <app-star-rating class.disabled [rating]='selectedNGO.ngo_rating' [itemId]='selectedNGO.ngo_rating+selectedNGO.id'
+                                    data-toggle="modal" data-target="#rating"></app-star-rating>
+                            </div>
+                        </div>
+                        <div>
+                            <h5 class="m-0">{{selectedNGO.ngo_name}}</h5>
+                            <p class="m-0">Regn. No. {{selectedNGO.ngo_reg_no}}<br>{{selectedNGO.ngo_address}}<br>{{selectedNGO.ngo_phone}}<br>{{selectedNGO.ngo_email}},</p>
+
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column align-items-end">
+                        <div>
+                            <ul class="d-inline-flex list-unstyled border rounded">
+                                <li class="d-flex flex-column justify-content-center align-items-center p-1 text-nowrap pl-2 pr-2">
+                                    <span>Total Donations</span><span><strong>{{selectedNGO.ngo_donations |
+                                            currency:'USD':'symbol':'1.2-2'}}</strong></span>
+                                </li>
+                                <li class="d-flex flex-column justify-content-center align-items-center p-1 text-nowrap pl-2 pr-2 border-left border-right bg-gray-200">
+                                    <span>Utilized fund</span><span> <a href="#" data-toggle="modal" data-target="#funds-utilized">
+                                            {{selectedNGO.ngo_fund_utilized | currency:'USD':'symbol':'1.2-2'}}</a></span>
+                                </li>
+                                <li class="d-flex flex-column justify-content-center align-items-center p-1 text-nowrap pl-2 pr-2 bg-light">
+                                    <span>My donations</span><span>{{selectedNGO.ngo_user_donations |
+                                        currency:'USD':'symbol':'1.2-2'}}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <ul class="d-inline-flex list-unstyled border rounded">
+                                <li class="d-flex flex-column justify-content-center align-items-center p-1 text-nowrap pl-2 pr-2">
+                                    <span>Total Projects</span><span><strong>{{selectedNGO.ngo_projects}}</strong></span>
+                                </li>
+                                <li class="d-flex flex-column justify-content-center border-left align-items-center p-1 text-nowrap pl-2 pr-2">
+                                    <span>Total no.of donors</span><span><a href="#" data-toggle="modal" data-target="#donors">{{selectedNGO.ngo_Donors}}</a></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="position-relative">
+                    <button class="btn btn-link gallery-link" type="button" data-toggle="modal" data-target="#gallery">
+                        <i class="fa fa-photo mr-1 text-muted"></i>Gallery
+                    </button>
+
+                    <div class="clear-both pt-3 pb-3">
+                        <h4 class="border-bottom">About</h4>
+                        <div class="about-content pr-4">
+                            <p class="about-content">{{selectedNGO.ngo_about}}</p>
+                        </div>
+                        <div class="mt-5">
+                            <form class="justify-content-start align-items-center" [formGroup]="donateForm">
+                                <div class="form-group d-inline-flex m-0">
+                                    <input class="form-control font-size-1rem w-50" type="number" formControlName="donationAmount"
+                                        placeholder="$ 150.00">
+                                    <div *ngIf="submitted && donation.donationAmount.errors" class="invalid-feedback"
+                                        [ngClass]="{ 'is-invalid': submitted && donation.donationAmount.errors}">
+                                        <div *ngIf="donation.donationAmount.errors.required">Donatoion amount is
+                                            required</div>
+                                    </div>
+                                    <a class="btn btn-warning ml-2 text-white" (click)='onDonate()' role="button">
+                                        Donate<i *ngIf="loading" class='fa fa-circle-o-notch fa-spin ml-2 '> </i>
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-gallery [itemId]='selectedNGO.ngo_reg_no'></app-gallery>
+
+<div class="modal fade" role="dialog" tabindex="-1" id="funds-utilized">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header pb-2">
+                <h4 class="modal-title">Funds utilized</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" aria-hidden="true">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table w-100 tbl-funds-utilized table-sm table-borderless table-striped">
+                    <thead class="bg-dark text-white">
+                        <tr>
+                            <th class="font-weight-normal pl-4">#</th>
+                            <th class="font-weight-normal">Item name</th>
+                            <th class="text-right font-weight-normal pr-4">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="overflow-y-auto max-height-200">
+                        <tr *ngFor="let spendDetails of selectedNGO.ngo_spend_details; let i = index">
+                            <td class="pl-4">{{i+1}}</td>
+                            <td>{{spendDetails.spendDescription}}</td>
+                            <td class="text-right pr-4" data-dismiss="modal" data-toggle="modal" (click)='renderGraph(spendDetails.spendId,spendDetails.spendAmount)'
+                                data-target="#contributionChart"><a href='#'>{{spendDetails.spendAmount
+                                    |
+                                    currency:'USD':'symbol':'1.2-2'}}</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade " role="dialog" tabindex="-1" id="contributionChart">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0 pt-2 pb-2">
+                <h4 class="modal-title text-center">Donor's contribution </h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-toggle="modal"
+                    data-target="#funds-utilized">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class='wrapper' style="text-align: center">
+                <div #graphcontainer> </div>
+                <!-- <i *ngIf="show_graph" class='fa fa-circle-o-notch fa-spin'>
+                </i> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" role="dialog" tabindex="-1" id="donors">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h4 class="modal-title">Donors list</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body overflow-y-auto max-height-200 p-0 mb-4 pt-2">
+                <div class="table-responsive table-sm table-borderless table-striped">
+                    <table class="table m-0">
+                        <thead class="bg-dark text-white">
+                            <tr>
+                                <th class="font-weight-normal pl-4">#</th>
+                                <th class="font-weight-normal">Donor name</th>
+                                <th class="text-right font-weight-normal  pr-4">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="overflow-y-auto max-height-200">
+                            <tr *ngFor="let ngo of getNgoDonorsAmountKeys(); let i = index">
+                                <td class="pl-4">{{i+1}}</td>
+                                <td>{{ngo}}</td>
+                                <td class="text-right pr-4">{{selectedNGO.ngo_donor_details.get(ngo) |
+                                    currency:'USD':'symbol':'1.2-2'}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf='selectedNGO.ngo_user_rating===0' class="modal fade" role="dialog" tabindex="-1" id="rating">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header pt-3 pb-3">
+                <h4 class="modal-title">Rating for <strong>{{selectedNGO.ngo_name}}</strong></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row h-100">
+                    <div class="col- col-sm-6 text-center my-auto">
+                        <p>My rating</p>
+                        <app-star-rating class="pop-rating" [iseditable]='selectedNGO.ngo_user_rating===0' [rating]='selectedNGO.ngo_user_rating'
+                            [itemId]='userRating.transactionId' data-dismiss="modal"></app-star-rating>
+                    </div>
+                    <div class="col- col-sm-6 text-center my-auto">
+                        <div class="rounded-circle border align-middle d-block mx-auto pop-overall-rating">
+                            <p class="mt-5">Overall rating</p>
+                            <app-star-rating class="pop-rating" [rating]='selectedNGO.ngo_rating' [itemId]='selectedNGO.id'></app-star-rating>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

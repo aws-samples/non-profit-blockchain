@@ -1,0 +1,47 @@
+.rating {
+    float: left;
+    min-width: 84px;
+    &:not(:checked) {
+      > {
+        input {
+          position: absolute;
+          top: -9999px;
+          clip: rect(0, 0, 0, 0);
+        }
+        label {
+          float: right;
+          width: 1em;
+          padding: 0.1em;
+          overflow: hidden;
+          white-space: nowrap;
+          cursor: pointer;
+          font-size: 110%;
+          line-height: 1.2;
+          color: #ddd;
+          &:before {
+            content: '★';
+          }
+        }
+      }
+      > label:hover {
+        color: gold;
+        ~ label {
+          color: gold;
+        }
+      }
+    }
+    > input:checked ~ label {
+      color: #ffc107;
+    }
+    > {
+      input:checked ~ label:hover {
+        color: #ea0;
+        ~ label {
+          color: #ea0;
+        }
+      }
+      label:hover ~ input:checked ~ label {
+        color: #ea0;
+      }
+    }
+  }

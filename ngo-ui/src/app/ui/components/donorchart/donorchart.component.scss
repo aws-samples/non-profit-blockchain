@@ -1,0 +1,46 @@
+
+// .wrapper{
+//   display: inline-block;
+//   position: relative;
+//   width: 100%;
+// }
+
+.pie-chart {
+  width: 100%;
+  display: inline-block;
+  // position: absolute;
+  // top:0px;
+  height: 400px !important;
+
+  /deep/ path {
+    stroke: #fff;
+    stroke-width: 2;
+  }
+  /deep/ .totalspend{
+    font-size: 1.6em;
+  }
+
+  /deep/ .label{
+    font-size: 1.2em;
+  }
+
+  /deep/ .percent{
+    font-size: 1.4em;
+  }
+}
+
+.legend{
+  font-weight: bold;
+
+  .item{
+    padding: 0 30px;
+
+    .circle{
+      height: 30px;
+      width: 30px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+  }
+}
+    

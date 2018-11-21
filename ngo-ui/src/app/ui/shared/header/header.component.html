@@ -1,0 +1,31 @@
+<div class="fixed-top">
+    <nav class="navbar navbar-custom navbar-dark navbar-expand-md bg-info navigation-clean-button p-1">
+        <div class="container-fluid">
+          <img src="../../../../assets/images/aws-logo.png" title="AWS" style="height:35px">
+          <button class="navbar-toggler" data-toggle="collapse" data-target="#navcol-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div *ngIf="currentUser" class="collapse navbar-collapse" id="navcol-1">
+            <ul class="nav navbar-nav ml-auto">
+              <li class="nav-item" role="presentation">
+                <a class="nav-link active">{{greetingMsg}} {{currentUser.name}} !</a>
+              </li>
+            </ul>
+            <a routerLink='/dashboard'>
+              <span class="text-white my-donations"><small>My Donations</small>
+              </span>
+            </a>
+            <a routerLink='/ngolist'>
+              <span class="text-white my-donations"><small>NPO List</small>
+              </span>
+            </a>
+            <span class="navbar-text actions" (click)='doAction()'>
+              <a class="text-primary">{{actionButton}}</a>
+            </span>
+          </div>
+        </div>
+
+      </nav>
+      <app-blockchain></app-blockchain>
+</div>

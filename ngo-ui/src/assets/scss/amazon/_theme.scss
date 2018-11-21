@@ -1,0 +1,259 @@
+$icon-size: 3rem;
+$icon-sm-width-height: 1.5rem;
+
+.icon-sm-wrapper{
+  width: $icon-sm-width-height;
+  height: $icon-sm-width-height;
+}
+
+// dynamic heights
+// header height - 145px
+
+.container-dynamic-height{
+  //min-height: 500px;
+  //max-height: calc(100% - 145px);
+}
+
+// .container-dynamic-height-mydonations{
+//   min-height: calc(100% - 375px);
+//   max-height: calc(100% - 375px);
+//   height: calc(100% - 375px);
+//   overflow-y: auto;
+//   border:4px solid red;
+// }
+
+.about-content{
+  min-height: 10rem;
+  max-height: 10rem;
+  overflow-y: auto;
+  
+}
+
+
+// margins
+.extra-margin-top{
+  margin-top: 178px;
+}
+
+.circle{
+  border-radius: 50%;
+}
+
+
+.fa-star{
+  @extend .text-yellow;
+}
+
+
+//horiztonal - tabs
+// overridden
+.custom-tabs {
+  .nav-link{
+    background: darken($light, 5%);
+    border-color: #dee2e6;
+    @extend .p-1;
+    @extend .pl-5;
+    @extend .pr-5;
+    @extend .text-dark;
+  }
+}
+
+.donors-list{
+    @extend .bg-white;
+    @extend .rounded;
+    @extend .border;
+    overflow-y: auto;
+
+
+    >div{
+    @extend .pt-2;
+    @extend .pb-2;
+    @extend .d-flex;
+    @extend .border-bottom;
+
+    >div{
+      &:first-child{
+        @extend .ml-2;
+        text-align: center;
+        min-width: 95px;
+        max-width: 95px;
+        overflow: hidden;
+      }
+    }
+
+      &.active{
+        @extend .bg-light;
+      }
+  }
+
+}
+
+// heights
+.max-height-200{
+  max-height: 200px;
+}
+
+// overflows
+.overflow-y-auto{
+  overflow-y: auto;
+}
+
+// clear floats
+.clear-both{
+  clear: both;
+}
+
+
+.gallery-link{
+  position: absolute;
+  right: 0;
+  top: -0.5rem;
+  @extend .pr-0;
+}
+
+.modal-lg{
+  max-width: 1000px;
+}
+
+.gallery {
+  @extend .d-flex;
+  @extend .flex-wrap;
+  //@extend .justify-content-center;
+  @extend .align-items-center;
+  max-height: 500px;
+  overflow-y: auto;
+
+  >div{
+    @extend .d-flex;
+    @extend .justify-content-center;
+    @extend .align-items-center;
+    @extend .m-1;
+    @extend .bg-dark;
+    // width: 179px;
+    // height: 120px;
+    width: 230px;
+    height: 150px;
+    text-align:center;
+    color: #ccc;
+    overflow: hidden;
+  }
+}
+
+
+.login-bg{
+  background: url("assets/images/login-bg.png") top center;
+  overflow: hidden;
+
+  .login-wrapper{
+    >div{
+      @extend .ml-5;
+      @extend .mr-5;
+      max-width: 250px;
+      min-width: 250px;
+    }
+  }
+}
+
+.icon-circle{
+  background: $gray-600;
+  border-radius: 50%;
+  @extend .p-2;
+  @extend .d-flex;
+  @extend .justify-content-center;
+  @extend .align-items-center;
+  width: $icon-size;
+  height: $icon-size;
+
+  i{
+    font-size: 1.8rem;
+    @extend .text-white;
+  }
+}
+
+// helpers
+.my-donations{
+  @extend .p-1;
+  @extend .pl-3;
+  @extend .pr-3;
+  @extend .ml-2;
+  @extend .mr-3;
+  border-radius: 1rem;
+  border:1px solid rgba(255,255,255, 0.2);
+}
+
+
+.font-size-0-5rem{
+  font-size: 0.5rem;
+}
+
+.font-size-1rem{
+  font-size: 0.9rem;
+}
+
+.font-size-2rem{
+  font-size: 2rem;
+}
+
+html{
+  height: 100%;
+
+  body{
+    // ikhan changes 
+    // min-height: 90%;
+    // max-height: 90%;
+    //margin-top: 36px;
+    min-height: 100%;
+    max-height: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+}
+
+.tbl-funds-utilized th {
+  border-top: 0;
+}
+.blockchain-activity-h6 {
+  padding: 0.75rem;
+  border-bottom: 2px solid #dee2e6;
+}
+.pop-overall-rating {
+  height: 150px;
+  width: 150px;
+  background-color: #f8f9fa;
+}
+.pop-rating {
+  display: inline-block;
+}
+
+.h-100 {
+  height: 100%;
+}
+
+.h-90 {
+  //height: 80% !important;
+}
+.h-95 {
+  //height: 95% !important;
+}
+.display-inline-grid {
+  display: inline-grid;
+}
+.mt-6 {
+  margin-top: 4rem !important;
+}
+.wdth-150 {
+  max-width: 150px;
+}
+.wdth-250 {
+  max-width: 250px;
+}
+#sidebar {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 20%;
+  background-color: #f8f9fa !important;
+  // border-left: 1px solid  rgba(0, 0, 0, 0.125) !important;
+  // background-color: rgba(0, 0, 0, 0.125);
+
+}

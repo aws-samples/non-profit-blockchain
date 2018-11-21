@@ -18,6 +18,8 @@
 #
 
 set +e
+echo installing jq
+sudo yum install jq
 echo To test, run the API server as per the instructions in the README, then execute this script on the command line
 echo NOTE: the logger for the REST API server should be running at INFO level, not DEBUG
 echo The export statements below can be used to point to either localhost or to an ELB endpoint, depending on where
@@ -25,8 +27,8 @@ echo the REST API server is running
 echo
 export ENDPOINT=Fabric-ELB-205962472.us-west-2.elb.amazonaws.com
 export PORT=80
-#export ENDPOINT=localhost
-#export PORT=3000
+export ENDPOINT=localhost
+export PORT=3000
 RED='\033[0;31m'
 RESTORE='\033[0m'
 echo connecting to server: $ENDPOINT:$PORT
@@ -39,6 +41,10 @@ USERID=$(uuidgen)
 echo
 response=$(curl -s -X POST http://${ENDPOINT}:${PORT}/users -H 'content-type: application/x-www-form-urlencoded' -d "username=${USERID}&orgName=Org1")
 echo $response
+echo 'Query all donors'
+echo
+curl -s -X GET http://${ENDPOINT}:${PORT}/donors -H 'content-type: application/json'
+
 echo Response should be: {"success":true,"secret":"","message":"$USERID enrolled Successfully"}
 echo
 echo Checking response:
