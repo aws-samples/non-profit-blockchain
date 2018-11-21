@@ -51,39 +51,49 @@ npm install
 
 ## Generate a connection profile
 
-NOTE: for TG, the connection profile CA name is the network member id.
+The REST API needs a connection profile to connect to the Fabric network. The instructions below will 
+auto-generate a connection profile. All of the information to create the connection profile is in 
+our Cloud9 environment, so we will generate the profile there and copy it to our client node.
 
-The REST API needs a connection profile to connect to the Fabric network. The instructions below will create
-the connection profile for the first-network provided by fabric-samples. To create the connection profile do the 
-following:
-
-* Edit the script ngo-rest-api/connection-profile/gen-connection-profile.sh. 
-* Update the REPODIR to point to the directory where this ngo-blockchain repo has been cloned.
-* Update the CERTDIR to point to the directory where the fabric-samples has been cloned, if this is where your crypto information resides.
-* Run the script
+In Cloud9:
 
 ```
 cd ~/non-profit-blockchain/ngo-rest-api/connection-profile
 ./gen-connection-profile.sh
+more ~/non-profit-blockchain/tmp/connection-profile/ngo-connection-profile.yaml
 ```
 
-This will generate the profiles and list the directory that stores them, for example:
+Copy the contents of the ngo-connection-profile.yaml file.
+
+SSH back into the client node and copy the connection profiles to the right location:
 
 ```
-ls -lR ~/non-profit-blockchain/tmp/connection-profile/
+REPODIR=~/non-profit-blockchain
+mkdir -p $REPODIR/tmp/connection-profile/org1
+mkdir -p $REPODIR/tmp/connection-profile/org2
+cp $REPODIR/ngo-rest-api/connection-profile/ngo-connection-profile-template.yaml $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
+cp $REPODIR/ngo-rest-api/connection-profile/client-org1.yaml $REPODIR/tmp/connection-profile/org1
+cp $REPODIR/ngo-rest-api/connection-profile/client-org2.yaml $REPODIR/tmp/connection-profile/org2
+```
+
+Now edit the ngo-connection-profile.yaml file, remove all the contents and replace with the contents you
+copied from Cloud9.
+
+```
+vi ~/non-profit-blockchain/tmp/connection-profile/ngo-connection-profile.yaml
+```
+NOTE: for TG, the connection profile CA name is the member id.
+
+Edit the config file used by app.js. Make sure the admin username and password is correct.
+
+```
+cd ~/non-profit-blockchain/ngo-rest-api
+vi config.json
 ```
 
 ## Run the REST API Node.js application
 
-Edit the file config.json and update the `admins` entry to contain the admin username and password for your org's Fabric CA.
-
-Then install the dependencies:
-
-```
-npm install
-```
-
-Then run the app (in the background if you prefer):
+Run the app (in the background if you prefer):
 
 ```
 node app.js &
