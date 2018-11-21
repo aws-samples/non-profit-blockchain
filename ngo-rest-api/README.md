@@ -56,15 +56,15 @@ auto-generate a connection profile. All of the information to create the connect
 our Cloud9 environment, so we will generate the profile there and copy it to our client node.
 
 In Cloud9:
-Make sure you still have the ENV variable set, which were populated when you built the Fabric network.
-If not, follow these steps:
+Make sure you still have the ENV variables set, which were populated when you built the Fabric network.
+If not, follow these steps. You can run these steps and the `source` command multiple times without side effects.
 
 Create the file that includes the ENV export values that define your Fabric network configuration.
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
-cp templates/exports-template.sh 2-exports.sh
-vi 2-exports.sh
+cp templates/exports-template.sh fabric-exports.sh
+vi fabric-exports.sh
 ```
 
 Update the export statements at the top of the file. The info you need either matches what you 
@@ -76,7 +76,7 @@ session and re-enter, you'll need to source the file again.
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
-source 2-exports.sh
+source fabric-exports.sh
 ```
 
 Now generate the connection profile and check that the connection profile contains all of the
@@ -88,33 +88,33 @@ cd ~/non-profit-blockchain/ngo-rest-api/connection-profile
 more ~/non-profit-blockchain/tmp/connection-profile/ngo-connection-profile.yaml
 ```
 
-Copy the contents of the ngo-connection-profile.yaml file.
-
-SSH back into the client node and copy the connection profiles to the right location:
-
-```
-REPODIR=~/non-profit-blockchain
-mkdir -p $REPODIR/tmp/connection-profile/org1
-mkdir -p $REPODIR/tmp/connection-profile/org2
-cp $REPODIR/ngo-rest-api/connection-profile/ngo-connection-profile-template.yaml $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
-cp $REPODIR/ngo-rest-api/connection-profile/client-org1.yaml $REPODIR/tmp/connection-profile/org1
-cp $REPODIR/ngo-rest-api/connection-profile/client-org2.yaml $REPODIR/tmp/connection-profile/org2
-```
-
-Now edit the ngo-connection-profile.yaml file, remove all the contents and replace with the contents you
-copied from Cloud9.
-
-```
-vi ~/non-profit-blockchain/tmp/connection-profile/ngo-connection-profile.yaml
-```
-NOTE: for TG, the connection profile CA name is the member id.
-
-Edit the config file used by app.js. Make sure the peer name in config.json is the same as the
+Check the config file used by app.js. Make sure the peer name in config.json is the same as the
 peer name in the connection profile. Also check that the admin username and password are correct.
 
 ```
 cd ~/non-profit-blockchain/ngo-rest-api
 vi config.json
+```
+
+config.json should look something like this:
+
+```
+{
+    "host":"localhost",
+    "port":"3000",
+    "channelName":"mychannel",
+    "chaincodeName":"ngo",
+    "eventWaitTime":"30000",
+    "peers":[
+        "peer1"
+    ],
+    "admins":[
+       {
+          "username":"admin",
+          "secret":"adminpwd"
+       }
+    ]
+ }
 ```
 
 ## Run the REST API Node.js application

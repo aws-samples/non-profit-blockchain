@@ -1,9 +1,0 @@
-export MSP_PATH=/opt/home/admin-msp
-export MSP=<member-id>
-export ORDERER=<orderer-dns>:<port> ## from output of get-network
-export PEER=<peer-dns>:<port> ## from output of get-node
-export CHANNEL=mychannel
-export CAFILE=/opt/home/taiga-tls.pem
-export CHAINCODENAME=mycc
-export CHAINCODEVERSION=v0
-export CHAINCODEDIR=github.com/chaincode_example02/go

@@ -1,7 +1,22 @@
+/*
+# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License.
+# A copy of the License is located at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# or in the "license" file accompanying this file. This file is distributed
+# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+# express or implied. See the License for the specific language governing
+# permissions and limitations under the License.
+#
+*/
 ol, ul {
     list-style: none;
   }
-  
+
   .cd-horizontal-blockchain {
     opacity: 0;
     -webkit-transition: opacity 0.2s;
@@ -94,7 +109,7 @@ ol, ul {
       padding-bottom: 15px;
       color: #383838;
       height: 40px;
-      
+
       -webkit-transform: translateZ(0);
       -moz-transform: translateZ(0);
       -ms-transform: translateZ(0);
@@ -126,8 +141,8 @@ ol, ul {
       }
       &.selected {
         height: 48px !important;
-        bottom: -29px;  
-        cursor: pointer;  
+        bottom: -29px;
+        cursor: pointer;
         // pointer-events: none;
         &::after {
           background-color: #7b9d6f;
@@ -136,7 +151,7 @@ ol, ul {
       }
       &.older-event::after {
         border-color: #7b9d6f;
-        cursor: pointer;  
+        cursor: pointer;
       }
     }
     li span {
@@ -146,7 +161,7 @@ ol, ul {
       font-size: 12px;
     }
   }
-  
+
   @media only screen and (min-width: 1100px) {
     .cd-horizontal-blockchain {
       &::before {
@@ -154,7 +169,7 @@ ol, ul {
       }
     }
   }
-  
+
   .cd-blockchain-navigation a {
     position: absolute;
     z-index: 1;
@@ -219,9 +234,9 @@ ol, ul {
       list-style: none;
     }
   }
-  
 
-  
+
+
   @media only screen and (min-width: 768px) {
     .cd-horizontal-blockchain .events-content {
       h2 {

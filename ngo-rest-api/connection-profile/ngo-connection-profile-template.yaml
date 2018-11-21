@@ -9,7 +9,7 @@ channels:
     orderers:
       - orderer.com
     peers:
-      %PEERNODEID%:
+      peer1:
         endorsingPeer: true
         chaincodeQuery: true
         ledgerQuery: true
@@ -19,7 +19,7 @@ organizations:
   Org1:
     mspid: %MEMBERID%
     peers:
-      - %PEERNODEID%
+      - peer1
     certificateAuthorities:
       - ca-org1
 
@@ -30,7 +30,7 @@ orderers:
       path: %CAFILE%
 
 peers:
-  %PEERNODEID%:
+  peer1:
     url: grpcs://%PEERSERVICEENDPOINT%
     grpcOptions:
       ssl-target-name-override: %PEERNODEID%

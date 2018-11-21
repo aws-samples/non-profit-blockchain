@@ -60,12 +60,14 @@ In Cloud9:
 export ENDPOINT=https://taiga-beta.us-east-1.amazonaws.com
 export REGION=us-east-1
 export NETWORKID=<the network ID you created in Step1, from the AWS Managed Blockchain Console>
+export NETWORKNAME=<the name you gave the network>
 ```
 
-Make sure the VPC endpoint has been populated: 
+Make sure the VPC endpoint has been populated and exported: 
 
 ```
 export VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
+echo $VPCENDPOINTSERVICENAME
 ```
 
 If the VPC endpoint is populated with a value, go ahead and run this script. This will create the
@@ -91,6 +93,14 @@ EC2 instance can be found in the output of the CloudFormation stack.
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
 ```
+
+Use `aws configure` to give your EC2 permissions to access your AWS resources:
+
+```
+aws configure
+```
+The credentials you enter here are the AWS access key and secret key that belong to the 
+AWS account you will use to create your Fabric network.
 
 Clone the repo:
 
@@ -134,7 +144,12 @@ nd-4MHB4EKFCRF7VBHXZE2ZU4F6GY.m-B7YYBFY4GREBZLPCO2SUS4GP3I.n-WDG36TTUD5HEJORZUPF
 Check the peer export file exists and that is contains a number of export keys with values:
 
 ```
-cat peer-exports.sh
+cat ~/peer-exports.sh 
+```
+If the file has values for all keys, source it:
+
+```
+source ~/peer-exports.sh 
 ```
 
 Enroll an admin identity with the Fabric CA (certificate authority). We will use this

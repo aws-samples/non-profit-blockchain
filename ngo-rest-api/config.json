@@ -5,12 +5,12 @@
     "chaincodeName":"ngo",
     "eventWaitTime":"30000",
     "peers":[
-        "peer0.org1.com"
+        "peer1"
     ],
     "admins":[
        {
           "username":"admin",
-          "secret":"adminpw"
+          "secret":"adminpwd"
        }
     ]
  }
