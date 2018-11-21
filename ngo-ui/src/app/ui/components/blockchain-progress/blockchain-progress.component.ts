@@ -76,13 +76,11 @@ export class BlockchainProgressComponent implements AfterViewInit {
   constructor(private _cdr: ChangeDetectorRef, private socketService: SocketService) {
     this.socketService.newMessage.subscribe(
       (data: any) => {
-        console.log('new Data', this._blockElements);
         try {
           _cdr.detectChanges();
           this.ngAfterViewInit();
-
         } catch (ex) {
-          console.log(ex);
+          console.error(ex);
         }
       });
   }

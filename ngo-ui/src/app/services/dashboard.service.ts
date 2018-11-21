@@ -58,7 +58,6 @@ export class DashboardService {
   userDonationsJsonAdopter(userDonationsData: any = []) {
     const userDonations: Array<Donation> = [];
 
-    console.log(userDonationsData);
     if (userDonationsData.length === undefined) {
       userDonationsData = [userDonationsData];
     }

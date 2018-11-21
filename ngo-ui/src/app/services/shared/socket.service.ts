@@ -40,7 +40,6 @@ export class SocketService {
   }
 
   public close() {
-    console.log('on closing WS');
     this.ws.close();
     this.subject = null;
   }

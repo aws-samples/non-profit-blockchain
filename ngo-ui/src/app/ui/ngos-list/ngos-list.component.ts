@@ -49,11 +49,9 @@ export class NgosListComponent implements OnInit {
       (data: any) => {
         const currentDonor = SessionService.getUser().name;
         this.selectedNGO.ngo_user_rating = data.rating;
-        if (data.itemId) {
-          this.ngoService.updateDonorNGORating(data.itemId, data.rating, currentDonor, this.selectedNGO.ngo_reg_no).subscribe(
-            resp => { }
-          );
-        }
+        this.ngoService.createDonorNGORating(data.rating, currentDonor, this.selectedNGO.ngo_reg_no).subscribe(
+          resp => { }
+        );
       });
   }
 
@@ -67,7 +65,6 @@ export class NgosListComponent implements OnInit {
         this.ngoMap.set(element.id, element);
       });
       this.selectedNGO = this.ngolist.length > 0 ? this.ngoMap.get(this.ngolist[0].id) : new Ngo();
-      console.log(this.ngoMap);
       setTimeout(() => {
         const ngo_data = UtilsService.mapToJson(this.ngoMap);
         SessionService.setValue('ngos', ngo_data);
@@ -77,7 +74,7 @@ export class NgosListComponent implements OnInit {
 
     },
       err => {
-        console.log(err);
+        console.error(err);
       }
     );
     this.donateForm = this.formBuilder.group({
@@ -173,23 +170,20 @@ export class NgosListComponent implements OnInit {
     if (this.donateForm.invalid) {
       return;
     }
-    console.log(this.donateForm.value);
     this.donateService.makeDonation(this.selectedNGO.ngo_reg_no, SessionService.getUser().name, this.donateForm.value.donationAmount)
       .subscribe(
         data => {
-          console.log('Donations', data);
           this.router.navigate([`donate/${data.donationId}`]);
         },
         err => {
           this.loading = false;
-          console.log('Well shit happened!!', err);
+          console.error(err);
           this.error = 'Something wrong with the donation. Will update you soon on this.';
         }
       );
   }
 
   getSpendData(spend_Id, totalamount) {
-    console.log(`getSpendAllocation for ${spend_Id}`);
     this.dashboardService.getContributorsBySpend(spend_Id).subscribe(
       data => {
         if (data.length > 0) {

@@ -54,7 +54,6 @@ export class SigninComponent implements OnInit {
       },
       err => {
         this.loading = false;
-        console.log('wrong user', err);
         this.error = 'User not found';
       }
     );

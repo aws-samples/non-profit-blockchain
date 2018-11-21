@@ -155,23 +155,19 @@ export class NgoDetailsComponent implements OnInit {
     if (this.donateForm.invalid) {
       return;
     }
-    console.log(this.donateForm.value);
     this.donateService.makeDonation(this.selectedNGO.ngo_reg_no, SessionService.getUser().name, this.donateForm.value.donationAmount)
       .subscribe(
         data => {
-          console.log('Donations', data);
           this.router.navigate([`donate/${data.donationId}`]);
         },
         err => {
           this.loading = false;
-          console.log('Well shit happened!!', err);
           this.error = 'Something wrong with the donation. Will update you soon on this.';
         }
       );
   }
 
   getSpendData(spend_Id, totalamount) {
-    console.log(`getSpendAllocation for ${spend_Id}`);
     this.dashboardService.getContributorsBySpend(spend_Id).subscribe(
       data => {
         if (data.length > 0) {

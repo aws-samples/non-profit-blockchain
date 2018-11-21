@@ -14,7 +14,7 @@ In the Cloud9 console, click 'Create Environment'
 5. In the Cloud9 terminal, in the home directory, clone this repo:
 
 ```
-cd
+cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
@@ -35,7 +35,7 @@ Before continuing, check to see that your Fabric network has been created and is
 wait for it to complete. Otherwise the steps below may fail.
 
 ## Step 2 - Create the Fabric Peer
-In the AWS Managed Blockchain Console.
+In the AWS Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 
 1. In the new network you have created, select the member in the Members section.
 2. Click `Create peer node`

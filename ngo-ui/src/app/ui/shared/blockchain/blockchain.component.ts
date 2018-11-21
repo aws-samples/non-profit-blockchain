@@ -42,15 +42,13 @@ export class BlockchainComponent implements OnInit {
   ngOnInit(): void {
     this.messages = <Subject<any>>this.socketService.connect(environment.socket_url);
     this.messages.subscribe(message => {
-      console.log(message);
       this.processMessage(message);
     });
     setInterval(() => {
-      console.log('ping');
       try {
         this.messages.next('ping');
       } catch (e) {
-        console.log('dasdas');
+        console.error(e);
       }
     }, 1000);
 
@@ -61,12 +59,8 @@ export class BlockchainComponent implements OnInit {
     );
   }
 
-  processConnection() {
-    console.log('connection started');
-  }
-
   processError(error) {
-    console.log(error);
+    console.error(error);
   }
 
   processMessage(message) {
@@ -83,20 +77,17 @@ export class BlockchainComponent implements OnInit {
       };
       jsonobj = <Block>message_obj;
     } catch (e) {
-      console.log('Invalid JSON: ', message.data);
+      console.error('Invalid JSON: ', message.data);
       return;
     }
     if (jsonobj) {
-      console.log(jsonobj);
       this.updateData(jsonobj);
     } else {
-      console.log('Hmm..., I\'ve never seen JSON like this:', jsonobj);
+      console.error('Hmm..., I\'ve never seen JSON like this:', jsonobj);
     }
   }
 
   updateData(block) {
-    console.log('this.blockchain => ', this.blockchain);
-    console.log('block =>', block);
     const data = this.blockchain;
     const len = data.length;
     if (data && data[len - 1].caption !== block.caption) {
@@ -108,7 +99,6 @@ export class BlockchainComponent implements OnInit {
       this.socketService.newMessage.emit({
         data: this.blockchain
       });
-      console.log(this.blockchain);
     }
   }
 

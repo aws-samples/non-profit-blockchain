@@ -5,8 +5,8 @@ import * as _ from 'underscore';
 
 @Component({
   selector: 'app-donorchart',
-  templateUrl: './Donorchart.component.html',
-  styleUrls: ['./Donorchart.component.scss']
+  templateUrl: './donorchart.component.html',
+  styleUrls: ['./donorchart.component.scss']
 })
 export class DonorchartComponent implements OnInit, OnChanges {
   @ViewChild('chart') chartContainer: ElementRef;
@@ -123,19 +123,6 @@ export class DonorchartComponent implements OnInit, OnChanges {
       .attrTween('d', function (newValues, i) {
         return vm.arcTween(newValues, i, this);
       });
-
-    // this.svg.selectAll('.donutText')
-    //   .data(this.pieGenerator)
-    //   .enter().append('text')
-    //   .attr('class', 'donutText')
-    //   .attr('x', 40)
-    //   // .attr('y', function (d) { console.log(d); })
-    //   .attr('dy', -10)
-    //   .append('textPath')
-    //   // .attr('startOffset', '10%')
-    //   .style('text-anchor', 'middle')
-    //   .attr('xlink:href', function (d, i) { return '#donutArc' + i; })
-    //   .text(function (d) { return vm.labels[d.index] + ': $ ' + vm.donation[d.index]; });
 
     this.svg.select('.totalspend').remove();
     this.svg.append('text')
