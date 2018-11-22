@@ -166,23 +166,23 @@ Resources:
           - Key:                                  ReInventBlockchainWorkshop
             Value:                                EC2ClientInstance
 
-  BlockchainWorkshopELB:
-    Type:                                         AWS::ElasticLoadBalancing::LoadBalancer
-    Properties:
-        AvailabilityZones:
-          Fn::GetAZs: ''
-        Instances:
-        - Ref:                                    BlockchainWorkshopEC2
-        Listeners:
-        - LoadBalancerPort:                       '80'
-          InstancePort:                           '3000'
-          Protocol:                               HTTP
-        HealthCheck:
-          Target:                                 HTTP:3000/health
-          HealthyThreshold:                       '3'
-          UnhealthyThreshold:                     '5'
-          Interval:                               '10'
-          Timeout:                                '5'
+  # BlockchainWorkshopELB:
+  #   Type:                                         AWS::ElasticLoadBalancing::LoadBalancer
+  #   Properties:
+  #       AvailabilityZones:
+  #         Fn::GetAZs: ''
+  #       Instances:
+  #       - Ref:                                    BlockchainWorkshopEC2
+  #       Listeners:
+  #       - LoadBalancerPort:                       '80'
+  #         InstancePort:                           '3000'
+  #         Protocol:                               HTTP
+  #       HealthCheck:
+  #         Target:                                 HTTP:3000/health
+  #         HealthyThreshold:                       '3'
+  #         UnhealthyThreshold:                     '5'
+  #         Interval:                               '10'
+  #         Timeout:                                '5'
 
 Outputs:
   VPCID:
