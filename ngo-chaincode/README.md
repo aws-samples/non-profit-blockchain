@@ -53,7 +53,7 @@ chaincode into this folder will make it accessible inside the Fabric CLI contain
 
 ```
 cd ~
-mkdir ./fabric-samples/chaincode/ngo
+mkdir -p ./fabric-samples/chaincode/ngo
 cp ./non-profit-blockchain/ngo-chaincode/src/* ./fabric-samples/chaincode/ngo
 ```
 

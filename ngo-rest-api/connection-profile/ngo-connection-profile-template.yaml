@@ -44,6 +44,7 @@ orderers:
 peers:
   peer1:
     url: grpcs://%PEERSERVICEENDPOINT%
+    eventUrl: grpcs://%PEERSERVICEENDPOINT%
     grpcOptions:
       ssl-target-name-override: %PEERNODEID%
     tlsCACerts:

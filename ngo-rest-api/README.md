@@ -59,7 +59,20 @@ the Fabric network and provide information needed by the Node.js application in 
 Fabric network. The instructions below will auto-generate a connection profile. 
 
 Make sure you still have the ENV variables set, which were populated when you built the Fabric network.
-If not, follow these steps. You can run these steps and the `source` command multiple times without side effects.
+Check the export statements at the top of this file:
+
+```
+cd ~/non-profit-blockchain/ngo-fabric
+cat fabric-exports.sh
+```
+
+If the export variables haven't been populated, or they are incorrect (perhaps pointing to a different 
+Fabric network), follow these steps. You can run these steps and the `source` command multiple times 
+without side effects.
+
+Update the export statements at the top of the file. The info you need either matches what you 
+entered when creating the Fabric network in Step 1, or can be found in the AWS Managed Blockchain Console,
+under your network.
 
 Create the file that includes the ENV export values that define your Fabric network configuration.
 
@@ -68,10 +81,6 @@ cd ~/non-profit-blockchain/ngo-fabric
 cp templates/exports-template.sh fabric-exports.sh
 vi fabric-exports.sh
 ```
-
-Update the export statements at the top of the file. The info you need either matches what you 
-entered when creating the Fabric network in Step 1, or can be found in the AWS Managed Blockchain Console,
-under your network.
 
 Source the file, so the exports are applied to your current session. If you exit the SSH session
 and re-enter, you'll need to source the file again.
