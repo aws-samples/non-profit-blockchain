@@ -54,7 +54,7 @@ cd ~/non-profit-blockchain/ngo-fabric
 ## Step 2 - in Cloud9
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
 the Fabric network. The Fabric client node will be created in its own VPC, with VPC endpoints 
-pointing to the Fabric network you created in Step 1.
+pointing to the Fabric network you created in [Part 1:](../ngo-fabric/README.md)
 
 Execute the following script:
 
@@ -163,74 +163,4 @@ Execute the following script:
 ```
 cd ~/non-profit-blockchain/ngo-fabric
 ./5-configtx.sh
-```
-
-## Step 6 - in Fabric client node
-Create a Fabric channel.
-
-Execute the following script:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-./6-channel.sh
-```
-
-## Step 7 - in Fabric client node
-Join peer to Fabric channel.
-
-Execute the following script:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-./7-join.sh
-```
-
-## Step 8 - in Fabric client node
-Install chaincode on Fabric peer.
-
-Execute the following script:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-./8-install.sh
-```
-
-## Step 9 - in Fabric client node
-Instantiate chaincode on Fabric channel.
-
-Execute the following script:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-./9-instantiate.sh
-```
-
-## Step 10 - in Fabric client node
-Query the chaincode on Fabric peer.
-
-Execute the following script:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-./10-query.sh
-```
-
-## Step 11 - in Fabric client node
-Invoke a Fabric transaction.
-
-Execute the following script:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-./11-invoke.sh
-```
-
-## Step 10 - in Fabric client node
-Query the chaincode on Fabric peer and check the change in value.
-
-Execute the following script:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-./10-query.sh
 ```

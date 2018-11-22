@@ -9,7 +9,7 @@ All steps are carried out on the Fabric client node you created in [Part 1:](../
 
 From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
 The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
-created in Step 3.
+created in [Part 1:](../ngo-fabric/README.md)
 
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
@@ -111,6 +111,6 @@ docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt
 The workshop instructions can be found in the README files in parts 1-4:
 
 * [Part 1:](../ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.
-* [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. Instructions can be found in the README under ngo-chaincode.
-* [Part 3:](../ngo-rest-api/README.md) Run the REST API. Instructions can be found in the README under ngo-rest-api.
-* [Part 4:](../ngo-ui/README.md) Run the Application. Instructions can be found in the README under ngo-ui.
+* [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
+* [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
+* [Part 4:](../ngo-ui/README.md) Run the Application. 

@@ -20,7 +20,7 @@ does not start a fabric-ca, which we need to run our application.
 The fabric-samples version we run below has been modified to start a fabric-ca.
 
 ```
-cd
+cd ~
 mv fabric-samples fabric-samples-1.3
 git clone https://github.com/mahoney1/fabric-samples.git
 cd fabric-samples
@@ -59,12 +59,14 @@ into the container, so we simply need to copy our chaincode to this folder.
 Clone this repo, which contains the chaincode:
 
 ```
+cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
 In your terminal window, change to the directory containing the chaincode:
 
 ```
+cd ~
 cd non-profit-blockchain/ngo-chaincode
 ```
 

@@ -9,7 +9,7 @@ For the Fabric workshop, the REST API server will run on the Fabric client node.
 
 From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
 The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
-created in Step 3.
+created in [Part 1:](../ngo-fabric/README.md)
 
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
@@ -59,11 +59,11 @@ the Fabric network and provide information needed by the Node.js application in 
 Fabric network. The instructions below will auto-generate a connection profile. 
 
 Make sure you still have the ENV variables set, which were populated when you built the Fabric network.
-Check the export statements at the top of this file:
+Check the export statements at the top of the file below:
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
-cat fabric-exports.sh
+more fabric-exports.sh
 ```
 
 If the export variables haven't been populated, or they are incorrect (perhaps pointing to a different 
@@ -71,7 +71,7 @@ Fabric network), follow these steps. You can run these steps and the `source` co
 without side effects.
 
 Update the export statements at the top of the file. The info you need either matches what you 
-entered when creating the Fabric network in Step 1, or can be found in the AWS Managed Blockchain Console,
+entered when creating the Fabric network in [Part 1:](../ngo-fabric/README.md), or can be found in the AWS Managed Blockchain Console,
 under your network.
 
 Create the file that includes the ENV export values that define your Fabric network configuration.
@@ -101,7 +101,7 @@ cd ~/non-profit-blockchain/ngo-rest-api/connection-profile
 more ~/non-profit-blockchain/tmp/connection-profile/ngo-connection-profile.yaml
 ```
 
-Check the config file used by app.js. Make sure the peer name in config.json (under 'peers:' is 
+Check the config file used by app.js. Make sure the peer name in config.json (under 'peers:') is 
 the same as the peer name in the connection profile. Also check that the admin username and 
 password are correct and match the values you updated in the connection profile.
 
@@ -202,7 +202,7 @@ and the ELB is able to execute the desired number of health checks against it. Y
 status in the EC2 console, under Load Balancers.
 
 ```
-vi ngo-load.sh
+vi ngo-load-workshop.sh
 ```
 
 The line to be changed is this one. It can either point to `localhost` or your ELB DNS. If you
@@ -232,6 +232,6 @@ using a command such as `pm2 start app.js`, which will keep the app running. The
 The workshop instructions can be found in the README files in parts 1-4:
 
 * [Part 1:](../ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.
-* [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. Instructions can be found in the README under ngo-chaincode.
-* [Part 3:](../ngo-rest-api/README.md) Run the REST API. Instructions can be found in the README under ngo-rest-api.
-* [Part 4:](../ngo-ui/README.md) Run the Application. Instructions can be found in the README under ngo-ui.
+* [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
+* [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
+* [Part 4:](../ngo-ui/README.md) Run the Application. 

@@ -1,7 +1,14 @@
 # Part1: Setup a Fabric network
 
 This section will create an AWS Managed Blockchain Fabric network. A combination of the AWS Console and the AWS CLI 
-will be used.
+will be used. The process to create the network is as follows:
+
+* Provision a Cloud9 instance. We will use the Linux terminal that Cloud9 provides
+* Use the AWS Managed Blockchain console to create a Fabric network and provision a peer node
+* From Cloud9, run a CloudFormation template to provision a VPC and a Fabric client node. You 
+will use the Fabric client node to administer the Fabric network
+* From the Fabric client node, create a Fabric channel, install & instantiate chaincode, and 
+query and invoke transactions on the Fabric network
 
 ## Pre-requisites - Cloud9
 We will use Cloud9 to provide a Linux terminal which has the AWS CLI already installed.
@@ -28,7 +35,7 @@ aws configure add-model --service-model file://service-2.json --service-name man
 ```
 
 ## Step 1 - Create the Fabric network
-In the AWS Managed Blockchain Console.
+In the AWS Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 
 Make sure you are in the correct AWS region (i.e. us-east-1, also known as N. Virginia) and follow the steps below:
 
@@ -57,11 +64,11 @@ In your Cloud9 terminal window.
 
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
 the Fabric network. The Fabric client node will be created in its own VPC, with VPC endpoints 
-pointing to the Fabric network you created in Step 1. CloudFormation will be used to create the
-Fabric client node.
+pointing to the Fabric network you created in [Part 1:](../ngo-fabric/README.md). CloudFormation 
+will be used to create the Fabric client node, the VPC and the VPC endpoints.
 
 The CloudFormation script requires a small number of parameter values. We'll make sure these 
-are available before running the script.
+are available as export variables before running the script.
 
 In Cloud9:
 
@@ -72,7 +79,7 @@ export NETWORKID=<the network ID you created in Step1, from the AWS Managed Bloc
 export NETWORKNAME=<the name you gave the network>
 ```
 
-Make sure the VPC endpoint has been populated and exported: 
+Make sure the VPC endpoint has been populated and exported. If it's blank, check the AWS Managed Blockchain Console: 
 
 ```
 export VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
@@ -87,7 +94,7 @@ cd ~/non-profit-blockchain/ngo-fabric
 ./3-vpc-client-node.sh
 ```
 
-Check the progress in the AWS CloudFormation console
+Check the progress in the AWS CloudFormation console.
 
 ## Step 4 - prepare the Fabric client node and enroll and identity
 On the Fabric client node.
@@ -98,7 +105,7 @@ node to interact with, which TLS certs to use, etc.
 
 From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
 The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
-created in Step 3.
+created in [Part 1:](../ngo-fabric/README.md)
 
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
@@ -120,8 +127,8 @@ vi fabric-exports.sh
 ```
 
 Update the export statements at the top of the file. The info you need either matches what you 
-entered when creating the Fabric network in Step 1, or can be found in the AWS Managed Blockchain Console,
-under your network.
+entered when creating the Fabric network in [Part 1:](../ngo-fabric/README.md), or can be found 
+in the AWS Managed Blockchain Console, under your network.
 
 Source the file, so the exports are applied to your current session. If you exit the SSH 
 session and re-connect, you'll need to source the file again.
@@ -134,7 +141,7 @@ source fabric-exports.sh
 Sourcing the file will do two things:
 * export the necessary ENV variables
 * create another file which contains the export values you need to use when working with a Fabric peer node.
-This can be found in the file: peer-exports.sh. You will see how to use this in a later step.
+This can be found in the file: `~/peer-exports.sh`. You will see how to use this in a later step.
 
 Check the `source` worked:
 
@@ -156,7 +163,8 @@ source ~/peer-exports.sh
 ```
 
 Enroll an admin identity with the Fabric CA (certificate authority). We will use this
-identity when we create the peer node in a later step.
+identity to administer the Fabric network and perform tasks such as creating channels
+and instantiating chaincode.
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
@@ -166,15 +174,20 @@ cd ~/non-profit-blockchain/ngo-fabric
 ## Step 5 - update the configtx channel configuration
 On the Fabric client node.
 
-Update the configtx channel configuration:
+Update the configtx channel configuration. The Name and ID fields should be updated with the member ID. 
+You can obtain the member ID from the AWS Managed Blockchain Console, or from the ENV variables 
+exported to your current session.
+
+```
+echo $MEMBERID
+```
+
+Update the configtx.yaml file:
 
 ```
 cp ~/non-profit-blockchain/ngo-fabric/configtx.yaml ~
 vi ~/configtx.yaml
 ```
-
-Update the Name and ID fields with the member ID. You can obtain the member ID from the AWS 
-Managed Blockchain Console.
 
 Generate the configtx channel configuration
 
@@ -279,6 +292,6 @@ cd ~/non-profit-blockchain/ngo-fabric
 The workshop instructions can be found in the README files in parts 1-4:
 
 * [Part 1:](../ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.
-* [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. Instructions can be found in the README under ngo-chaincode.
-* [Part 3:](../ngo-rest-api/README.md) Run the REST API. Instructions can be found in the README under ngo-rest-api.
-* [Part 4:](../ngo-ui/README.md) Run the Application. Instructions can be found in the README under ngo-ui.
+* [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
+* [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
+* [Part 4:](../ngo-ui/README.md) Run the Application. 
