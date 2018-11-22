@@ -2,33 +2,34 @@
 
 #
 # Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this
-# software and associated documentation files (the "Software"), to deal in the Software
-# without restriction, including without limitation the rights to use, copy, modify,
-# merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-# PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License.
+# A copy of the License is located at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# or in the "license" file accompanying this file. This file is distributed 
+# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. See the License for the specific language governing 
+# permissions and limitations under the License.
 #
 
+# Test script for testing the REST API
+# Set the exports below to point to the REST API hostname/port and run the script
+
+# The export statements below can be used to point to either localhost or to an ELB endpoint, 
+# depending on where the REST API server is running 
+export ENDPOINT=Fabric-ELB-205962472.us-west-2.elb.amazonaws.com
+export PORT=80
+#export ENDPOINT=localhost
+#export PORT=3000
 set +e
 echo installing jq
 sudo yum install jq
 echo To test, run the API server as per the instructions in the README, then execute this script on the command line
-echo NOTE: the logger for the REST API server should be running at INFO level, not DEBUG
-echo The export statements below can be used to point to either localhost or to an ELB endpoint, depending on where
-echo the REST API server is running 
+echo NOTE: the logger for the REST API server (in app.js) should be running at INFO level, not DEBUG
 echo
-export ENDPOINT=Fabric-ELB-205962472.us-west-2.elb.amazonaws.com
-export PORT=80
-export ENDPOINT=localhost
-export PORT=3000
 RED='\033[0;31m'
 RESTORE='\033[0m'
 echo connecting to server: $ENDPOINT:$PORT
@@ -41,10 +42,6 @@ USERID=$(uuidgen)
 echo
 response=$(curl -s -X POST http://${ENDPOINT}:${PORT}/users -H 'content-type: application/x-www-form-urlencoded' -d "username=${USERID}&orgName=Org1")
 echo $response
-echo 'Query all donors'
-echo
-curl -s -X GET http://${ENDPOINT}:${PORT}/donors -H 'content-type: application/json'
-
 echo Response should be: {"success":true,"secret":"","message":"$USERID enrolled Successfully"}
 echo
 echo Checking response:

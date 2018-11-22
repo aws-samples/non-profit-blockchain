@@ -1,13 +1,13 @@
 # Part1: Setup a Fabric network
 
-This section will create a Fabric network. A combination of the AWS Console and the AWS CLI 
+This section will create an AWS Managed Blockchain Fabric network. A combination of the AWS Console and the AWS CLI 
 will be used.
 
 ## Pre-requisites - Cloud9
-We will use Cloud9 to provide a Linux shell.
+We will use Cloud9 to provide a Linux terminal which has the AWS CLI already installed.
 
 1. Spin up a [Cloud9 IDE](https://us-east-1.console.aws.amazon.com/cloud9/home?region=us-east-1) from the AWS console.
-In the Cloud9 console, click 'Create Environment'
+In the Cloud9 console, click 'Create Environment'. Using 'us-east-1' for the region will be easier.
 2. Provide a name for your environment, e.g. fabric-c9, and click **Next Step**
 3. Select `m4-large` (or an instance type with 4-8 GiB of RAM) and click **Next Step**
 4. Click **Create environment**. It would typically take 30-60s to create your Cloud9 IDE
@@ -18,7 +18,8 @@ cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-Download the model file for the new AWS Managed Blockchain service
+Download the model file for the new AWS Managed Blockchain service. This is a temporary step
+and will not be required once the `managedblockchain` service has been included in the latest CLI.
 
 ```
 cd ~

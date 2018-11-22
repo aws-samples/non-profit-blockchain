@@ -1,3 +1,25 @@
+#!/bin/bash
+
+#
+# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License.
+# A copy of the License is located at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# or in the "license" file accompanying this file. This file is distributed 
+# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. See the License for the specific language governing 
+# permissions and limitations under the License.
+#
+
+# Script for loading the NGOs and other data used in the workshop, via the REST API
+# Set the exports below to point to the REST API hostname/port and run the script
+
+# The export statements below can be used to point to either localhost or to an ELB endpoint, 
+# depending on where the REST API server is running 
 set +e
 export ENDPOINT=ngo10-elb-2090058053.us-east-1.elb.amazonaws.com
 export PORT=80
@@ -6,7 +28,6 @@ export PORT=80
 echo connecting to server: $ENDPOINT:$PORT
 echo
 echo '---------------------------------------'
-
 echo 'Creating NGO - 1101'
 echo
 
@@ -35,7 +56,6 @@ TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/ngos -H 'content-type: appli
 
 echo "Transaction ID is $TRX_ID"
 
-
 echo 'Creating NGO - 1103'
 echo
 
@@ -47,9 +67,6 @@ TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/ngos -H 'content-type: appli
     "contactNumber": "6309472628",
     "contactEmail": "animalrecuse@animalrecuse.com"
 }')
-
-
-
 echo "Transaction ID is $TRX_ID"
 
 echo 'Creating NGO - 1104'
@@ -66,7 +83,7 @@ TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/ngos -H 'content-type: appli
 
 echo "Transaction ID is $TRX_ID"
 
-echo 'Creating NGO -1105'
+echo 'Creating NGO - 1105'
 echo
 
 TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/ngos -H 'content-type: application/json' -d '{
@@ -79,3 +96,14 @@ TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/ngos -H 'content-type: appli
 }')
 
 echo "Transaction ID is $TRX_ID"
+
+echo 'Checking that the data has been loaded'
+
+echo 'Query all NGOs'
+echo
+curl -s -X GET http://${ENDPOINT}:${PORT}/ngos -H 'content-type: application/json'
+echo
+echo 'Query specific NGOs - looking for NGO 1103'
+echo
+curl -s -X GET http://${ENDPOINT}:${PORT}/ngos/1103 -H 'content-type: application/json'
+

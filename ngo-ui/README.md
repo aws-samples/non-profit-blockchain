@@ -1,4 +1,4 @@
-# NGO Chaincode
+# Part 4: The User Interface
 
 The instructions in this README will help you to install the NGO User Interface application,
 and connect it to the REST API you created in Part 3.
@@ -7,10 +7,25 @@ The UI is a Node.js / AngularJS application and will run on your Cloud9 instance
 
 All steps are carried out on the Cloud9 instance you created in Part 1.
 
+## Which browser?
+
+The UI has been tested with recent version of Firefox and Chrome. 
+
+The Node.js serving the application will run on your Cloud9 instance. One interesting 'feature'
+of Cloud9 is that you can preview the running application in your Cloud9 IDE, and also 
+pop this out into a browser window. HOWEVER, you cannot copy the URL into another browser
+and expect it to work. Cloud9 will only show the application in the same browser as the
+Cloud9 IDE is running. If you are running Cloud9 in Firefox, you can preview the application
+in Firefox, but you cannot copy the URL and view the application in Chrome. If you wanted to
+do this, you would need to login to the same AWS account in Chrome, open up the same Cloud9 IDE, 
+and preview the same application. You could then see the application running in both Firefox
+and Chrome.
+
 ## Pre-requisites
 
-You will need to set the context before carrying out any Fabric CLI commands. We do this 
-using the export files that were generated for us in Part 1.
+Your REST API should be exposed via an AWS Elastic Load Balancer (ELB). This was created for you
+by CloudFormation in [Part 1:](ngo-fabric/README.md). You can find the DNS endpoint for the ELB in
+the Outputs of your CloudFormation stack in the CloudFormation console.
 
 You should have already cloned the repo below. You would have done this when setting up the
 Fabric network in [Part 1:](ngo-fabric/README.md).
@@ -19,28 +34,6 @@ Fabric network in [Part 1:](ngo-fabric/README.md).
 cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
-
-Source the file, so the exports are applied to your current session. If you exit the SSH 
-session and re-connect, you'll need to source the file again.
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-source fabric-exports.sh
-```
-
-Check the peer export file exists and that it contains a number of export keys with values:
-
-```
-cat ~/peer-exports.sh 
-```
-If the file has values for all keys, source it:
-
-```
-source ~/peer-exports.sh 
-```
-
-## Step 1 - clone the repo containing the chaincode
-
 
 ### Install Node
 On Cloud9.
@@ -64,6 +57,24 @@ cd ~/non-profit-blockchain/ngo-ui
 npm i
 ```
 
+## Point the Node.js application to your REST API
+
+Your REST API is exposed via an AWS Elastic Load Balancer (ELB). To find the DNS endpoint for the ELB,
+go to your CloudFormation stack and look in Outputs.
+
+Edit the file below and change the location of the REST API that the UI depends on:
+
+```
+vi src/environments/environment.ts 
+```
+
+The values to be changed are as follows. The trailing backslash is important for the api_url.
+
+```
+  api_url: 'http://ngo10-elb-2090058053.us-east-1.elb.amazonaws.com/',
+  socket_url: 'ws://ngo10-elb-2090058053.us-east-1.elb.amazonaws.com'
+```
+
 ## Start the application
 
 ```
@@ -78,60 +89,9 @@ You should see this:
 ** Angular Live Development Server is listening on 0.0.0.0:8080, open your browser on http://localhost:8080/ **
 ```
 
-
-
-
-
-
-**Warning**
-
-To change the location of the REST API that the UI depends on, change the values in these files:
-
-```
-vi src/environments/environment.ts 
-vi src/environments/environment.prod.ts
-```
-
-The values to be changed are as follows. The trailing backslash is important.
-
-```
-  api_url: 'http://ngo10-elb-2090058053.us-east-1.elb.amazonaws.com/',
-  socket_url: 'ws://ngo10-elb-2090058053.us-east-1.elb.amazonaws.com'
-```
-
-> Verify that you are running at least node 8.9.x, Angular7.x, Angular cli and npm 5.x.x by running node -v and npm -v in a terminal/console window. Older versions produce errors, but newer versions are fine.
-
-1. Go to project folder and install dependencies.
-     ```bash
-     npm i
-     ```
-
-2. Launch development server:
-     ```bash
-     npm start
-     ```
-
- 3. Create production build:
-Change production server url: src/environments/environment.prod.ts
-     ```bash
-     vi src/environments/environment.prod.ts
-     ```
-      api_url: 'Your prod server api URL',
-      socket_url: 'Your prod server socket URL'
-     ```
-     npm run build  
-     ```
-
-**Note**
-
-> You don't need to build the Demo app library because it's published in npm and added as dependency of the project.
-
-
-Tasks                    | Description
--------------------------|---------------------------------------------------------------------------------------
-npm i                    | Install dependencies
-npm start                | Start the app in development mode
-npm run build            | Build the app for production
+In Cloud9, navigate to the Cloud9 menu and click Preview->Preview Running Application. This will show
+the UI login page in a pane in the Cloud9 IDE. You can expand this out to your browser by clicking the 
+icon next to the URL in the preview pane.
 
 ## Pat yourself on the back, you've completed the workshop
 The workshop instructions can be found in the README files in parts 1-4:

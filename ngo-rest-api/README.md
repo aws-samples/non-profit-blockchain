@@ -178,6 +178,34 @@ response:
     {"docType":"donor","donorUserName":"edge","email":"edge@def.com","registeredDate":"2018-10-22T11:52:20.182Z"}
 ]
 ```
+# Load the workshop test data
+
+Loading the test data uses cURL commands similar to those you used above to test the API. You can 
+use the same endpoint (i.e. localhost), since you will load the test data from the Fabric client node,
+or you can use the AWS Elastic Load Balancer (ELB) that is used to expose your REST API. To find the 
+DNS endpoint for the ELB, go to the CloudFormation stack created in [Part 1:](ngo-fabric/README.md) 
+and look in Outputs. If you receive an error using the ELB it might be because the underlying EC2 
+instance has not moved to an 'InService' state. This will happen once the REST API server is running
+and the ELB is able to execute the desired number of health checks against it. You can check the 
+status in the EC2 console, under Load Balancers.
+
+```
+vi ngo-load.sh
+```
+
+The line to be changed is this one. It can either point to `localhost` or your ELB DNS. If you
+use `localhost` you also need to change the port to `3000`:
+
+```
+export ENDPOINT=ngo10-elb-2090058053.us-east-1.elb.amazonaws.com
+export PORT=80
+```
+
+After saving the changes, run the script:
+
+```
+./ngo-load-workshop.sh
+```
 
 # Testing
 We can test the Node.js application locally or on an EC2 instance. The workshop runs the REST API on
