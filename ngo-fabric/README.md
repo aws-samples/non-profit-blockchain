@@ -142,11 +142,12 @@ $ echo $PEERSERVICEENDPOINT
 nd-4MHB4EKFCRF7VBHXZE2ZU4F6GY.m-B7YYBFY4GREBZLPCO2SUS4GP3I.n-WDG36TTUD5HEJORZUPF4REKMBI.managedblockchain.us-east-1.amazonaws.com:30003
 ```
 
-Check the peer export file exists and that is contains a number of export keys with values:
+Check the peer export file exists and that it contains a number of export keys with values:
 
 ```
 cat ~/peer-exports.sh 
 ```
+
 If the file has values for all keys, source it:
 
 ```

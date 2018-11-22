@@ -1,279 +1,102 @@
-# NGO on Hyperledger Fabric
+# NGO Chaincode
 
-The chaincode in ngo.js supports donors donating funds to an NGO (i.e. non-profit), while tracking 
-the spending of those funds and the allocation of the spending records against each donation. Donors
-are therefore able to track how their donations are being spent. Donations and spending are tracked 
-on a Hyperledger Fabric blockchain network with both donors and NGO's (non profits) being members of
-the network. The application is 3-tier:
+The instructions in this README will help you to install the NGO chaincode into the
+Fabric network you created in Part 1.
 
-* Node.js / Angular user interface, accessing services provided by a REST API
-* REST API, running as a Node.js Express application, using the Hyperledger Fabric SDK to query 
-and invoke chaincode
-* Fabric Chaincode, written in Node.js
+All steps are carried out on the Fabric client node you created in Part 1.
 
 ## Pre-requisites
 
-To run and test this application locally you will need a Hyperledger Fabric network running, either
-locally on your laptop or on an EC2 instance.
+You will need to set the context before carrying out any Fabric CLI commands. We do this 
+using the export files that were generated for us in Part 1.
 
-Follow the instructions here to install the fabric-samples repo, and download the
-Fabric binaries and Docker images. This will download the latest version of Fabric: 
-
-https://hyperledger-fabric.readthedocs.io/en/latest/install.html
-
-Now, we need to install a slightly different version of fabric-samples. The default fabric-samples repo above
-does not start a fabric-ca, which we need to run our application.
-
-The fabric-samples version we run below has been modified to start a fabric-ca.
+Source the file, so the exports are applied to your current session. If you exit the SSH 
+session and re-connect, you'll need to source the file again.
 
 ```
-cd
-mv fabric-samples fabric-samples-1.3
-git clone https://github.com/mahoney1/fabric-samples.git
-cd fabric-samples
-git checkout multi-org
-cp -R ../fabric-samples-1.3/bin .
-cp -R ../fabric-samples-1.3/config .
+cd ~/non-profit-blockchain/ngo-fabric
+source fabric-exports.sh
 ```
 
-Change to the fabric-samples directory. We will use the first network so change to this directory:
+Check the peer export file exists and that it contains a number of export keys with values:
 
 ```
-cd first-network
+cat ~/peer-exports.sh 
 ```
-
-## Start the Fabric network
-
-The first time you start the network you should generate the keys/certs:
+If the file has values for all keys, source it:
 
 ```
-./byfn.sh generate
+source ~/peer-exports.sh 
 ```
 
-Then start the network. The `-a` argument below will start fabric-ca in addition to the other Fabric components:
+## Step 1 - clone the repo containing the chaincode
+
+You should have already cloned this repo in Part 1.
 
 ```
-./byfn.sh up -s couchdb -l node -a
-```
-
-## Install or update the chaincode
-
-Now, how do we get the chaincode into the Fabric network so we can install and instantiate it?
-
-We'll install the chaincode from the CLI container. This container maps a `chaincode` folder from your local host 
-into the container, so we simply need to copy our chaincode to this folder.
-
-Clone this repo, which contains the chaincode:
-
-```
+cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-In your terminal window, change to the directory containing the chaincode:
+## Step 2 - copy the chaincode into the CLI container
+
+The Fabric CLI container that is running on your Fabric client node (do `docker ps` to see it)
+mounts a folder from the Fabric client node EC2 instance: /home/ec2-user/fabric-samples/chaincode.
+You should already have this folder on your Fabric client node as it was created earlier. Copying the 
+chaincode into this folder will make it accessible inside the Fabric CLI container.
 
 ```
-cd non-profit-blockchain/ngo-chaincode
+cd ~
+mkdir ./fabric-samples/chaincode/ngo
+cp ./non-profit-blockchain/ngo-chaincode/src/* ./fabric-samples/chaincode/ngo
 ```
 
-Update the REPODIR variable in the statements below to match the location of your fabric-samples repo, and
-then execute all the commands in your terminal window:
+## Step 3 - install the chaincode on your peer
 
-If installing on Mac:
-
-```
-cd ~/Documents/apps/non-profit-blockchain/ngo-chaincode
-REPODIR=/Users/edgema/Documents/apps/fabric-samples
-rm $REPODIR/chaincode/ngo/*
-mkdir -p $REPODIR/chaincode/ngo
-cp src/package.json $REPODIR/chaincode/ngo
-cp src/ngo.js $REPODIR/chaincode/ngo
-```
-
-If installing on an EC2 instance:
+Notice we are using the `-l node` flag, as our chaincode is written in Node.js.
 
 ```
-cd ~/non-profit-blockchain/ngo-chaincode
-REPODIR=/home/ubuntu/fabric-samples
-rm $REPODIR/chaincode/ngo/*
-mkdir -p $REPODIR/chaincode/ngo
-cp src/package.json $REPODIR/chaincode/ngo
-cp src/ngo.js $REPODIR/chaincode/ngo
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_LOCALMSPID=$MSP" -e  "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER"  cli peer chaincode install -n ngo -l node -v v0 -p /opt/gopath/src/github.com/ngo
 ```
 
-To confirm that this is now visible inside your CLI container, exec into the container:
+Expected response:
 
 ```
-docker exec -it cli bash
+2018-11-15 06:39:47.625 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
+2018-11-15 06:39:47.625 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
+2018-11-15 06:39:47.625 UTC [container] WriteFolderToTarPackage -> INFO 003 rootDirectory = /opt/gopath/src/github.com/ngo
+2018-11-15 06:39:47.636 UTC [chaincodeCmd] install -> INFO 004 Installed remotely response:<status:200 payload:"OK" >
 ```
 
-Inside the CLI container:
+## Step 4 - instantiate the chaincode on the channel
 
 ```
-# ls /opt/gopath/src/github.com/chaincode/ngo
-package.json  ngo.js
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_LOCALMSPID=$MSP" -e  "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER"  cli peer chaincode instantiate -o $ORDERER -C mychannel -n ngo -v v0 -c '{"Args":["init"]}' --cafile /opt/home/taiga-tls.pem --tls
 ```
 
-You can repeat this process whenever you update the chaincode.
-
-Install the chaincode on the peer nodes. You'll install it to each peer node separately by setting the appropriate ENV variables
-before doing a `peer chaincode install`. This simply copies the chaincode to the peer node. If you are upgrading the chaincode,
-i.e. creating a new version, you 'll need to increment the version number in the statements below (the -v option).
-
-In the byfn network there are 4 peer nodes. You'll copy to each one individually by changing the ENV variables as appropriate
-
-### Shortcut - statements for all 4 peers
+Expected response:
+(Note this might fail if the chaincode has been previously instantiated. Chaincode only needs to be
+instantiated once on a channel)
 
 ```
-export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-export CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-export CORE_PEER_LOCALMSPID="Org1MSP"
-export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-peer chaincode install -n ngo -v 5.5 -l node -p /opt/gopath/src/github.com/chaincode/ngo
-
-export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-export CORE_PEER_ADDRESS=peer1.org1.example.com:7051
-export CORE_PEER_LOCALMSPID="Org1MSP"
-export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls/ca.crt
-peer chaincode install -n ngo -v 5.5 -l node -p /opt/gopath/src/github.com/chaincode/ngo
-
-export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
-export CORE_PEER_ADDRESS=peer0.org2.example.com:7051
-export CORE_PEER_LOCALMSPID="Org2MSP"
-export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
-peer chaincode install -n ngo -v 5.5 -l node -p /opt/gopath/src/github.com/chaincode/ngo
-
-export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
-export CORE_PEER_ADDRESS=peer1.org2.example.com:7051
-export CORE_PEER_LOCALMSPID="Org2MSP"
-export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer1.org2.example.com/tls/ca.crt
-peer chaincode install -n ngo -v 5.5 -l node -p /opt/gopath/src/github.com/chaincode/ngo
-
-export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-export CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-export CORE_PEER_LOCALMSPID="Org1MSP"
-export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-peer chaincode upgrade -C mychannel -n ngo -l node -v 5.5 -c '{"Args":["init"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer')" -o orderer.example.com:7050 --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+2018-11-15 06:41:02.847 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
+2018-11-15 06:41:02.847 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
 ```
 
-### peer0.org1
+## Step 5 - query the chaincode
 
+Query all donors
 ```
-export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-export CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-export CORE_PEER_LOCALMSPID="Org1MSP"
-export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-peer chaincode install -n ngo -v 5.5 -l node -p /opt/gopath/src/github.com/chaincode/ngo
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode query -C mychannel -n ngo -c '{"Args":["queryAllDonors"]}'
 ```
 
-### peer1.org1
-
+Query a specific donor
 ```
-export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-export CORE_PEER_ADDRESS=peer1.org1.example.com:7051
-export CORE_PEER_LOCALMSPID="Org1MSP"
-export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls/ca.crt
-peer chaincode install -n ngo -v 5.5 -l node -p /opt/gopath/src/github.com/chaincode/ngo
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode query -C mychannel -n ngo -c '{"Args":["queryDonor","{\"donorUserName\": \"edge\"}"]}'
 ```
 
-### peer0.org2
+## Step 6 - invoke a transaction
 
 ```
-export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
-export CORE_PEER_ADDRESS=peer0.org2.example.com:7051
-export CORE_PEER_LOCALMSPID="Org2MSP"
-export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
-peer chaincode install -n ngo -v 5.5 -l node -p /opt/gopath/src/github.com/chaincode/ngo
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode invoke -C mychannel -n ngo -c  '{"Args":["createDonor","{\"donorUserName\": \"edge\", \"email\": \"edge@def.com\", \"registeredDate\": \"2018-10-22T11:52:20.182Z\"}"]}' -o $ORDERER --cafile /opt/home/taiga-tls.pem --tls
 ```
-
-### peer1.org2
-
-```
-export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
-export CORE_PEER_ADDRESS=peer1.org2.example.com:7051
-export CORE_PEER_LOCALMSPID="Org2MSP"
-export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer1.org2.example.com/tls/ca.crt
-peer chaincode install -n ngo -v 5.5 -l node -p /opt/gopath/src/github.com/chaincode/ngo
-```
-
-## Instantiate the chaincode
-
-The chaincode only needs to be instantiated on a single peer node. Since we are using TLS we pass the TLS cert, which is
-conveniently stored in the CLI.
-
-If you are upgrading the chaincode, you'll use the `upgrade` command below instead of the `instantiated` command:
-
-### peer0.org1 - instantiate
-
-```
-export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-export CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-export CORE_PEER_LOCALMSPID="Org1MSP"
-export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-peer chaincode instantiate -C mychannel -n ngo -l node -v 5.5 -c '{"Args":["init"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer')" -o orderer.example.com:7050 --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-```
-
-### peer0.org1 - upgrade
-
-```
-export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-export CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-export CORE_PEER_LOCALMSPID="Org1MSP"
-export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-peer chaincode upgrade -C mychannel -n ngo -l node -v 5.5 -c '{"Args":["init"]}' -P "AND ('Org1MSP.peer','Org2MSP.peer')" -o orderer.example.com:7050 --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-```
-
-Check that the chaincode was instantiated on the channel. You can run this after either an `upgrade` or an `instantiate` 
-
-```
-# peer chaincode list --instantiated -C mychannel -o orderer.example.com:7050 --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem 
-Get instantiated chaincodes on channel mychannel:
-Name: mycc, Version: 5.5, Path: /opt/gopath/src/github.com/chaincode/chaincode_example02/node/, Escc: escc, Vscc: vscc
-Name: ngo, Version: 5.5, Path: /opt/gopath/src/github.com/chaincode/ngo, Escc: escc, Vscc: vscc
-```
-
-## Invoke transactions to add participants in the network
-
-To invoke transaction must have installed the chaincode on the two peers used in the first-network: peer0.org1 and peer0.org2.
-
-The statements for querying the chaincode and invoking transactions can be found in ./test-chaincode.sh
-
-## Directly query the CouchDB database to see your data
-
-```
-docker exec -it cli bash
-```
-
-Find the list of CouchDB databases:
-
-```
-curl couchdb0:5984/_all_dbs
-```
-
-Check the docs in the db:
-
-```
-curl couchdb0:5984/mychannel_ngo/_all_docs
-curl -X POST 'http://couchdb0:5984/mychannel_ngo/_find' -H 'Content-Type: application/json' --data '{"selector": {"docType": "donor"}}'
-curl -X POST 'http://couchdb0:5984/mychannel_ngo/_find' -H 'Content-Type: application/json' --data '{"selector": {"docType": "donation", "ngo":"1234"}}'
-```
-
-## Cleanup
-
-```
-./byfn.sh down
-docker rm -f $(docker ps -aq)
-docker network prune
-```
-
-# Troubleshooting
-
-Chaincode endorsed by multiple endorsing peers may throw this error:
-```
-Error: could not assemble transaction: ProposalResponsePayloads do not match - proposal response: version:1 response:<status:200 > payload: ...
-```
-
-The usual reason for this is different values in the write set produced by different peers. This can arise if your
-chaincode tries to generate a value, for example, if you use `new Date()` to assign a timestamp to a field in your
-chaincode. The date on each endorsing peer node could be slightly different, which causes the Fabric validation process to fail.
-Another cause could be trying to generate a sequence number or unique ID (such as a UUID) in chaincode. Again, the results
-may differ on the endorsing peers and the transaction proposal will fail the validation checks.
