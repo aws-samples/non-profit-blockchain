@@ -83,16 +83,16 @@ export class BlockchainProgressComponent implements AfterViewInit {
   loaded = false;
   selectedIndex = 0;
   @ViewChild('eventsWrapper') eventsWrapper: ElementRef;
-  @ViewChild('fillingLine') fillingLine: ElementRef;
+  @ViewChild('connectBlocks') connectBlocks: ElementRef;
   @ViewChildren('blockEvents') blockEvents: QueryList<ElementRef>;
   eventsWrapperWidth = 0;
   private _viewInitialized = false;
 
-  constructor(private _cdr: ChangeDetectorRef, private socketService: SocketService) {
+  constructor(private detectChange: ChangeDetectorRef, private socketService: SocketService) {
     this.socketService.newMessage.subscribe(
       (data: any) => {
         try {
-          _cdr.detectChanges();
+          detectChange.detectChanges();
           this.ngAfterViewInit();
         } catch (ex) {
           console.error(ex);
@@ -100,22 +100,8 @@ export class BlockchainProgressComponent implements AfterViewInit {
       });
   }
 
-  private _blockWrapperWidth = 720;
-
-  @Input()
-  set blockWrapperWidth(value: number) {
-    this._blockWrapperWidth = value;
-    this._cdr.detectChanges();
-  }
-
-  private _eventsMinDistance = 100;
-
-  @Input()
-  set eventsMinDistance(value: number) {
-    this._eventsMinDistance = value;
-    this.initView();
-  }
-
+  private blockEventsWidth = 720;
+  private blockEventsGap = 100;
   private _blockElements: Block[];
 
   get blockElements(): Block[] {
@@ -126,25 +112,6 @@ export class BlockchainProgressComponent implements AfterViewInit {
   set blockElements(value: Block[]) {
     this._blockElements = value;
     this.initView();
-  }
-
-  private _disabled = false;
-
-  @Input()
-  set disabled(value: boolean) {
-    this._disabled = value;
-  }
-
-  private _showContent = false;
-
-  get showContent(): boolean {
-    return this._showContent;
-  }
-
-  @Input()
-  set showContent(value: boolean) {
-    this._showContent = value;
-    this._cdr.detectChanges();
   }
 
   private static pxToNumber(val: string): number {
@@ -192,7 +159,6 @@ export class BlockchainProgressComponent implements AfterViewInit {
         .split(',')[4];
       translateValue = Number(blockTranslateStr);
     }
-
     return translateValue;
   }
 
@@ -222,81 +188,31 @@ export class BlockchainProgressComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this._cdr.detach();
+    this.detectChange.detach();
     this._viewInitialized = true;
     this.initView();
     $('[data-toggle="tooltip"]').tooltip();
   }
 
-  onScrollClick(event: Event, forward: boolean) {
-    event.preventDefault();
-    this.updateSlide(this.eventsWrapperWidth, forward);
-    this._cdr.detectChanges();
-  }
-
-  setLastRecord(selectedItem: Block) {
-    event.preventDefault();
-    if (this._disabled) {
-      return;
-    }
-    const element = event.target;
-    let visibleItem = this._blockElements[0];
-    this._blockElements.forEach(function (item: Block) {
-      if (item.selected && item !== selectedItem) {
-        visibleItem = item;
-        item.selected = false;
-      }
-    });
-    this.selectedIndex = this._blockElements.indexOf(selectedItem);
-    selectedItem.selected = true;
-    this.updateFilling(element);
-    this._cdr.detectChanges();
-  }
-
-  onEventClick(event: Event, selectedItem: Block) {
-    event.preventDefault();
-    return;
-    if (this._disabled) {
-      return;
-    }
-    const element = event.target;
-    let visibleItem = this._blockElements[0];
-    this._blockElements.forEach(function (item: Block) {
-      if (item.selected && item !== selectedItem) {
-        visibleItem = item;
-        item.selected = false;
-      }
-    });
-    this.selectedIndex = this._blockElements.indexOf(selectedItem);
-    selectedItem.selected = true;
-    this.updateFilling(element);
-    this._cdr.detectChanges();
-  }
-
   initBlockChain(blockChains: Block[]) {
-    const eventsMinLapse = 100;  // BlockchainProgressComponent.minLapse(blockChains);
-    this.setBlockPosition(blockChains, this._eventsMinDistance, eventsMinLapse);
-    this.setBlockChainWidth(blockChains, this._eventsMinDistance, eventsMinLapse);
+    const blockEventsMinDist = 100;
+    this.setBlockPosition(blockChains, this.blockEventsGap, blockEventsMinDist);
+    this.setBlockChainWidth(blockChains, this.blockEventsGap, blockEventsMinDist);
     this.loaded = true;
   }
 
-  updateSlide(blockTotWidth: number, forward: boolean) {
-    const translateValue = BlockchainProgressComponent.getTranslateValue(this.eventsWrapper.nativeElement);
-
-    if (forward) {
-      this.translateBlockChain(translateValue - this._blockWrapperWidth + this._eventsMinDistance, this._blockWrapperWidth - blockTotWidth);
-    } else {
-      this.translateBlockChain(translateValue + this._blockWrapperWidth - this._eventsMinDistance, null);
-    }
+  onBlocksScrollChange(e: Event, right: boolean) {
+    e.preventDefault();
+    this.updateBlocksVisibility(this.eventsWrapperWidth, right);
+    this.detectChange.detectChanges();
   }
 
-  updateBlockChainPosition(element: Element) {
-    const eventStyle = window.getComputedStyle(element);
-    const eventLeft = BlockchainProgressComponent.pxToNumber(eventStyle.getPropertyValue('left'));
+  updateBlocksVisibility(blockTotWidth: number, right: boolean) {
     const translateValue = BlockchainProgressComponent.getTranslateValue(this.eventsWrapper.nativeElement);
-
-    if (eventLeft > this._blockWrapperWidth - translateValue) {
-      this.translateBlockChain(-eventLeft + this._blockWrapperWidth / 2, this._blockWrapperWidth - this.eventsWrapperWidth);
+    if (right) {
+      this.translateBlockChain(translateValue - this.blockEventsWidth + this.blockEventsGap, this.blockEventsWidth - blockTotWidth);
+    } else {
+      this.translateBlockChain(translateValue + this.blockEventsWidth - this.blockEventsGap, null);
     }
   }
 
@@ -308,29 +224,54 @@ export class BlockchainProgressComponent implements AfterViewInit {
     this.nextLinkInactive = value === totWidth;
   }
 
-  setBlockChainWidth(elements: Block[], width: number, eventsMinLapse: number) {
+  updateBlockChainPosition(element: Element) {
+    const eventStyle = window.getComputedStyle(element);
+    const eventLeft = BlockchainProgressComponent.pxToNumber(eventStyle.getPropertyValue('left'));
+    const translateValue = BlockchainProgressComponent.getTranslateValue(this.eventsWrapper.nativeElement);
+    if (eventLeft > this.blockEventsWidth - translateValue) {
+      this.translateBlockChain(-eventLeft + this.blockEventsWidth / 2, this.blockEventsWidth - this.eventsWrapperWidth);
+    }
+  }
+
+  setBlockChainWidth(elements: Block[], width: number, blockEventsMinDist: number) {
     let timeSpan = 100;
     if (elements.length > 2) {
       timeSpan = timeSpan * elements.length;
     } else {
       timeSpan = 350;
     }
-    let timeSpanNorm = timeSpan / eventsMinLapse;
+    let timeSpanNorm = timeSpan / blockEventsMinDist;
     timeSpanNorm = Math.round(timeSpanNorm) + 4;
     this.eventsWrapperWidth = timeSpanNorm * width;
     const aHref = this.eventsWrapper.nativeElement.querySelectorAll('img.selected')[0];
-    this.updateFilling(aHref);
+    this.updateConnectBlocks(aHref);
     this.updateBlockChainPosition(aHref);
     return this.eventsWrapperWidth;
   }
 
-  private updateFilling(element: any) {
+  private updateConnectBlocks(element: any) {
     const eventStyle = window.getComputedStyle(element);
     const eventLeft = eventStyle.getPropertyValue('left');
     const eventWidth = eventStyle.getPropertyValue('width');
     const eventLeftNum = BlockchainProgressComponent.pxToNumber(eventLeft) + BlockchainProgressComponent.pxToNumber(eventWidth) / 2;
     const scaleValue = eventLeftNum / this.eventsWrapperWidth;
-    BlockchainProgressComponent.setTransformValue(this.fillingLine.nativeElement, 'scaleX', scaleValue);
+    BlockchainProgressComponent.setTransformValue(this.connectBlocks.nativeElement, 'scaleX', scaleValue);
+  }
+
+  private setBlockPosition(elements: Block[], min: number, blockEventsMinDist: number) {
+    const blockEventsArray = this.blockEvents.toArray();
+    let i = 0;
+    for (const component of elements) {
+      const distance = 100 * i + 1;
+      const distanceNorm = Math.round(distance / blockEventsMinDist);
+      blockEventsArray[i].nativeElement.style.left = distanceNorm * min + 'px';
+      blockEventsArray[i].nativeElement.children[0].style.left = distanceNorm * min + 'px';
+
+      const span: HTMLSpanElement = <HTMLSpanElement>blockEventsArray[i].nativeElement.parentElement.children[1];
+      const spanWidth = BlockchainProgressComponent.getElementWidth(span);
+      span.style.left = distanceNorm * min - 8 + 'px';
+      i++;
+    }
   }
 
   private initView(): void {
@@ -346,23 +287,7 @@ export class BlockchainProgressComponent implements AfterViewInit {
       }
       this.initBlockChain(this._blockElements);
     }
-    this._cdr.detectChanges();
-  }
-
-  private setBlockPosition(elements: Block[], min: number, eventsMinLapse: number) {
-    const blockEventsArray = this.blockEvents.toArray();
-    let i = 0;
-    for (const component of elements) {
-      const distance = 100 * i + 1;
-      const distanceNorm = Math.round(distance / eventsMinLapse);
-      blockEventsArray[i].nativeElement.style.left = distanceNorm * min + 'px';
-      blockEventsArray[i].nativeElement.children[0].style.left = distanceNorm * min + 'px';
-
-      const span: HTMLSpanElement = <HTMLSpanElement>blockEventsArray[i].nativeElement.parentElement.children[1];
-      const spanWidth = BlockchainProgressComponent.getElementWidth(span);
-      span.style.left = distanceNorm * min - 8 + 'px';
-      i++;
-    }
+    this.detectChange.detectChanges();
   }
 
   getTransections(item) {

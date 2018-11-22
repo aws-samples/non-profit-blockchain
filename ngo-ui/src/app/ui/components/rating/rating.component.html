@@ -17,17 +17,17 @@
 ––>
 <fieldset class="rating">
   <input type="radio" readOnly="true" [name]="inputName" value="5" [checked]="rating===5" />
-  <label (click)='onClick(5)'>5 stars</label>
+  <span (click)='onClick(5)'></span>
 
   <input type="radio" readOnly="true" [name]="inputName" value="4" [checked]="rating===4" />
-  <label (click)='onClick(4)'>4 stars</label>
+  <span (click)='onClick(4)'></span>
 
   <input type="radio" readOnly="true" [name]="inputName" value="3" [checked]="rating===3" />
-  <label (click)='onClick(3)'>3 stars</label>
+  <span (click)='onClick(3)'></span>
 
   <input type="radio" readOnly="true" [name]="inputName" value="2" [checked]="rating===2" />
-  <label (click)='onClick(2)'>2 stars</label>
+  <span (click)='onClick(2)'></span>
 
   <input type="radio" readOnly="true" [name]="inputName" value="1" [checked]="rating===1" />
-  <label (click)='onClick(1)'>1 star</label>
+  <span (click)='onClick(1)'></span>
 </fieldset>

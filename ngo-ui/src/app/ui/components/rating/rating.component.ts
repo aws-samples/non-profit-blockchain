@@ -35,7 +35,6 @@ export class RatingComponent implements OnInit {
 
   constructor(private ratingService: RatingService) { }
 
-
   ngOnInit() {
     this.inputName = this.itemId + '_rating';
   }

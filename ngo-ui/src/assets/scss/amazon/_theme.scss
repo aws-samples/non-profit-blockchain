@@ -141,8 +141,9 @@ $icon-sm-width-height: 1.5rem;
 
 
 .login-bg{
-  background: url("assets/images/login-bg.png") top center;
+  background: url("assets/images/login-bg.png") no-repeat top center;
   overflow: hidden;
+  background-size: cover;
 
   .login-wrapper{
     >div{

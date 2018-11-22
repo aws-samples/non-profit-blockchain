@@ -15,9 +15,16 @@
 #
 */
 ––>
-
 <section class="cd-horizontal-blockchain border-bottom shadow-sm bg-white pt-3" [ngClass]="{'loaded': loaded}">
   <div class="blockchain">
+    <ul class="cd-blockchain-navigation">
+      <li>
+        <a href="#" (click)="onBlocksScrollChange($event, false)" class="prev" [ngClass]="{'inactive':prevLinkInactive}"></a>
+      </li>
+      <li>
+        <a href="#" (click)="onBlocksScrollChange($event, true)" class="next" [ngClass]="{'inactive':nextLinkInactive}"></a>
+      </li>
+    </ul>
     <div class="events-wrapper">
       <h6 class="text-center text-orange">Block-chain Events</h6>
       <div class="events" #eventsWrapper [style.width.px]="eventsWrapperWidth">
@@ -29,19 +36,8 @@
               {{item.caption}}</span>
           </li>
         </ol>
-        <span class="filling-line" aria-hidden="true" #fillingLine></span>
-
+        <span class="filling-line" aria-hidden="true" #connectBlocks></span>
       </div>
     </div>
-
-    <ul class="cd-blockchain-navigation">
-      <li>
-        <a href="#" (click)="onScrollClick($event, false)" class="prev" [ngClass]="{'inactive':prevLinkInactive}">Prev</a>
-      </li>
-      <li>
-        <a href="#" (click)="onScrollClick($event, true)" class="next" [ngClass]="{'inactive':nextLinkInactive}">Next</a>
-      </li>
-    </ul>
   </div>
-
 </section>
