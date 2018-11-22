@@ -7,9 +7,9 @@ and the underlying Fabric chaincode.
 ## The REST API Server on the Fabric client node
 For the Fabric workshop, the REST API server will run on the Fabric client node.
 
-From Cloud9, SSH into the Fabric client node. The key should be in your home directory. The DNS of the
-EC2 instance can be found in the output of the CloudFormation stack you created when setting up the
-Fabric network.
+From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
+The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
+created in Step 3.
 
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
@@ -26,6 +26,8 @@ git clone https://github.com/aws-samples/non-profit-blockchain.git
 ### Install Node
 On the Fabric client node.
 
+Install Node.js. We will use v8.x.
+
 ```
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
 ```
@@ -39,7 +41,7 @@ nvm use lts/carbon
 Amazon Linux seems to be missing g++, so:
 
 ```
-sudo yum install gcc-c++
+sudo yum install gcc-c++ -y
 ```
 
 ### Npm install
@@ -50,12 +52,12 @@ npm install
 ```
 
 ## Generate a connection profile
+On the Fabric client node.
 
-The REST API needs a connection profile to connect to the Fabric network. The instructions below will 
-auto-generate a connection profile. All of the information to create the connection profile is in 
-our Cloud9 environment, so we will generate the profile there and copy it to our client node.
+The REST API needs a connection profile to connect to the Fabric network. Connection profiles describe
+the Fabric network and provide information needed by the Node.js application in order to connect to the
+Fabric network. The instructions below will auto-generate a connection profile. 
 
-In Cloud9:
 Make sure you still have the ENV variables set, which were populated when you built the Fabric network.
 If not, follow these steps. You can run these steps and the `source` command multiple times without side effects.
 
@@ -71,16 +73,18 @@ Update the export statements at the top of the file. The info you need either ma
 entered when creating the Fabric network in Step 1, or can be found in the AWS Managed Blockchain Console,
 under your network.
 
-Source the file, so the exports are applied to your current Cloud9 session. If you exit the Cloud9
-session and re-enter, you'll need to source the file again.
+Source the file, so the exports are applied to your current session. If you exit the SSH session
+and re-enter, you'll need to source the file again.
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
 source fabric-exports.sh
 ```
 
-Now generate the connection profile and check that the connection profile contains all of the
-endpoints and other information:
+Now generate the connection profile and check that the connection profile contains URL endpoints 
+for the peer, orderer and CA, an 'mspid', a 'caName', and that the admin username and password
+match those you entered when creating the Fabric network. If they do not match, edit the file
+and update them.
 
 ```
 cd ~/non-profit-blockchain/ngo-rest-api/connection-profile
@@ -88,8 +92,9 @@ cd ~/non-profit-blockchain/ngo-rest-api/connection-profile
 more ~/non-profit-blockchain/tmp/connection-profile/ngo-connection-profile.yaml
 ```
 
-Check the config file used by app.js. Make sure the peer name in config.json is the same as the
-peer name in the connection profile. Also check that the admin username and password are correct.
+Check the config file used by app.js. Make sure the peer name in config.json (under 'peers:' is 
+the same as the peer name in the connection profile. Also check that the admin username and 
+password are correct and match the values you updated in the connection profile.
 
 ```
 cd ~/non-profit-blockchain/ngo-rest-api
@@ -122,6 +127,7 @@ config.json should look something like this:
 Run the app (in the background if you prefer):
 
 ```
+cd ~/non-profit-blockchain/ngo-rest-api
 node app.js &
 ```
 
@@ -131,44 +137,55 @@ Once the app is running you can register an identity, and then start to execute 
 ## Register/enroll a user:
 
 request:
+```
 curl -s -X POST http://localhost:3000/users -H "content-type: application/x-www-form-urlencoded" -d 'username=michael&orgName=Org1'
+```
 
 response:
+```
 {"success":true,"secret":"","message":"michael enrolled Successfully"}
+```
 
-## GET methods
-
-### Get all donors
-
-request:
-curl -s -X GET   "http://localhost:3000/donors" -H "content-type: application/json"
-
-response:
-[
-    {"docType":"donor","donorUserName":"braendle","email":"braendle@abc.com","registeredDate":"2018-10-26"},
-    {"docType":"donor","donorUserName":"edge","email":"edge@abc.com","registeredDate":"2018-10-25"}
-]
-
-## POST methods
-
-### POST Donor
+## POST a Donor
 
 request:
+```
 curl -s -X POST "http://localhost:3000/donors" -H "content-type: application/json" -d '{ 
    "donorUserName": "edge", 
    "email": "edge@def.com", 
    "registeredDate": "2018-10-22T11:52:20.182Z" 
 }'
+```
 
 response:
 A transaction ID, which can be ignored:
 
+```
 d5b8bc766e0ada43db013643fc17f397eacdb3e95e22ef48271ad5fb33e5abe7
+```
+
+## Get all donors
+
+request:
+```
+curl -s -X GET   "http://localhost:3000/donors" -H "content-type: application/json"
+```
+
+response:
+```
+[
+    {"docType":"donor","donorUserName":"edge","email":"edge@def.com","registeredDate":"2018-10-22T11:52:20.182Z"}
+]
+```
 
 # Testing
-We can test the node application locally or on an EC2 instance. When testing on an EC2 instance 
-we need to keep the REST API node application running after we exit the SSH session. I use PM2 to do 
-this. `pm2 start app.js` will keep the app running, and logs can be found in `~/.pm2/logs`
+We can test the Node.js application locally or on an EC2 instance. The workshop runs the REST API on
+the Fabric client node. If you exit the SSH session on the Fabric client node, the running REST API 
+will automatically exit.
+
+For purposes of the workshop we can just leave the SSH session open. However, if we need to keep the REST 
+API application running after we exit the SSH session, we can use various methods to do this. I use `PM2`,
+using a command such as `pm2 start app.js`, which will keep the app running. The logs can be found in `~/.pm2/logs`.
 
 # Troubleshooting
 
