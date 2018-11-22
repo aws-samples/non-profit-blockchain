@@ -43,6 +43,7 @@ export VPCENDPOINTSERVICENAME=$VpcEndpointServiceName
 export CASERVICEENDPOINT=$CaEndpoint
 export PEERNODEID=$nodeID
 export PEERSERVICEENDPOINT=$endpoint
+export PEEREVENTENDPOINT=$eventEndPoint
 
 echo Useful information used in Cloud9
 echo REGION: $REGION
@@ -59,6 +60,7 @@ echo VPCENDPOINTSERVICENAME: $VPCENDPOINTSERVICENAME
 echo CASERVICEENDPOINT: $CASERVICEENDPOINT
 echo PEERNODEID: $PEERNODEID
 echo PEERSERVICEENDPOINT: $PEERSERVICEENDPOINT
+echo PEEREVENTENDPOINT: $PEEREVENTENDPOINT
 
 # Exports to be exported before executing any Fabric 'peer' commands via the CLI
 cat << EOF > peer-exports.sh
