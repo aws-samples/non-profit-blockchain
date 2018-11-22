@@ -1,4 +1,4 @@
-# NGO Chaincode
+# Part 2: NGO Chaincode
 
 The instructions in this README will help you to install the NGO chaincode into the
 Fabric network you created in Part 1.
@@ -100,3 +100,11 @@ docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode invoke -C mychannel -n ngo -c  '{"Args":["createDonor","{\"donorUserName\": \"edge\", \"email\": \"edge@def.com\", \"registeredDate\": \"2018-10-22T11:52:20.182Z\"}"]}' -o $ORDERER --cafile /opt/home/taiga-tls.pem --tls
 ```
+
+## Move on to Part 3
+The workshop instructions can be found in the README files in parts 1-4:
+
+* [Part 1:](ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.
+* [Part 2:](ngo-chaincode/README.md) Deploy the NGO chaincode. Instructions can be found in the README under ngo-chaincode.
+* [Part 3:](ngo-rest-api/README.md) Run the REST API. Instructions can be found in the README under ngo-rest-api.
+* [Part 4:](ngo-ui/README.md) Run the Application. Instructions can be found in the README under ngo-ui.

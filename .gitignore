@@ -4,3 +4,5 @@ archive
 .idea
 ngo-rest-api/node_modules
 ngo-rest-api/fabric-client-kv-org1
+ngo-ui/node_modules
+ngo-ui/Config

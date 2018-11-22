@@ -1,6 +1,6 @@
-# REST API to expose the Chaincode
+# Part 3: RESTful API to expose the Chaincode
 
-The REST API is a Node.js application that uses the Fabric SDK to interact with the Fabric chaincode
+The RESTful API is a Node.js application that uses the Fabric SDK to interact with the Fabric chaincode
 and exposes the chaincode functions as REST APIs. This allows loose coupling between the UI application
 and the underlying Fabric chaincode.
 
@@ -128,6 +128,7 @@ Run the app (in the background if you prefer):
 
 ```
 cd ~/non-profit-blockchain/ngo-rest-api
+nvm use lts/carbon
 node app.js &
 ```
 
@@ -187,14 +188,10 @@ For purposes of the workshop we can just leave the SSH session open. However, if
 API application running after we exit the SSH session, we can use various methods to do this. I use `PM2`,
 using a command such as `pm2 start app.js`, which will keep the app running. The logs can be found in `~/.pm2/logs`.
 
-# Troubleshooting
+## Move on to Part 4
+The workshop instructions can be found in the README files in parts 1-4:
 
-Error: [2018-11-06T11:44:51.485] [ERROR] Helper - ##### getRegisteredUser - Failed to get registered user: michael with error: TypeError: Cannot read property 'curve' of undefined
-
-Solution: make sure the certificate stores are removed before starting the REST api. Using `./start.sh` will remove these. The 
-error is caused by using the wrong certificate - probably an old one from the cert store.
-
-
-[2018-11-16T10:25:40.240] [ERROR] Connection - ##### getRegisteredUser - Failed to get registered user: 5742cbbe-03b6-449d-ab65-3c885b6bfee1 with error: Error: Enrollment failed with errors [[{"code":19,"message":"CA 'ca.esxh3vewtnhsrldv5du3p52zpq' does not exist"}]]
-
-We need to the name of the Fabric CA, as set in the CA, in FABRIC_CA_SERVER_CA_NAME
+* [Part 1:](ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.
+* [Part 2:](ngo-chaincode/README.md) Deploy the NGO chaincode. Instructions can be found in the README under ngo-chaincode.
+* [Part 3:](ngo-rest-api/README.md) Run the REST API. Instructions can be found in the README under ngo-rest-api.
+* [Part 4:](ngo-ui/README.md) Run the Application. Instructions can be found in the README under ngo-ui.

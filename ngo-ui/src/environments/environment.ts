@@ -19,7 +19,7 @@ export const environment = {
   port: '',
   dbhost: '',
   dbport: '',
-  api_url: 'http://Fabric-ELB-205962472.us-west-2.elb.amazonaws.com/',
+  api_url: 'http://ngo10-elb-2090058053.us-east-1.elb.amazonaws.com/',
   test: 'test',
-  socket_url: 'ws://Fabric-ELB-205962472.us-west-2.elb.amazonaws.com'
+  socket_url: 'ws://ngo10-elb-2090058053.us-east-1.elb.amazonaws.com'
 };

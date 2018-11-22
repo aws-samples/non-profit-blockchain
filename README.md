@@ -1,17 +1,18 @@
-# AWS Blockchain Workshop
+# AWS Managed Blockchain Workshop
+
 ## Building a blockchain application to support donations and spend tracking for a 
 ## non-profit organisation using Hyperledger Fabric
 
-Builds a Hyperledger Fabric blockchain network, a REST API and a User Interface application to 
-track donations and spend for non-profit organizations. Donors are able to track the donations
-they make and how how their donations are being spent. Donations and spending are tracked 
-on a Hyperledger Fabric blockchain network with both donors and NGO's (non profits) being members of
-the network. The application is 3-tier and consists of:
+This workshop builds an AWS Managed Blockchain Hyperledger Fabric network, a RESTful API and a 
+User Interface application that tracks donations and spend for non-profit organizations. Donors 
+are able to track the donations they make and how how their donations are being spent. Donations 
+and spending are tracked on a Hyperledger Fabric blockchain network with both donors and NGO's 
+(non profits) being members of the network. The application is 3-tier and consists of:
 
-* Node.js / Angular user interface, accessing services provided by a REST API
+* Node.js / Angular user interface application, accessing services provided by a RESTful API
 * REST API, running as a Node.js Express application, using the Hyperledger Fabric SDK to query 
 and invoke chaincode
-* Fabric Chaincode, written in Node.js
+* Fabric Chaincode, written in Node.js, deployed to a Hyperledger Fabric network
 
 This workshop will build an AWS Managed Blockchain Hyperledger Fabric network, deploy the chaincode,
 start the REST API and finally run an application that uses the REST API to interact with the Fabric
@@ -25,11 +26,10 @@ network. The workshop is divided into four parts:
 ## Getting started
 Follow the README instructions in parts 1-4 in order:
 
-* Part 1: Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network. Instructions 
-can be found in the README under ngo-fabric.
-* Part 2: Deploy the NGO chaincode. Instructions can be found in the README under ngo-chaincode.
-* Part 3: Run the REST API. Instructions can be found in the README under ngo-rest-api.
-* Part 4: Run the Application. Instructions can be found in the README under ngo-ui.
+* [Part 1:](ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.
+* [Part 2:](ngo-chaincode/README.md) Deploy the NGO chaincode. Instructions can be found in the README under ngo-chaincode.
+* [Part 3:](ngo-rest-api/README.md) Run the REST API. Instructions can be found in the README under ngo-rest-api.
+* [Part 4:](ngo-ui/README.md) Run the Application. Instructions can be found in the README under ngo-ui.
 
 ## License
 
