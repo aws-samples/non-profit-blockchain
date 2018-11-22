@@ -18,6 +18,14 @@ cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
+Download the model file for the new AWS Managed Blockchain service
+
+```
+cd ~
+aws s3 cp s3://taiga-beta-test/service-2.json .  
+aws configure add-model --service-model file://service-2.json --service-name managedblockchain
+```
+
 ## Step 1 - Create the Fabric network
 In the AWS Managed Blockchain Console.
 
@@ -37,7 +45,7 @@ wait for it to complete. Otherwise the steps below may fail.
 ## Step 2 - Create the Fabric Peer
 In the AWS Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 
-1. In the new network you have created, select the member in the Members section.
+1. In the new network you have created, click on the member in the Members section.
 2. Click `Create peer node`
 3. Enter 40 for storage, accept the other defaults, and click `Create peer node`
 
