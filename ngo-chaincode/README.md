@@ -1,21 +1,21 @@
 # Part 2: NGO Chaincode
 
 The instructions in this README will help you to install the NGO chaincode into the
-Fabric network you created in [Part 1:](../ngo-fabric/README.md)
+Fabric network you created in [Part 1.](../ngo-fabric/README.md)
 
-All steps are carried out on the Fabric client node you created in [Part 1:](../ngo-fabric/README.md)
+All steps are carried out on the Fabric client node you created in [Part 1.](../ngo-fabric/README.md)
 
 ## Pre-requisites
 
 From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
 The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
-created in [Part 1:](../ngo-fabric/README.md)
+created in [Part 1.](../ngo-fabric/README.md)
 
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
 ```
 
-You should have already cloned this repo in [Part 1:](../ngo-fabric/README.md)
+You should have already cloned this repo in [Part 1.](../ngo-fabric/README.md)
 
 ```
 cd ~
@@ -23,7 +23,7 @@ git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
 You will need to set the context before carrying out any Fabric CLI commands. We do this 
-using the export files that were generated for us in [Part 1:](../ngo-fabric/README.md)
+using the export files that were generated for us in [Part 1.](../ngo-fabric/README.md)
 
 Source the file, so the exports are applied to your current session. If you exit the SSH 
 session and re-connect, you'll need to source the file again.

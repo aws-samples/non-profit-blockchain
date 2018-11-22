@@ -64,7 +64,7 @@ In your Cloud9 terminal window.
 
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
 the Fabric network. The Fabric client node will be created in its own VPC, with VPC endpoints 
-pointing to the Fabric network you created in [Part 1:](../ngo-fabric/README.md). CloudFormation 
+pointing to the Fabric network you created in [Part 1.](../ngo-fabric/README.md). CloudFormation 
 will be used to create the Fabric client node, the VPC and the VPC endpoints.
 
 The CloudFormation script requires a small number of parameter values. We'll make sure these 
@@ -105,7 +105,7 @@ node to interact with, which TLS certs to use, etc.
 
 From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
 The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
-created in [Part 1:](../ngo-fabric/README.md)
+created in [Part 1.](../ngo-fabric/README.md)
 
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
@@ -127,7 +127,7 @@ vi fabric-exports.sh
 ```
 
 Update the export statements at the top of the file. The info you need either matches what you 
-entered when creating the Fabric network in [Part 1:](../ngo-fabric/README.md), or can be found 
+entered when creating the Fabric network in [Part 1.](../ngo-fabric/README.md), or can be found 
 in the AWS Managed Blockchain Console, under your network.
 
 Source the file, so the exports are applied to your current session. If you exit the SSH 

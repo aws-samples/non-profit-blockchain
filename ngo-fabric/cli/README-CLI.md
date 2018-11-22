@@ -54,7 +54,7 @@ cd ~/non-profit-blockchain/ngo-fabric
 ## Step 2 - in Cloud9
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
 the Fabric network. The Fabric client node will be created in its own VPC, with VPC endpoints 
-pointing to the Fabric network you created in [Part 1:](../ngo-fabric/README.md)
+pointing to the Fabric network you created in [Part 1.](../ngo-fabric/README.md)
 
 Execute the following script:
 
