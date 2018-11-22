@@ -5,7 +5,7 @@ and connect it to the REST API you created in Part 3.
 
 The UI is a Node.js / AngularJS application and will run on your Cloud9 instance.
 
-All steps are carried out on the Cloud9 instance you created in Part 1.
+All steps are carried out on the Cloud9 instance you created in [Part 1:](../ngo-fabric/README.md).
 
 ## Which browser?
 
@@ -22,20 +22,20 @@ and preview the same application. You could then see the application running in 
 and Chrome.
 
 ## Pre-requisites
+On Cloud9.
 
 Your REST API should be exposed via an AWS Elastic Load Balancer (ELB). This was created for you
-by CloudFormation in [Part 1:](ngo-fabric/README.md). You can find the DNS endpoint for the ELB in
+by CloudFormation in [Part 1:](../ngo-fabric/README.md). You can find the DNS endpoint for the ELB in
 the Outputs of your CloudFormation stack in the CloudFormation console.
 
-You should have already cloned the repo below. You would have done this when setting up the
-Fabric network in [Part 1:](ngo-fabric/README.md).
+You should have already cloned this repo in [Part 1:](../ngo-fabric/README.md)
 
 ```
 cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-### Install Node
+## Step 1 - install Node
 On Cloud9.
 
 Install Node.js. We will use v8.x.
@@ -50,14 +50,14 @@ nvm install lts/carbon
 nvm use lts/carbon
 ```
 
-### Npm dependency install
+## Step 2 - install dependencies
 
 ```
 cd ~/non-profit-blockchain/ngo-ui
 npm i
 ```
 
-## Point the Node.js application to your REST API
+## Step 3 - point the Node.js application to your REST API
 
 Your REST API is exposed via an AWS Elastic Load Balancer (ELB). To find the DNS endpoint for the ELB,
 go to your CloudFormation stack and look in Outputs.
@@ -75,7 +75,7 @@ The values to be changed are as follows. The trailing backslash is important for
   socket_url: 'ws://ngo10-elb-2090058053.us-east-1.elb.amazonaws.com'
 ```
 
-## Start the application
+## Step 4 - start the application
 
 ```
 cd ~/non-profit-blockchain/ngo-ui
@@ -93,7 +93,7 @@ In Cloud9, navigate to the Cloud9 menu and click Preview->Preview Running Applic
 the UI login page in a pane in the Cloud9 IDE. You can expand this out to your browser by clicking the 
 icon next to the URL in the preview pane.
 
-## Pat yourself on the back, you've completed the workshop
+## Step 5 - pat yourself on the back, you've completed the workshop
 The workshop instructions can be found in the README files in parts 1-4:
 
 * [Part 1:](../ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.

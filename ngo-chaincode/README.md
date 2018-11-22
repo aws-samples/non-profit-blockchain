@@ -1,14 +1,29 @@
 # Part 2: NGO Chaincode
 
 The instructions in this README will help you to install the NGO chaincode into the
-Fabric network you created in Part 1.
+Fabric network you created in [Part 1:](../ngo-fabric/README.md)
 
-All steps are carried out on the Fabric client node you created in Part 1.
+All steps are carried out on the Fabric client node you created in [Part 1:](../ngo-fabric/README.md)
 
 ## Pre-requisites
 
+From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
+The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
+created in Step 3.
+
+```
+ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
+```
+
+You should have already cloned this repo in [Part 1:](../ngo-fabric/README.md)
+
+```
+cd ~
+git clone https://github.com/aws-samples/non-profit-blockchain.git
+```
+
 You will need to set the context before carrying out any Fabric CLI commands. We do this 
-using the export files that were generated for us in Part 1.
+using the export files that were generated for us in [Part 1:](../ngo-fabric/README.md)
 
 Source the file, so the exports are applied to your current session. If you exit the SSH 
 session and re-connect, you'll need to source the file again.
@@ -29,16 +44,7 @@ If the file has values for all keys, source it:
 source ~/peer-exports.sh 
 ```
 
-## Step 1 - clone the repo containing the chaincode
-
-You should have already cloned this repo in Part 1.
-
-```
-cd ~
-git clone https://github.com/aws-samples/non-profit-blockchain.git
-```
-
-## Step 2 - copy the chaincode into the CLI container
+## Step 1 - copy the chaincode into the CLI container
 
 The Fabric CLI container that is running on your Fabric client node (do `docker ps` to see it)
 mounts a folder from the Fabric client node EC2 instance: /home/ec2-user/fabric-samples/chaincode.
@@ -51,7 +57,7 @@ mkdir ./fabric-samples/chaincode/ngo
 cp ./non-profit-blockchain/ngo-chaincode/src/* ./fabric-samples/chaincode/ngo
 ```
 
-## Step 3 - install the chaincode on your peer
+## Step 2 - install the chaincode on your peer
 
 Notice we are using the `-l node` flag, as our chaincode is written in Node.js.
 
@@ -68,7 +74,7 @@ Expected response:
 2018-11-15 06:39:47.636 UTC [chaincodeCmd] install -> INFO 004 Installed remotely response:<status:200 payload:"OK" >
 ```
 
-## Step 4 - instantiate the chaincode on the channel
+## Step 3 - instantiate the chaincode on the channel
 
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_LOCALMSPID=$MSP" -e  "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER"  cli peer chaincode instantiate -o $ORDERER -C mychannel -n ngo -v v0 -c '{"Args":["init"]}' --cafile /opt/home/taiga-tls.pem --tls
@@ -83,7 +89,7 @@ instantiated once on a channel)
 2018-11-15 06:41:02.847 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
 ```
 
-## Step 5 - query the chaincode
+## Step 4 - query the chaincode
 
 Query all donors
 ```
@@ -95,7 +101,7 @@ Query a specific donor
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode query -C mychannel -n ngo -c '{"Args":["queryDonor","{\"donorUserName\": \"edge\"}"]}'
 ```
 
-## Step 6 - invoke a transaction
+## Step 5 - invoke a transaction
 
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode invoke -C mychannel -n ngo -c  '{"Args":["createDonor","{\"donorUserName\": \"edge\", \"email\": \"edge@def.com\", \"registeredDate\": \"2018-10-22T11:52:20.182Z\"}"]}' -o $ORDERER --cafile /opt/home/taiga-tls.pem --tls

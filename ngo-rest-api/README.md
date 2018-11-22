@@ -2,9 +2,9 @@
 
 The RESTful API is a Node.js application that uses the Fabric SDK to interact with the Fabric chaincode
 and exposes the chaincode functions as REST APIs. This allows loose coupling between the UI application
-and the underlying Fabric chaincode.
+and the underlying Fabric network.
 
-## The REST API Server on the Fabric client node
+## Pre-requisites
 For the Fabric workshop, the REST API server will run on the Fabric client node.
 
 From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
@@ -15,15 +15,14 @@ created in Step 3.
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
 ```
 
-You should have already cloned the repo below. You would have done this when setting up the
-Fabric network.
+You should have already cloned this repo in [Part 1:](../ngo-fabric/README.md)
 
 ```
-cd
+cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-### Install Node
+## Step 1 - install Node
 On the Fabric client node.
 
 Install Node.js. We will use v8.x.
@@ -44,14 +43,15 @@ Amazon Linux seems to be missing g++, so:
 sudo yum install gcc-c++ -y
 ```
 
-### Npm install
+## Step 2 - install dependencies
+On the Fabric client node.
 
 ```
 cd ~/non-profit-blockchain/ngo-rest-api
 npm install
 ```
 
-## Generate a connection profile
+## Step 3 - generate a connection profile
 On the Fabric client node.
 
 The REST API needs a connection profile to connect to the Fabric network. Connection profiles describe
@@ -122,7 +122,8 @@ config.json should look something like this:
  }
 ```
 
-## Run the REST API Node.js application
+## Step 4 - run the REST API Node.js application
+On the Fabric client node.
 
 Run the app (in the background if you prefer):
 
@@ -132,10 +133,12 @@ nvm use lts/carbon
 node app.js &
 ```
 
-# REST API 
+## Step 5 - test the REST API
+On the Fabric client node.
+
 Once the app is running you can register an identity, and then start to execute chaincode
 
-## Register/enroll a user:
+### Register/enroll a user:
 
 request:
 ```
@@ -147,7 +150,7 @@ response:
 {"success":true,"secret":"","message":"michael enrolled Successfully"}
 ```
 
-## POST a Donor
+### POST a Donor
 
 request:
 ```
@@ -162,10 +165,10 @@ response:
 A transaction ID, which can be ignored:
 
 ```
-d5b8bc766e0ada43db013643fc17f397eacdb3e95e22ef48271ad5fb33e5abe7
+{"transactionId":"2f3f3a85340bde09b505b0d37235d1d32a674e43a66229f9a205e7d8d5328ed1"}
 ```
 
-## Get all donors
+### Get all donors
 
 request:
 ```
@@ -178,12 +181,12 @@ response:
     {"docType":"donor","donorUserName":"edge","email":"edge@def.com","registeredDate":"2018-10-22T11:52:20.182Z"}
 ]
 ```
-# Load the workshop test data
+## Step 6 - load the workshop test data
 
 Loading the test data uses cURL commands similar to those you used above to test the API. You can 
 use the same endpoint (i.e. localhost), since you will load the test data from the Fabric client node,
 or you can use the AWS Elastic Load Balancer (ELB) that is used to expose your REST API. To find the 
-DNS endpoint for the ELB, go to the CloudFormation stack created in [Part 1:](ngo-fabric/README.md) 
+DNS endpoint for the ELB, go to the CloudFormation stack created in [Part 1:](../ngo-fabric/README.md)
 and look in Outputs. If you receive an error using the ELB it might be because the underlying EC2 
 instance has not moved to an 'InService' state. This will happen once the REST API server is running
 and the ELB is able to execute the desired number of health checks against it. You can check the 
