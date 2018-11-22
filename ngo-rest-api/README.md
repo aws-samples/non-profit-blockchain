@@ -219,7 +219,7 @@ using a command such as `pm2 start app.js`, which will keep the app running. The
 ## Move on to Part 4
 The workshop instructions can be found in the README files in parts 1-4:
 
-* [Part 1:](ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.
-* [Part 2:](ngo-chaincode/README.md) Deploy the NGO chaincode. Instructions can be found in the README under ngo-chaincode.
-* [Part 3:](ngo-rest-api/README.md) Run the REST API. Instructions can be found in the README under ngo-rest-api.
-* [Part 4:](ngo-ui/README.md) Run the Application. Instructions can be found in the README under ngo-ui.
+* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.
+* [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. Instructions can be found in the README under ngo-chaincode.
+* [Part 3:](../ngo-rest-api/README.md) Run the REST API. Instructions can be found in the README under ngo-rest-api.
+* [Part 4:](../ngo-ui/README.md) Run the Application. Instructions can be found in the README under ngo-ui.
