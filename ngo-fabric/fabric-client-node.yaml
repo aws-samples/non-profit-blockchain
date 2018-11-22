@@ -1,157 +1,207 @@
 # Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
 # A copy of the License is located at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# or in the "license" file accompanying this file. This file is distributed 
-# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-# express or implied. See the License for the specific language governing 
+#
+# or in the "license" file accompanying this file. This file is distributed
+# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+# express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 
-AWSTemplateFormatVersion: '2010-09-09'
-Description: >
+AWSTemplateFormatVersion:                         '2010-09-09'
+Description:                                      >
   This template creates a Fabric client node, which will run the Fabric CLI and
   interact with a Fabric network. The client node is an EC2 instance, and will be created in
   its own VPC. Private VPC Endpoints will also be created, pointing to the Fabric service.
-
 Parameters:
   KeyName:
-    Type: AWS::EC2::KeyPair::KeyName
-    Description: Name of an existing EC2 key pair to enable SSH access to the EC2 instance
+    Type:                                         AWS::EC2::KeyPair::KeyName
+    Description:                                  Name of an existing EC2 key pair to enable SSH access to the EC2 instance
   BlockchainVpcEndpointServiceName:
-    Type: String
-    Description: Name of the Blockchain VPC Endpoint. Obtained from running 'aws taiga get-network'
+    Type:                                         String
+    Description:                                  Name of the Blockchain VPC Endpoint. Obtained from running 'aws managedblockchain get-network'
 
 Resources:
+  BlockchainWorkshopRootRole:
+    Type:                                         "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version:                                  "2012-10-17"
+        Statement:
+          -
+            Effect:                               "Allow"
+            Principal:
+              Service:
+                -                                 "ec2.amazonaws.com"
+            Action:
+              -                                   "sts:AssumeRole"
+      Path:                                       "/"
+      MaxSessionDuration:                         10800
+      Policies:
+        -
+          PolicyName:                             "root"
+          PolicyDocument:
+            Version:                              "2012-10-17"
+            Statement:
+              -
+                Effect:                           "Allow"
+                Action:                           "*"
+                Resource:                         "*"
+
+  BlockchainWorkshopRootInstanceProfile:
+    Type:                                         "AWS::IAM::InstanceProfile"
+    Properties:
+      Path:                                       "/"
+      Roles:
+        -
+          Ref:                                    "BlockchainWorkshopRootRole"
+
   BlockchainWorkshopVPC:
-    Type:                                    AWS::EC2::VPC
+    Type:                                         AWS::EC2::VPC
     Properties:
-      CidrBlock:                             10.0.0.0/16
-      EnableDnsSupport:                      True
-      EnableDnsHostnames:                    True
-      InstanceTenancy:                       default
+      CidrBlock:                                  10.0.0.0/16
+      EnableDnsSupport:                           True
+      EnableDnsHostnames:                         True
+      InstanceTenancy:                            default
       Tags:
-        - Key:                               Name
-          Value:                             BlockchainWSVPC
+        - Key:                                    ReInventBlockchainWorkshop
+          Value:                                  VPC
 
-  BlockchainWSPublicSubnet:
-    Type:                                    AWS::EC2::Subnet
+  BlockchainWorkshopPublicSubnet:
+    Type:                                         AWS::EC2::Subnet
     Properties:
-        VpcId:                               !Ref BlockchainWorkshopVPC
-        MapPublicIpOnLaunch:                 false
-        CidrBlock:                           10.0.0.16/28
+        VpcId:                                    !Ref BlockchainWorkshopVPC
+        MapPublicIpOnLaunch:                      false
+        CidrBlock:                                10.0.0.16/28
         Tags:
-        - Key:                               Name
-          Value:                             BlockchainWSPublicSubnet
+        - Key:                                    ReInventBlockchainWorkshop
+          Value:                                  PublicSubnet
 
-  BlockchainWSSecurityGroupBase:
-        Type:                                AWS::EC2::SecurityGroup
+  BlockchainWorkshopSecurityGroupBase:
+        Type:                                     AWS::EC2::SecurityGroup
         Properties:
-          GroupDescription:                  Base Security Group
-          VpcId:                             !Ref BlockchainWorkshopVPC
+          GroupDescription:                       Base Security Group
+          VpcId:                                  !Ref BlockchainWorkshopVPC
           SecurityGroupIngress:
-          - IpProtocol:                      tcp
-            CidrIp:                          0.0.0.0/0
-            FromPort:                        22
-            ToPort:                          22
+          - IpProtocol:                           tcp
+            CidrIp:                               0.0.0.0/0
+            FromPort:                             22
+            ToPort:                               22
           Tags:
-          - Key:                             Name
-            Value:                           BlockchainWSSecurityGroupBase
+          - Key:                                  ReInventBlockchainWorkshop
+            Value:                                BaseSecurityGroup
 
-  BlockchainWSSecurityGroupBaseIngress:
-    Type:                                    AWS::EC2::SecurityGroupIngress
+  BlockchainWorkshopSecurityGroupBaseIngress:
+    Type:                                         AWS::EC2::SecurityGroupIngress
     Properties:
-      IpProtocol:                            -1
-      FromPort:                              -1
-      GroupId:                               !GetAtt BlockchainWSSecurityGroupBase.GroupId
-      ToPort:                                -1
-      SourceSecurityGroupId:                 !GetAtt BlockchainWSSecurityGroupBase.GroupId
+      IpProtocol:                                 -1
+      FromPort:                                   -1
+      GroupId:                                    !GetAtt BlockchainWorkshopSecurityGroupBase.GroupId
+      ToPort:                                     -1
+      SourceSecurityGroupId:                      !GetAtt BlockchainWorkshopSecurityGroupBase.GroupId
       Tags:
-      - Key:                                 Name
-        Value:                               BlockchainWSSecurityGroupBaseIngress
+      - Key:                                      ReInventBlockchainWorkshop
+        Value:                                    BaseSecurityGroupIngress
 
   BlockchainWorkshopInternetGateway:
-    Type:                                    "AWS::EC2::InternetGateway"
+    Type:                                         "AWS::EC2::InternetGateway"
     Properties:
       Tags:
-      - Key:                                 Name
-        Value:                               BlockchainWorkshopInternetGateway
+      - Key:                                      ReInventBlockchainWorkshop
+        Value:                                    InternetGateway
 
   BlockchainWorkshopAttachGateway:
-    Type:                                    AWS::EC2::VPCGatewayAttachment
+    Type:                                         AWS::EC2::VPCGatewayAttachment
     Properties:
-       VpcId:                                !Ref BlockchainWorkshopVPC
-       InternetGatewayId:                    !Ref BlockchainWorkshopInternetGateway
+       VpcId:                                     !Ref BlockchainWorkshopVPC
+       InternetGatewayId:                         !Ref BlockchainWorkshopInternetGateway
 
   BlockchainWorkshopRouteTable:
-    Type:                                    AWS::EC2::RouteTable
+    Type:                                         AWS::EC2::RouteTable
     Properties:
-        VpcId:                               !Ref BlockchainWorkshopVPC
+        VpcId:                                    !Ref BlockchainWorkshopVPC
         Tags:
-          - Key:                             Name
-            Value:                           BlockchainWorkshopRouteTable
+          - Key:                                  ReInventBlockchainWorkshop
+            Value:                                RouteTable
 
   BlockchainWorkshopRoute:
-    Type:                                    AWS::EC2::Route
+    Type:                                         AWS::EC2::Route
     Properties:
-        RouteTableId:                        !Ref BlockchainWorkshopRouteTable
-        DestinationCidrBlock:                0.0.0.0/0
-        GatewayId:                           !Ref BlockchainWorkshopInternetGateway
+        RouteTableId:                             !Ref BlockchainWorkshopRouteTable
+        DestinationCidrBlock:                     0.0.0.0/0
+        GatewayId:                                !Ref BlockchainWorkshopInternetGateway
 
   BlockchainWorkshopSubnetRouteTableAssociation:
-    Type:                                    AWS::EC2::SubnetRouteTableAssociation
+    Type:                                         AWS::EC2::SubnetRouteTableAssociation
     Properties:
-        SubnetId:                            !Ref BlockchainWSPublicSubnet
-        RouteTableId:                        !Ref BlockchainWorkshopRouteTable
+        SubnetId:                                 !Ref BlockchainWorkshopPublicSubnet
+        RouteTableId:                             !Ref BlockchainWorkshopRouteTable
 
-  BlockchainWSVPCEndpoint:
-    Type:                                    AWS::EC2::VPCEndpoint
+  BlockchainWorkshopVPCEndpoint:
+    Type:                                         AWS::EC2::VPCEndpoint
     Properties:
-        VpcId:                               !Ref BlockchainWorkshopVPC
-        PrivateDnsEnabled:                   True
-        ServiceName:                         !Ref BlockchainVpcEndpointServiceName
-        VpcEndpointType:                     Interface
-        SubnetIds:                           [!Ref BlockchainWSPublicSubnet]
-        SecurityGroupIds:                    [!Ref BlockchainWSSecurityGroupBase]
-
+        VpcId:                                    !Ref BlockchainWorkshopVPC
+        PrivateDnsEnabled:                        True
+        ServiceName:                              !Ref BlockchainVpcEndpointServiceName
+        VpcEndpointType:                          Interface
+        SubnetIds:                                [!Ref BlockchainWorkshopPublicSubnet]
+        SecurityGroupIds:                         [!Ref BlockchainWorkshopSecurityGroupBase]
 
   BlockchainWorkshopEC2:
-    Type:                                    AWS::EC2::Instance
+    Type:                                         AWS::EC2::Instance
     Properties:
-        KeyName:                             !Ref KeyName
-        ImageId:                             'ami-051fb05bb164a0247'
-        InstanceType:                        't2.small'
+        KeyName:                                  !Ref KeyName
+        ImageId:                                  'ami-051fb05bb164a0247'
+        InstanceType:                             't2.small'
+        IamInstanceProfile:                       !Ref BlockchainWorkshopRootInstanceProfile
         NetworkInterfaces:
-        - AssociatePublicIpAddress:          true
-          DeviceIndex:                       0
-          PrivateIpAddress:                  10.0.0.26
-          GroupSet:                          [!Ref BlockchainWSSecurityGroupBase]
-          SubnetId:                          !Ref BlockchainWSPublicSubnet
+        - AssociatePublicIpAddress:               true
+          DeviceIndex:                            0
+          GroupSet:                               [!Ref BlockchainWorkshopSecurityGroupBase]
+          SubnetId:                               !Ref BlockchainWorkshopPublicSubnet
         Tags:
-          - Key:                             Name
-            Value:                           BlockchainWorkshopEC2
+          - Key:                                  ReInventBlockchainWorkshop
+            Value:                                EC2ClientInstance
+
+  BlockchainWorkshopELB:
+    Type:                                         AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+        AvailabilityZones:
+          Fn::GetAZs: ''
+        Instances:
+        - Ref:                                    BlockchainWorkshopEC2
+        Listeners:
+        - LoadBalancerPort:                       '80'
+          InstancePort:                           '3000'
+          Protocol:                               HTTP
+        HealthCheck:
+          Target:                                 HTTP:3000/health
+          HealthyThreshold:                       '3'
+          UnhealthyThreshold:                     '5'
+          Interval:                               '10'
+          Timeout:                                '5'
 
 Outputs:
   VPCID:
-    Description: VPC ID
+    Description:                                  VPC ID
     Value:
-      !Ref BlockchainWorkshopVPC
+      !Ref                                        BlockchainWorkshopVPC
   PublicSubnetID:
-    Description: Public Subnet ID
+    Description:                                  Public Subnet ID
     Value:
-      !Ref BlockchainWSPublicSubnet
+      !Ref                                        BlockchainWorkshopPublicSubnet
   SecurityGroupID:
-    Description: Security Group ID
+    Description:                                  Security Group ID
     Value:
-      !GetAtt BlockchainWSSecurityGroupBase.GroupId
+      !GetAtt                                     BlockchainWorkshopSecurityGroupBase.GroupId
   EC2URL:
-    Description: Public DNS of the EC2 instance
+    Description:                                  Public DNS of the EC2 instance
     Value:
-      !GetAtt BlockchainWorkshopEC2.PublicDnsName
+      !GetAtt                                     BlockchainWorkshopEC2.PublicDnsName
   BlockchainVPCEndpoint:
-    Description: VPC Endpoint ID
+    Description:                                  VPC Endpoint ID
     Value:
-      !Ref BlockchainWSVPCEndpoint
+      !Ref                                        BlockchainWorkshopVPCEndpoint

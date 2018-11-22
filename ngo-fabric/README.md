@@ -9,7 +9,7 @@ We will use Cloud9 to provide a Linux shell.
 1. Spin up a [Cloud9 IDE](https://us-east-1.console.aws.amazon.com/cloud9/home?region=us-east-1) from the AWS console.
 In the Cloud9 console, click 'Create Environment'
 2. Provide a name for your environment, e.g. fabric-c9, and click **Next Step**
-3. Leave everything as default and click **Next Step**
+3. Select `m4-large` (or an instance type with 4-8 GiB of RAM) and click **Next Step**
 4. Click **Create environment**. It would typically take 30-60s to create your Cloud9 IDE
 5. In the Cloud9 terminal, in the home directory, clone this repo:
 
@@ -21,7 +21,7 @@ git clone https://github.com/aws-samples/non-profit-blockchain.git
 ## Step 1 - Create the Fabric network
 In the AWS Managed Blockchain Console.
 
-Make sure you are in the correct AWS region and follow the steps below:
+Make sure you are in the correct AWS region (i.e. us-east-1, also known as N. Virginia) and follow the steps below:
 
 1. Click `Create a Network`
 2. Make sure `Hyperleger Fabric 1.2` is selected
