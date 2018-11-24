@@ -22,7 +22,7 @@ Parameters:
     Description:                                  Name of an existing EC2 key pair to enable SSH access to the EC2 instance
   BlockchainVpcEndpointServiceName:
     Type:                                         String
-   Description:                                   Name of the Blockchain VPC Endpoint. Obtained from running 'aws managedblockchain get-network'
+    Description:                                  Name of the Blockchain VPC Endpoint. Obtained from running 'aws managedblockchain get-network'
  
 Resources:
   BlockchainWorkshopRootRole:
