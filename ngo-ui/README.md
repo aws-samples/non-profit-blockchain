@@ -35,7 +35,7 @@ cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-## Step 1 - install Node
+## Step 1 - Install Node
 On Cloud9.
 
 Install Node.js. We will use v8.x.
@@ -50,14 +50,14 @@ nvm install lts/carbon
 nvm use lts/carbon
 ```
 
-## Step 2 - install dependencies
+## Step 2 - Install dependencies
 
 ```
 cd ~/non-profit-blockchain/ngo-ui
 npm i
 ```
 
-## Step 3 - point the Node.js application to your REST API
+## Step 3 - Point the Node.js application to your REST API
 
 Your REST API is exposed via an AWS Elastic Load Balancer (ELB). The ELB was created for you
 by CloudFormation in [Part 1.](../ngo-fabric/README.md). You can find the DNS endpoint for the ELB in
@@ -76,7 +76,7 @@ The values to be changed are as follows. The trailing backslash is important for
   socket_url: 'ws://ngo10-elb-2090058053.us-east-1.elb.amazonaws.com'
 ```
 
-## Step 4 - start the application
+## Step 4 - Start the application
 
 ```
 cd ~/non-profit-blockchain/ngo-ui
@@ -94,7 +94,7 @@ In Cloud9, navigate to the Cloud9 menu and click Preview->Preview Running Applic
 the UI login page in a pane in the Cloud9 IDE. You can expand this out to your browser by clicking the 
 icon next to the URL in the preview pane.
 
-## Step 5 - register a user in the application
+## Step 5 - Register a user in the application
 Registering a user is necessary before you carry out any tasks in the UI application. User registration
 will call the Fabric CA and enroll a new user. This user will then be used to invoke transactions and
 execute queries against the Fabric network. You can register a new user in the UI application. The link
@@ -108,7 +108,11 @@ into the network, such as [this one](../ngo-rest-api/ngo-load-workshop.sh)
 You could also query the chaincode directly and see the same information. You query the chaincode from 
 the Fabric client node. An example of how to query the chaincode can be found in [this script](../ngo-chaincode/test-chaincode-aws.sh)
 
-## Step 6 - pat yourself on the back, you've completed the workshop
+## Step 6 - Pat yourself on the back, you've completed the workshop
+You have successfully built a Hyperledger Fabric network using the AWS Managed Blockchain service, deployed
+chaincode to the service, connected a RESTful API to the service and deployed an Angular application that
+communicates with the RESTful API.
+
 The workshop instructions can be found in the README files in parts 1-4:
 
 * [Part 1:](../ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.

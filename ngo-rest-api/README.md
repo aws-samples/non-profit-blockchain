@@ -22,7 +22,7 @@ cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-## Step 1 - install Node
+## Step 1 - Install Node
 On the Fabric client node.
 
 Install Node.js. We will use v8.x.
@@ -43,7 +43,7 @@ Amazon Linux seems to be missing g++, so:
 sudo yum install gcc-c++ -y
 ```
 
-## Step 2 - install dependencies
+## Step 2 - Install dependencies
 On the Fabric client node.
 
 ```
@@ -51,7 +51,7 @@ cd ~/non-profit-blockchain/ngo-rest-api
 npm install
 ```
 
-## Step 3 - generate a connection profile
+## Step 3 - Generate a connection profile
 On the Fabric client node.
 
 The REST API needs a connection profile to connect to the Fabric network. Connection profiles describe
@@ -131,7 +131,7 @@ config.json should look something like this:
  }
 ```
 
-## Step 4 - run the REST API Node.js application
+## Step 4 - Run the REST API Node.js application
 On the Fabric client node.
 
 Run the app (in the background if you prefer):
@@ -142,7 +142,7 @@ nvm use lts/carbon
 node app.js &
 ```
 
-## Step 5 - test the REST API
+## Step 5 - Test the REST API
 On the Fabric client node.
 
 Once the app is running you can register an identity, and then start to execute chaincode
@@ -190,7 +190,7 @@ response:
     {"docType":"donor","donorUserName":"edge","email":"edge@def.com","registeredDate":"2018-10-22T11:52:20.182Z"}
 ]
 ```
-## Step 6 - load the workshop test data
+## Step 6 - Load the workshop test data
 
 Loading the test data uses cURL commands similar to those you used above to test the API. You can 
 use the same endpoint (i.e. localhost), since you will load the test data from the Fabric client node,

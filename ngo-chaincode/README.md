@@ -44,7 +44,7 @@ If the file has values for all keys, source it:
 source ~/peer-exports.sh 
 ```
 
-## Step 1 - copy the chaincode into the CLI container
+## Step 1 - Copy the chaincode into the CLI container
 
 The Fabric CLI container that is running on your Fabric client node (do `docker ps` to see it)
 mounts a folder from the Fabric client node EC2 instance: /home/ec2-user/fabric-samples/chaincode.
@@ -57,7 +57,7 @@ mkdir -p ./fabric-samples/chaincode/ngo
 cp ./non-profit-blockchain/ngo-chaincode/src/* ./fabric-samples/chaincode/ngo
 ```
 
-## Step 2 - install the chaincode on your peer
+## Step 2 - Install the chaincode on your peer
 
 Notice we are using the `-l node` flag, as our chaincode is written in Node.js.
 
@@ -74,7 +74,7 @@ Expected response:
 2018-11-15 06:39:47.636 UTC [chaincodeCmd] install -> INFO 004 Installed remotely response:<status:200 payload:"OK" >
 ```
 
-## Step 3 - instantiate the chaincode on the channel
+## Step 3 - Instantiate the chaincode on the channel
 
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_LOCALMSPID=$MSP" -e  "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER"  cli peer chaincode instantiate -o $ORDERER -C mychannel -n ngo -v v0 -c '{"Args":["init"]}' --cafile /opt/home/taiga-tls.pem --tls
@@ -89,7 +89,7 @@ instantiated once on a channel)
 2018-11-15 06:41:02.847 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
 ```
 
-## Step 4 - query the chaincode
+## Step 4 - Query the chaincode
 
 Query all donors
 ```
@@ -101,7 +101,7 @@ Query a specific donor
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode query -C mychannel -n ngo -c '{"Args":["queryDonor","{\"donorUserName\": \"edge\"}"]}'
 ```
 
-## Step 5 - invoke a transaction
+## Step 5 - Invoke a transaction
 
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode invoke -C mychannel -n ngo -c  '{"Args":["createDonor","{\"donorUserName\": \"edge\", \"email\": \"edge@def.com\", \"registeredDate\": \"2018-10-22T11:52:20.182Z\"}"]}' -o $ORDERER --cafile /opt/home/taiga-tls.pem --tls
