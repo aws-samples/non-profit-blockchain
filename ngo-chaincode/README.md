@@ -26,7 +26,9 @@ You will need to set the context before carrying out any Fabric CLI commands. We
 using the export files that were generated for us in [Part 1](../ngo-fabric/README.md)
 
 Source the file, so the exports are applied to your current session. If you exit the SSH 
-session and re-connect, you'll need to source the file again.
+session and re-connect, you'll need to source the file again. The `source` command below
+will print out the values of the key ENV variables. Make sure they are all populated. If
+they are not, follow Step 4 in [Part 1](../ngo-fabric/README.md) to repopulate them:
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
@@ -66,11 +68,15 @@ cp ./non-profit-blockchain/ngo-chaincode/src/* ./fabric-samples/chaincode/ngo
 
 ## Step 2 - Install the chaincode on your peer
 
+Before executing any chaincode functions, the chaincode must be installed on the peer node. Chaincode
+must be installed on every peer that wants to invoke transactions or run the query functions in the
+chaincode.
+
 Notice we are using the `-l node` flag, as our chaincode is written in Node.js.
 
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" \
-    -e "CORE_PEER_LOCALMSPID=$MSP" -e  "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER"  \
+    -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER"  \
     cli peer chaincode install -n ngo -l node -v v0 -p /opt/gopath/src/github.com/ngo
 ```
 
@@ -85,9 +91,15 @@ Expected response:
 
 ## Step 3 - Instantiate the chaincode on the channel
 
+Instantiation initlizes the chaincode on the channel, i.e. it binds the chaincode to a specific channel.
+Instantiation is treated as a Fabric transaction. In fact, when chaincode is instantiated, the Init function
+on the chaincode is called. Instantiation also sets the endorsement policy for this version of the chaincode
+on this channel. In the example below we are not explictly passing an endorsement policy, so the default
+policy of 'any member of the organizations in the channel' is applied.
+
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" \
-    -e "CORE_PEER_LOCALMSPID=$MSP" -e  "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER"  \
+    -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER"  \
     cli peer chaincode instantiate -o $ORDERER -C mychannel -n ngo -v v0 -c '{"Args":["init"]}' --cafile /opt/home/taiga-tls.pem --tls
 ```
 
@@ -105,24 +117,47 @@ instantiated once on a channel)
 Query all donors
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" \
--e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+-e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+cli peer chaincode query -C mychannel -n ngo -c '{"Args":["queryAllDonors"]}'
+```
+
+Expected response:
+This is correct as we do not have any donors in our network yet. We'll add one in the next step.
+
+```
+[]
+```
+
+## Step 5 - Invoke a transaction
+
+Let's add a couple of donors to Fabric. Execute both of these transactions below:
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" \
+-e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+cli peer chaincode invoke -C mychannel -n ngo \
+-c  '{"Args":["createDonor","{\"donorUserName\": \"edge\", \"email\": \"edge@def.com\", \"registeredDate\": \"2018-10-22T11:52:20.182Z\"}"]}' -o $ORDERER --cafile /opt/home/taiga-tls.pem --tls
+
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" \
+-e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+cli peer chaincode invoke -C mychannel -n ngo \
+-c  '{"Args":["createDonor","{\"donorUserName\": \"braendle\", \"email\": \"braendle@def.com\", \"registeredDate\": \"2018-11-05T14:31:20.182Z\"}"]}' -o $ORDERER --cafile /opt/home/taiga-tls.pem --tls
+```
+
+## Step 6 - Query the chaincode
+
+Query all donors
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" \
+-e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
 cli peer chaincode query -C mychannel -n ngo -c '{"Args":["queryAllDonors"]}'
 ```
 
 Query a specific donor
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" \
--e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+-e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
 cli peer chaincode query -C mychannel -n ngo -c '{"Args":["queryDonor","{\"donorUserName\": \"edge\"}"]}'
-```
-
-## Step 5 - Invoke a transaction
-
-```
-docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" \
--e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
-cli peer chaincode invoke -C mychannel -n ngo \
--c  '{"Args":["createDonor","{\"donorUserName\": \"edge\", \"email\": \"edge@def.com\", \"registeredDate\": \"2018-10-22T11:52:20.182Z\"}"]}' -o $ORDERER --cafile /opt/home/taiga-tls.pem --tls
 ```
 
 ## Move on to Part 3

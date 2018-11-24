@@ -22,6 +22,19 @@ cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
+You will need to set the context before carrying out any Fabric CLI commands. We do this 
+using the export files that were generated for us in [Part 1](../ngo-fabric/README.md)
+
+Source the file, so the exports are applied to your current session. If you exit the SSH 
+session and re-connect, you'll need to source the file again. The `source` command below
+will print out the values of the key ENV variables. Make sure they are all populated. If
+they are not, follow Step 4 in [Part 1](../ngo-fabric/README.md) to repopulate them:
+
+```
+cd ~/non-profit-blockchain/ngo-fabric
+source fabric-exports.sh
+```
+
 ## Step 1 - Install Node
 On the Fabric client node.
 
