@@ -10,7 +10,7 @@
 # on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
-
+ 
 AWSTemplateFormatVersion:                         '2010-09-09'
 Description:                                      >
   This template creates a Fabric client node, which will run the Fabric CLI and
@@ -22,8 +22,8 @@ Parameters:
     Description:                                  Name of an existing EC2 key pair to enable SSH access to the EC2 instance
   BlockchainVpcEndpointServiceName:
     Type:                                         String
-    Description:                                  Name of the Blockchain VPC Endpoint. Obtained from running 'aws managedblockchain get-network'
-
+   Description:                                   Name of the Blockchain VPC Endpoint. Obtained from running 'aws managedblockchain get-network'
+ 
 Resources:
   BlockchainWorkshopRootRole:
     Type:                                         "AWS::IAM::Role"
@@ -50,7 +50,7 @@ Resources:
                 Effect:                           "Allow"
                 Action:                           "*"
                 Resource:                         "*"
-
+ 
   BlockchainWorkshopRootInstanceProfile:
     Type:                                         "AWS::IAM::InstanceProfile"
     Properties:
@@ -58,7 +58,7 @@ Resources:
       Roles:
         -
           Ref:                                    "BlockchainWorkshopRootRole"
-
+ 
   BlockchainWorkshopVPC:
     Type:                                         AWS::EC2::VPC
     Properties:
@@ -69,17 +69,27 @@ Resources:
       Tags:
         - Key:                                    ReInventBlockchainWorkshop
           Value:                                  VPC
-
+ 
   BlockchainWorkshopPublicSubnet:
     Type:                                         AWS::EC2::Subnet
     Properties:
         VpcId:                                    !Ref BlockchainWorkshopVPC
         MapPublicIpOnLaunch:                      false
-        CidrBlock:                                10.0.0.16/28
-        Tags:
+        CidrBlock:                                10.0.0.32/28
+       Tags:
         - Key:                                    ReInventBlockchainWorkshop
           Value:                                  PublicSubnet
-
+ 
+  BlockchainWorkshopPublicSubnetELB:
+    Type:                                         AWS::EC2::Subnet
+    Properties:
+        VpcId:                                    !Ref BlockchainWorkshopVPC
+        MapPublicIpOnLaunch:                      true
+        CidrBlock:                                10.0.0.16/28
+        Tags:
+        - Key:                                    Name
+          Value:                                  BlockchainWSPublicSubnetELB
+ 
   BlockchainWorkshopSecurityGroupBase:
         Type:                                     AWS::EC2::SecurityGroup
         Properties:
@@ -90,10 +100,14 @@ Resources:
             CidrIp:                               0.0.0.0/0
             FromPort:                             22
             ToPort:                               22
+          - IpProtocol:                           tcp
+            CidrIp:                               0.0.0.0/0
+            FromPort:                             80
+            ToPort:                               80
           Tags:
           - Key:                                  ReInventBlockchainWorkshop
             Value:                                BaseSecurityGroup
-
+ 
   BlockchainWorkshopSecurityGroupBaseIngress:
     Type:                                         AWS::EC2::SecurityGroupIngress
     Properties:
@@ -105,20 +119,20 @@ Resources:
       Tags:
       - Key:                                      ReInventBlockchainWorkshop
         Value:                                    BaseSecurityGroupIngress
-
+ 
   BlockchainWorkshopInternetGateway:
     Type:                                         "AWS::EC2::InternetGateway"
     Properties:
       Tags:
       - Key:                                      ReInventBlockchainWorkshop
         Value:                                    InternetGateway
-
+ 
   BlockchainWorkshopAttachGateway:
     Type:                                         AWS::EC2::VPCGatewayAttachment
     Properties:
        VpcId:                                     !Ref BlockchainWorkshopVPC
        InternetGatewayId:                         !Ref BlockchainWorkshopInternetGateway
-
+ 
   BlockchainWorkshopRouteTable:
     Type:                                         AWS::EC2::RouteTable
     Properties:
@@ -126,20 +140,20 @@ Resources:
         Tags:
           - Key:                                  ReInventBlockchainWorkshop
             Value:                                RouteTable
-
+ 
   BlockchainWorkshopRoute:
     Type:                                         AWS::EC2::Route
     Properties:
         RouteTableId:                             !Ref BlockchainWorkshopRouteTable
         DestinationCidrBlock:                     0.0.0.0/0
         GatewayId:                                !Ref BlockchainWorkshopInternetGateway
-
+ 
   BlockchainWorkshopSubnetRouteTableAssociation:
     Type:                                         AWS::EC2::SubnetRouteTableAssociation
     Properties:
         SubnetId:                                 !Ref BlockchainWorkshopPublicSubnet
         RouteTableId:                             !Ref BlockchainWorkshopRouteTable
-
+ 
   BlockchainWorkshopVPCEndpoint:
     Type:                                         AWS::EC2::VPCEndpoint
     Properties:
@@ -149,7 +163,7 @@ Resources:
         VpcEndpointType:                          Interface
         SubnetIds:                                [!Ref BlockchainWorkshopPublicSubnet]
         SecurityGroupIds:                         [!Ref BlockchainWorkshopSecurityGroupBase]
-
+ 
   BlockchainWorkshopEC2:
     Type:                                         AWS::EC2::Instance
     Properties:
@@ -161,29 +175,33 @@ Resources:
         - AssociatePublicIpAddress:               true
           DeviceIndex:                            0
           GroupSet:                               [!Ref BlockchainWorkshopSecurityGroupBase]
-          SubnetId:                               !Ref BlockchainWorkshopPublicSubnet
+         SubnetId:                                !Ref BlockchainWorkshopPublicSubnet
         Tags:
-          - Key:                                  ReInventBlockchainWorkshop
-            Value:                                EC2ClientInstance
-
-  # BlockchainWorkshopELB:
-  #   Type:                                         AWS::ElasticLoadBalancing::LoadBalancer
-  #   Properties:
-  #       AvailabilityZones:
-  #         Fn::GetAZs: ''
-  #       Instances:
-  #       - Ref:                                    BlockchainWorkshopEC2
-  #       Listeners:
-  #       - LoadBalancerPort:                       '80'
-  #         InstancePort:                           '3000'
-  #         Protocol:                               HTTP
-  #       HealthCheck:
-  #         Target:                                 HTTP:3000/health
-  #         HealthyThreshold:                       '3'
-  #         UnhealthyThreshold:                     '5'
-  #         Interval:                               '10'
-  #         Timeout:                                '5'
-
+          - Key:                                  Name
+            Value:                                ManagedBlockchainWorkshopEC2ClientInstance
+ 
+  BlockchainWorkshopELB:
+    Type:                                         AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      SecurityGroups:                             [!Ref BlockchainWorkshopSecurityGroupBase]
+      Subnets:                                    [!Ref BlockchainWorkshopPublicSubnetELB]
+      Instances:
+        - !Ref                                    BlockchainWorkshopEC2
+      Listeners:
+        - LoadBalancerPort:                       '80'
+          InstancePort:                           '3000'
+          Protocol:                               HTTP
+      HealthCheck:
+        Target:                                   HTTP:3000/health
+        HealthyThreshold:                         '3'
+        UnhealthyThreshold:                       '5'
+        Interval:                                 '10'
+        Timeout:                                  '5'
+      LoadBalancerName:                           BlockchainWorkshopELB
+      Tags:
+        - Key:                                    Name
+          Value:                                  ELB
+ 
 Outputs:
   VPCID:
     Description:                                  VPC ID
@@ -201,6 +219,10 @@ Outputs:
     Description:                                  Public DNS of the EC2 instance
     Value:
       !GetAtt                                     BlockchainWorkshopEC2.PublicDnsName
+  ELBDNS:
+    Description:                                  Public DNS of the ELB
+    Value:
+      !GetAtt                                     BlockchainWorkshopELB.DNSName
   BlockchainVPCEndpoint:
     Description:                                  VPC Endpoint ID
     Value:

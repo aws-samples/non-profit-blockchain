@@ -71,42 +71,10 @@ The REST API needs a connection profile to connect to the Fabric network. Connec
 the Fabric network and provide information needed by the Node.js application in order to connect to the
 Fabric network. The instructions below will auto-generate a connection profile. 
 
-Make sure you still have the ENV variables set, which were populated when you built the Fabric network.
-Check the export statements at the top of the file below:
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-more fabric-exports.sh
-```
-
-If the export variables haven't been populated, or they are incorrect (perhaps pointing to a different 
-Fabric network), follow these steps. You can run these steps and the `source` command multiple times 
-without side effects.
-
-Update the export statements at the top of the file. The info you need either matches what you 
-entered when creating the Fabric network in [Part 1](../ngo-fabric/README.md), or can be found in the AWS Managed Blockchain Console,
-under your network.
-
-Create the file that includes the ENV export values that define your Fabric network configuration.
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-cp templates/exports-template.sh fabric-exports.sh
-vi fabric-exports.sh
-```
-
-Source the file, so the exports are applied to your current session. If you exit the SSH session
-and re-enter, you'll need to source the file again.
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-source fabric-exports.sh
-```
-
-Now generate the connection profile and check that the connection profile contains URL endpoints 
-for the peer, orderer and CA, an 'mspid', a 'caName', and that the admin username and password
-match those you entered when creating the Fabric network. If they do not match, edit the file
-and update them.
+Generate the connection profile using the script below and check that the connection profile contains 
+URL endpoints for the peer, orderer and CA, an 'mspid', a 'caName', and that the admin username and password
+match those you entered when creating the Fabric network. If they do not match, edit the connection profile
+and update them. The connection profile can be found here: `~/non-profit-blockchain/tmp/connection-profile/ngo-connection-profile.yaml`
 
 ```
 cd ~/non-profit-blockchain/ngo-rest-api/connection-profile
@@ -158,7 +126,9 @@ node app.js &
 ## Step 5 - Test the REST API
 On the Fabric client node.
 
-Once the app is running you can register an identity, and then start to execute chaincode
+Once the app is running you can register an identity, and then start to execute chaincode. The command
+below registers a user identity with the Fabric CA. This user identity is then used to run chaincode
+queries and invoke transactions.
 
 ### Register/enroll a user:
 
