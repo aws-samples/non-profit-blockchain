@@ -64,11 +64,11 @@ In your Cloud9 terminal window.
 
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
 the Fabric network. The Fabric client node will be created in its own VPC, with VPC endpoints 
-pointing to the Fabric network you created in [Part 1.](../ngo-fabric/README.md). CloudFormation 
+pointing to the Fabric network you created in [Part 1](../ngo-fabric/README.md). CloudFormation 
 will be used to create the Fabric client node, the VPC and the VPC endpoints.
 
-The CloudFormation script requires a small number of parameter values. We'll make sure these 
-are available as export variables before running the script.
+The CloudFormation template requires a number of parameter values. We'll make sure these 
+are available as export variables before running the script below.
 
 In Cloud9:
 
@@ -79,7 +79,8 @@ export NETWORKID=<the network ID you created in Step1, from the AWS Managed Bloc
 export NETWORKNAME=<the name you gave the network>
 ```
 
-Make sure the VPC endpoint has been populated and exported. If it's blank, check the AWS Managed Blockchain Console: 
+Set the VPC endpoint. Make sure it has been populated and exported. If the `echo` statement below shows
+that it's blank, check the AWS Managed Blockchain Console: 
 
 ```
 export VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
@@ -94,7 +95,7 @@ cd ~/non-profit-blockchain/ngo-fabric
 ./3-vpc-client-node.sh
 ```
 
-Check the progress in the AWS CloudFormation console.
+Check the progress in the AWS CloudFormation console and wait until the stack is CREATE COMPLETE.
 
 ## Step 4 - Prepare the Fabric client node and enroll and identity
 On the Fabric client node.
@@ -105,7 +106,9 @@ node to interact with, which TLS certs to use, etc.
 
 From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
 The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
-created in [Part 1.](../ngo-fabric/README.md)
+created in Step 3 above.
+
+Answer 'yes' if prompted: `Are you sure you want to continue connecting (yes/no)`
 
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem

@@ -9,13 +9,13 @@ For the Fabric workshop, the REST API server will run on the Fabric client node.
 
 From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
 The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
-created in [Part 1.](../ngo-fabric/README.md)
+created in [Part 1](../ngo-fabric/README.md)
 
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
 ```
 
-You should have already cloned this repo in [Part 1.](../ngo-fabric/README.md)
+You should have already cloned this repo in [Part 1](../ngo-fabric/README.md)
 
 ```
 cd ~
@@ -195,7 +195,7 @@ response:
 Loading the test data uses cURL commands similar to those you used above to test the API. You can 
 use the same endpoint (i.e. localhost), since you will load the test data from the Fabric client node,
 or you can use the AWS Elastic Load Balancer (ELB) that is used to expose your REST API. To find the 
-DNS endpoint for the ELB, go to the CloudFormation stack created in [Part 1.](../ngo-fabric/README.md)
+DNS endpoint for the ELB, go to the CloudFormation stack created in [Part 1](../ngo-fabric/README.md)
 and look in Outputs. If you receive an error using the ELB it might be because the underlying EC2 
 instance has not moved to an 'InService' state. This will happen once the REST API server is running
 and the ELB is able to execute the desired number of health checks against it. You can check the 

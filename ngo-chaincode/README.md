@@ -1,21 +1,21 @@
 # Part 2: NGO Chaincode
 
 The instructions in this README will help you to install the NGO chaincode into the
-Fabric network you created in [Part 1.](../ngo-fabric/README.md)
+Fabric network you created in [Part 1](../ngo-fabric/README.md)
 
-All steps are carried out on the Fabric client node you created in [Part 1.](../ngo-fabric/README.md)
+All steps are carried out on the Fabric client node you created in [Part 1](../ngo-fabric/README.md)
 
 ## Pre-requisites
 
 From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
 The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
-created in [Part 1.](../ngo-fabric/README.md)
+created in [Part 1](../ngo-fabric/README.md)
 
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
 ```
 
-You should have already cloned this repo in [Part 1.](../ngo-fabric/README.md)
+You should have already cloned this repo in [Part 1](../ngo-fabric/README.md)
 
 ```
 cd ~
@@ -23,7 +23,7 @@ git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
 You will need to set the context before carrying out any Fabric CLI commands. We do this 
-using the export files that were generated for us in [Part 1.](../ngo-fabric/README.md)
+using the export files that were generated for us in [Part 1](../ngo-fabric/README.md)
 
 Source the file, so the exports are applied to your current session. If you exit the SSH 
 session and re-connect, you'll need to source the file again.
@@ -48,6 +48,13 @@ source ~/peer-exports.sh
 
 The Fabric CLI container that is running on your Fabric client node (do `docker ps` to see it)
 mounts a folder from the Fabric client node EC2 instance: /home/ec2-user/fabric-samples/chaincode.
+You can see this by looking at the docker config. Look at the `Mounts` section in the output where
+you'll see `/home/ec2-user/fabric-samples/chaincode` mounted into the Docker container:
+
+```
+docker inspect cli
+```
+
 You should already have this folder on your Fabric client node as it was created earlier. Copying the 
 chaincode into this folder will make it accessible inside the Fabric CLI container.
 
@@ -62,7 +69,9 @@ cp ./non-profit-blockchain/ngo-chaincode/src/* ./fabric-samples/chaincode/ngo
 Notice we are using the `-l node` flag, as our chaincode is written in Node.js.
 
 ```
-docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_LOCALMSPID=$MSP" -e  "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER"  cli peer chaincode install -n ngo -l node -v v0 -p /opt/gopath/src/github.com/ngo
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" \
+    -e "CORE_PEER_LOCALMSPID=$MSP" -e  "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER"  \
+    cli peer chaincode install -n ngo -l node -v v0 -p /opt/gopath/src/github.com/ngo
 ```
 
 Expected response:
@@ -77,7 +86,9 @@ Expected response:
 ## Step 3 - Instantiate the chaincode on the channel
 
 ```
-docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_LOCALMSPID=$MSP" -e  "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER"  cli peer chaincode instantiate -o $ORDERER -C mychannel -n ngo -v v0 -c '{"Args":["init"]}' --cafile /opt/home/taiga-tls.pem --tls
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" \
+    -e "CORE_PEER_LOCALMSPID=$MSP" -e  "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER"  \
+    cli peer chaincode instantiate -o $ORDERER -C mychannel -n ngo -v v0 -c '{"Args":["init"]}' --cafile /opt/home/taiga-tls.pem --tls
 ```
 
 Expected response:
@@ -93,18 +104,25 @@ instantiated once on a channel)
 
 Query all donors
 ```
-docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode query -C mychannel -n ngo -c '{"Args":["queryAllDonors"]}'
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" \
+-e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+cli peer chaincode query -C mychannel -n ngo -c '{"Args":["queryAllDonors"]}'
 ```
 
 Query a specific donor
 ```
-docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode query -C mychannel -n ngo -c '{"Args":["queryDonor","{\"donorUserName\": \"edge\"}"]}'
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" \
+-e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+cli peer chaincode query -C mychannel -n ngo -c '{"Args":["queryDonor","{\"donorUserName\": \"edge\"}"]}'
 ```
 
 ## Step 5 - Invoke a transaction
 
 ```
-docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode invoke -C mychannel -n ngo -c  '{"Args":["createDonor","{\"donorUserName\": \"edge\", \"email\": \"edge@def.com\", \"registeredDate\": \"2018-10-22T11:52:20.182Z\"}"]}' -o $ORDERER --cafile /opt/home/taiga-tls.pem --tls
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/taiga-tls.pem" \
+-e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+cli peer chaincode invoke -C mychannel -n ngo \
+-c  '{"Args":["createDonor","{\"donorUserName\": \"edge\", \"email\": \"edge@def.com\", \"registeredDate\": \"2018-10-22T11:52:20.182Z\"}"]}' -o $ORDERER --cafile /opt/home/taiga-tls.pem --tls
 ```
 
 ## Move on to Part 3

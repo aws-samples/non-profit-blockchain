@@ -38,6 +38,3 @@ aws cloudformation deploy --stack-name $NETWORKNAME-fabric-client-node --templat
 --capabilities CAPABILITY_NAMED_IAM \
 --parameter-overrides KeyName=$NETWORKNAME-keypair BlockchainVpcEndpointServiceName=$VPCENDPOINTSERVICENAME \
 --region $REGION
-
-aws cloudformation wait stack-create-complete --stack-name $NETWORKNAME-fabric-client-node
-
