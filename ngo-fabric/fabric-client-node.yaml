@@ -175,8 +175,8 @@ Resources:
         - AssociatePublicIpAddress:               true
           DeviceIndex:                            0
           GroupSet:                               [!Ref BlockchainWorkshopSecurityGroupBase]
-          SubnetId:                                !Ref BlockchainWorkshopPublicSubnet
-          Tags:
+          SubnetId:                               !Ref BlockchainWorkshopPublicSubnet
+        Tags:
           - Key:                                  Name
             Value:                                ManagedBlockchainWorkshopEC2ClientInstance
  
