@@ -147,8 +147,8 @@ response:
 request:
 ```
 curl -s -X POST "http://localhost:3000/donors" -H "content-type: application/json" -d '{ 
-   "donorUserName": "edge", 
-   "email": "edge@def.com", 
+   "donorUserName": "edge2", 
+   "email": "edge2@def.com", 
    "registeredDate": "2018-10-22T11:52:20.182Z" 
 }'
 ```
