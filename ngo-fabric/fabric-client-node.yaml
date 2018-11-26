@@ -197,7 +197,6 @@ Resources:
         UnhealthyThreshold:                       '5'
         Interval:                                 '10'
         Timeout:                                  '5'
-      LoadBalancerName:                           BlockchainWorkshopELB
       Tags:
         - Key:                                    Name
           Value:                                  ELB
