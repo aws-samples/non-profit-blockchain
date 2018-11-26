@@ -97,6 +97,8 @@ on the chaincode is called. Instantiation also sets the endorsement policy for t
 on this channel. In the example below we are not explictly passing an endorsement policy, so the default
 policy of 'any member of the organizations in the channel' is applied.
 
+It can take up to 30 seconds to instantiate chaincode on the channel.
+
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
     -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER"  \

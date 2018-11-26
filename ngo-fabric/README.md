@@ -201,6 +201,17 @@ cd ~/non-profit-blockchain/ngo-fabric
 ./5-configtx.sh
 ```
 
+You should see:
+
+```
+$ ./5-configtx.sh
+2018-11-26 21:41:22.885 UTC [common/tools/configtxgen] main -> INFO 001 Loading configuration
+2018-11-26 21:41:22.887 UTC [common/tools/configtxgen] doOutputChannelCreateTx -> INFO 002 Generating new channel configtx
+2018-11-26 21:41:22.887 UTC [common/tools/configtxgen/encoder] NewApplicationGroup -> WARN 003 Default policy emission is deprecated, please include policy specificiations for the application group in configtx.yaml
+2018-11-26 21:41:22.887 UTC [common/tools/configtxgen/encoder] NewApplicationOrgGroup -> WARN 004 Default policy emission is deprecated, please include policy specificiations for the application org group m-BHX24CQGP5CUNFS3YZTO2MPSRI in configtx.yaml
+2018-11-26 21:41:22.888 UTC [common/tools/configtxgen] doOutputChannelCreateTx -> INFO 005 Writing new channel tx
+```
+
 Check that the channel configuration has been generated:
 
 ```
@@ -219,6 +230,18 @@ cd ~/non-profit-blockchain/ngo-fabric
 ./6-channel.sh
 ```
 
+You should see:
+
+```
+$ ./6-channel.sh
+2018-11-26 21:41:29.684 UTC [channelCmd] InitCmdFactory -> INFO 001 Endorser and orderer connections initialized
+2018-11-26 21:41:29.752 UTC [cli/common] readBlock -> INFO 002 Got status: &{NOT_FOUND}
+2018-11-26 21:41:29.761 UTC [channelCmd] InitCmdFactory -> INFO 003 Endorser and orderer connections initialized
+2018-11-26 21:41:29.963 UTC [cli/common] readBlock -> INFO 004 Got status: &{NOT_FOUND}
+2018-11-26 21:41:29.972 UTC [channelCmd] InitCmdFactory -> INFO 005 Endorser and orderer connections initialized
+2018-11-26 21:41:30.174 UTC [cli/common] readBlock -> INFO 006 Got status: &{NOT_FOUND}
+2018-11-26 21:41:34.370 UTC [cli/common] readBlock -> INFO 026 Received block: 0
+```
 ## Step 7 - Join your peer node to the channel
 On the Fabric client node.
 
@@ -229,6 +252,14 @@ Execute the following script:
 ```
 cd ~/non-profit-blockchain/ngo-fabric
 ./7-join.sh
+```
+
+You should see:
+
+```
+$ ./7-join.sh
+2018-11-26 21:41:40.983 UTC [channelCmd] InitCmdFactory -> INFO 001 Endorser and orderer connections initialized
+2018-11-26 21:41:41.022 UTC [channelCmd] executeJoin -> INFO 002 Successfully submitted proposal to join channel
 ```
 
 ## Step 8 - Install chaincode on your peer node
@@ -243,16 +274,34 @@ cd ~/non-profit-blockchain/ngo-fabric
 ./8-install.sh
 ```
 
+You should see:
+
+```
+$ ./8-install.sh
+2018-11-26 21:41:46.585 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
+2018-11-26 21:41:46.585 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
+2018-11-26 21:41:48.004 UTC [chaincodeCmd] install -> INFO 003 Installed remotely response:<status:200 payload:"OK" > 
+```
+
 ## Step 9 - Instantiate the chaincode on the channel
 On the Fabric client node.
 
-Instantiate chaincode on Fabric channel.
+Instantiate chaincode on Fabric channel. This statement may take around 30 seconds, and you
+won't see a specific success response.
 
 Execute the following script:
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
 ./9-instantiate.sh
+```
+
+You should see:
+
+```
+$ ./9-instantiate.sh
+2018-11-26 21:41:53.738 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
+2018-11-26 21:41:53.738 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
 ```
 
 ## Step 10 - Query the chaincode
@@ -267,6 +316,12 @@ cd ~/non-profit-blockchain/ngo-fabric
 ./10-query.sh
 ```
 
+You should see:
+
+```
+100
+```
+
 ## Step 11 - Invoke a transaction
 On the Fabric client node.
 
@@ -277,6 +332,13 @@ Execute the following script:
 ```
 cd ~/non-profit-blockchain/ngo-fabric
 ./11-invoke.sh
+```
+
+You should see:
+
+```
+$ ./11-invoke.sh
+2018-11-26 21:45:20.935 UTC [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 001 Chaincode invoke successful. result: status:200 
 ```
 
 ## Step 10 - Query the chaincode again and check the change in value

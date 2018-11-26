@@ -40,6 +40,10 @@ response=$(curl -s -X POST http://${ENDPOINT}:${PORT}/users -H 'content-type: ap
 echo $response
 echo Response should be: {"success":true,"secret":"","message":"$USERID enrolled Successfully"}
 
+echo '---------------------------------------'
+echo NGOs
+echo '---------------------------------------'
+
 echo 'Creating NGO - 1101'
 echo
 
@@ -81,8 +85,6 @@ TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/ngos -H 'content-type: appli
     "contactEmail": "animalrescue@animalrescue.com"
 }')
 
-
-
 echo "Transaction ID is $TRX_ID"
 
 echo 'Creating NGO - 1104'
@@ -123,3 +125,110 @@ echo 'Query specific NGOs - looking for NGO 1103'
 echo
 curl -s -X GET http://${ENDPOINT}:${PORT}/ngos/1103 -H 'content-type: application/json'
 
+echo '---------------------------------------'
+echo Donors
+echo '---------------------------------------'
+echo 'Create Donor'
+echo
+TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/donors -H 'content-type: application/json' -d '{ 
+   "donorUserName": "jane", 
+   "email": "jane@abc.com", 
+   "registeredDate": "2018-10-21T09:52:20.182Z" 
+}')
+echo "Transaction ID is $TRX_ID"
+echo
+TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/donors -H 'content-type: application/json' -d '{ 
+   "donorUserName": "louisa", 
+   "email": "louisa@hij.com", 
+   "registeredDate": "2018-11-18T05:32:20.182Z" 
+}')
+echo "Transaction ID is $TRX_ID"
+
+echo 'Query all donors'
+echo
+curl -s -X GET http://${ENDPOINT}:${PORT}/donors -H 'content-type: application/json'
+
+echo '---------------------------------------'
+echo Donation
+echo '---------------------------------------'
+echo
+echo 'Create Donation'
+echo
+DONATION1=$(uuidgen)
+TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/donations -H 'content-type: application/json' -d '{ 
+        "donationId": "'"${DONATION1}"'",
+        "donationAmount": 100,
+        "donationDate": "2018-09-20T12:41:59.582Z",
+        "donorUserName": "edge",
+        "ngoRegistrationNumber": "1102"
+}')
+echo "Transaction ID is $TRX_ID"
+echo
+DONATION2=$(uuidgen)
+TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/donations -H 'content-type: application/json' -d '{ 
+        "donationId": "'"${DONATION2}"'",
+        "donationAmount": 255,
+        "donationDate": "2018-09-18T07:41:59.582Z",
+        "donorUserName": "jane",
+        "ngoRegistrationNumber": "1105"
+}')
+echo "Transaction ID is $TRX_ID"
+echo
+DONATION3=$(uuidgen)
+TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/donations -H 'content-type: application/json' -d '{ 
+        "donationId": "'"${DONATION3}"'",
+        "donationAmount": 900,
+        "donationDate": "2018-09-09T06:32:59.582Z",
+        "donorUserName": "louisa",
+        "ngoRegistrationNumber": "1103"
+}')
+echo "Transaction ID is $TRX_ID"
+echo
+DONATION4=$(uuidgen)
+TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/donations -H 'content-type: application/json' -d '{ 
+        "donationId": "'"${DONATION4}"'",
+        "donationAmount": 430,
+        "donationDate": "2018-08-09T09:32:59.582Z",
+        "donorUserName": "braendle",
+        "ngoRegistrationNumber": "1103"
+}')
+echo "Transaction ID is $TRX_ID"
+echo
+DONATION5=$(uuidgen)
+TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/donations -H 'content-type: application/json' -d '{ 
+        "donationId": "'"${DONATION5}"'",
+        "donationAmount": 200,
+        "donationDate": "2018-09-18T07:41:59.582Z",
+        "donorUserName": "edge",
+        "ngoRegistrationNumber": "1103"
+}')
+echo "Transaction ID is $TRX_ID"
+echo
+echo 'Query all Donations'
+echo
+curl -s -X GET http://${ENDPOINT}:${PORT}/donations -H 'content-type: application/json'
+
+echo '---------------------------------------'
+echo Spend
+echo '---------------------------------------'
+echo 'Create Spend'
+echo
+SPENDID=$(uuidgen)
+TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/spend -H 'content-type: application/json' -d '{ 
+        "ngoRegistrationNumber": "1103",
+        "spendId": "'"${SPENDID}"'",
+        "spendDescription": "Fees for hiring transport for animal delivery",
+        "spendDate": "2018-11-19T12:20:59.582Z",
+        "spendAmount": 125
+}')
+echo "Transaction ID is $TRX_ID"
+echo
+SPENDID=$(uuidgen)
+TRX_ID=$(curl -s -X POST http://${ENDPOINT}:${PORT}/spend -H 'content-type: application/json' -d '{ 
+        "ngoRegistrationNumber": "1105",
+        "spendId": "'"${SPENDID}"'",
+        "spendDescription": "Purchase test tubes",
+        "spendDate": "2018-09-10T22:41:59.582Z",
+        "spendAmount": 99
+}')
+echo "Transaction ID is $TRX_ID"

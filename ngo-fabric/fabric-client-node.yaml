@@ -102,8 +102,8 @@ Resources:
             ToPort:                               22
           - IpProtocol:                           tcp
             CidrIp:                               0.0.0.0/0
-            FromPort:                             80
-            ToPort:                               80
+            FromPort:                             0
+            ToPort:                               65535
           Tags:
           - Key:                                  ReInventBlockchainWorkshop
             Value:                                BaseSecurityGroup
@@ -196,7 +196,7 @@ Resources:
       Listeners:
         - LoadBalancerPort:                       '80'
           InstancePort:                           '3000'
-          Protocol:                               HTTP
+          Protocol:                               TCP
       HealthCheck:
         Target:                                   HTTP:3000/health
         HealthyThreshold:                         '3'
