@@ -16,7 +16,7 @@
 # REPODIR points to this repo
 # LOCALCA points to the location of the TLS cert
 REPODIR=~/non-profit-blockchain
-LOCALCA=/home/ec2-user/taiga-tls.pem 
+LOCALCA=/home/ec2-user/managedblockchain-tls-chain.pem 
 
 #copy the connection profiles
 mkdir -p $REPODIR/tmp/connection-profile/org1

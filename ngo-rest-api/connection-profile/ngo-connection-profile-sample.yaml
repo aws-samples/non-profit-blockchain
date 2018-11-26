@@ -41,7 +41,7 @@ orderers:
   orderer.com:
     url: grpcs://orderer.n-WDG36TTUD5HEJORZUPF4REKMBI.managedblockchain.us-east-1.amazonaws.com:30001
     tlsCACerts:
-      path: /home/ec2-user/taiga-tls.pem
+      path: /home/ec2-user/managedblockchain-tls-chain.pem
 
 peers:
   nd-4MHB4EKFCRF7VBHXZE2ZU4F6GY:
@@ -49,7 +49,7 @@ peers:
     grpcOptions:
       ssl-target-name-override: nd-4MHB4EKFCRF7VBHXZE2ZU4F6GY
     tlsCACerts:
-      path: /home/ec2-user/taiga-tls.pem
+      path: /home/ec2-user/managedblockchain-tls-chain.pem
 
 certificateAuthorities:
   ca-org1:
@@ -57,7 +57,7 @@ certificateAuthorities:
     httpOptions:
       verify: false
     tlsCACerts:
-      path: /home/ec2-user/taiga-tls.pem
+      path: /home/ec2-user/managedblockchain-tls-chain.pem
     registrar:
       - enrollId: admin
         enrollSecret: adminpwd
