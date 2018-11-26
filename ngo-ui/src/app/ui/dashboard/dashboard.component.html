@@ -44,13 +44,6 @@
                                 <td>{{userDonation.date | date: 'MM/dd/yyyy'}}</td>
                                 <td class="text-right">{{userDonation.amount | currency:'USD':'symbol':'1.2-2'}}</td>
                             </tr>
-                            <tr *ngFor="let userDonation of userDonationslist; let i = index">
-                                <td class="pl-0">{{i+1}}</td>
-                                <td><a routerLink="/details/{{userDonation.ngo_id}}">{{userDonation.ngo_name}}</a></td>
-                                <td>20</td>
-                                <td>{{userDonation.date | date: 'MM/dd/yyyy'}}</td>
-                                <td class="text-right">{{userDonation.amount | currency:'USD':'symbol':'1.2-2'}}</td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>

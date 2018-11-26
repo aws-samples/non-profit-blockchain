@@ -28,7 +28,7 @@ set +e
 echo installing jq
 sudo yum install jq
 echo To test, run the API server as per the instructions in the README, then execute this script on the command line
-echo NOTE: the logger for the REST API server (in app.js) should be running at INFO level, not DEBUG
+echo 'NOTE: the logger for the REST API server (in app.js) should be running at INFO level, not DEBUG'
 echo
 RED='\033[0;31m'
 RESTORE='\033[0m'

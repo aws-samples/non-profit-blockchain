@@ -72,8 +72,8 @@ vi src/environments/environment.ts
 The values to be changed are as follows. The trailing backslash is important for the api_url.
 
 ```
-  api_url: 'http://ngo10-elb-2090058053.us-east-1.elb.amazonaws.com/',
-  socket_url: 'ws://ngo10-elb-2090058053.us-east-1.elb.amazonaws.com'
+  api_url: 'http://tg-fabric-Blockcha-1NVE3TSKYVEQ3-247478291.us-east-1.elb.amazonaws.com/',
+  socket_url: 'ws://tg-fabric-Blockcha-1NVE3TSKYVEQ3-247478291.us-east-1.elb.amazonaws.com'
 ```
 
 ## Step 4 - Start the application
@@ -93,6 +93,10 @@ You should see this:
 In Cloud9, navigate to the Cloud9 menu and click Preview->Preview Running Application. This will show
 the UI login page in a pane in the Cloud9 IDE. You can expand this out to your browser by clicking the 
 icon next to the URL in the preview pane.
+
+NOTE: You must remove the `https://` protocol from the Cloud9 URL. The application does not use TLS/SSL,
+and most modern browsers will not allow you to call an HTTPS endpoint when the underlying application
+makes HTTP calls. 
 
 ## Step 5 - Register a user in the application
 Registering a user is necessary before you carry out any tasks in the UI application. User registration
