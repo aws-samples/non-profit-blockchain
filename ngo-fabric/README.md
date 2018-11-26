@@ -55,7 +55,7 @@ In the AWS Managed Blockchain Console: https://console.aws.amazon.com/managedblo
 
 1. In the new network you have created, click on the member in the Members section.
 2. Click `Create peer node`
-3. Enter 40 for storage, accept the other defaults, and click `Create peer node`
+3. Enter 20 for storage, accept the other defaults, and click `Create peer node`
 
 We'll continue with the next steps while we wait for the peer node to become HEALTHY.
 
@@ -73,7 +73,6 @@ are available as export variables before running the script below.
 In Cloud9:
 
 ```
-export ENDPOINT=https://taiga-beta.us-east-1.amazonaws.com
 export REGION=us-east-1
 export NETWORKID=<the network ID you created in Step1, from the AWS Managed Blockchain Console>
 export NETWORKNAME=<the name you gave the network>
