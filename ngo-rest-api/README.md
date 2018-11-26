@@ -185,6 +185,7 @@ and the ELB is able to execute the desired number of health checks against it. Y
 status in the EC2 console, under Load Balancers.
 
 ```
+cd ~/non-profit-blockchain/ngo-rest-api
 vi ngo-load-workshop.sh
 ```
 
@@ -199,6 +200,7 @@ export PORT=80
 After saving the changes, run the script:
 
 ```
+cd ~/non-profit-blockchain/ngo-rest-api
 ./ngo-load-workshop.sh
 ```
 

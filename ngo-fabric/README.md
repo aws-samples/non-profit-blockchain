@@ -110,6 +110,7 @@ created in Step 3 above.
 Answer 'yes' if prompted: `Are you sure you want to continue connecting (yes/no)`
 
 ```
+cd ~
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
 ```
 

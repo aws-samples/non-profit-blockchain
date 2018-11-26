@@ -30,6 +30,16 @@ echo '---------------------------------------'
 echo connecting to server: $ENDPOINT:$PORT
 echo '---------------------------------------'
 
+echo '---------------------------------------'
+echo Registering a user
+echo '---------------------------------------'
+echo 'Register User'
+USERID=$(uuidgen)
+echo
+response=$(curl -s -X POST http://${ENDPOINT}:${PORT}/users -H 'content-type: application/x-www-form-urlencoded' -d "username=${USERID}&orgName=Org1")
+echo $response
+echo Response should be: {"success":true,"secret":"","message":"$USERID enrolled Successfully"}
+
 echo 'Creating NGO - 1101'
 echo
 

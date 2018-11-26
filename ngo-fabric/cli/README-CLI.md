@@ -132,8 +132,8 @@ section using ctrl-c. The exports you copy should look something like this:
 ```
 export MSP_PATH=/opt/home/admin-msp
 export MSP=m-U2UK2RBNQBBMFAZVJPAACYQOEQ
-export ORDERER=orderer.n-PGVKO3H3RFH75PLI3DBMLUQ66M.taiga.us-east-1.amazonaws.com:30001
-export PEER=nd-4727DEQV4NHYHASCYK4OXFSMEI.m-U2UK2RBNQBBMFAZVJPAACYQOEQ.n-PGVKO3H3RFH75PLI3DBMLUQ66M.taiga.us-east-1.amazonaws.com:30003
+export ORDERER=orderer.n-ZX2IFPESDJB67NMOV4VK5HEFL4.managedblockchain.us-east-1.amazonaws.com:30001
+export PEER=nd-N6FEBJD4IRALNCLNVYUGOWQV5M.m-ZSKQNOCTFFAM3JZNRBRLO735II.n-ZX2IFPESDJB67NMOV4VK5HEFL4.managedblockchain.us-east-1.amazonaws.com:30003
 export CHANNEL=mychannel
 export CAFILE=/opt/home/managedblockchain-tls-chain.pem
 export CHAINCODENAME=mycc

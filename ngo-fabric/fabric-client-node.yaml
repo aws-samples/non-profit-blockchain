@@ -154,6 +154,12 @@ Resources:
         SubnetId:                                 !Ref BlockchainWorkshopPublicSubnet
         RouteTableId:                             !Ref BlockchainWorkshopRouteTable
  
+  BlockchainWorkshopSubnetRouteTableAssociationELB:
+    Type:                                         AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+        SubnetId:                                 !Ref BlockchainWorkshopPublicSubnetELB
+        RouteTableId:                             !Ref BlockchainWorkshopRouteTable
+
   BlockchainWorkshopVPCEndpoint:
     Type:                                         AWS::EC2::VPCEndpoint
     Properties:
