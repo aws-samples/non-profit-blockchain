@@ -79,10 +79,10 @@ export NETWORKNAME=<the name you gave the network>
 ```
 
 Set the VPC endpoint. Make sure it has been populated and exported. If the `echo` statement below shows
-that it's blank, check the AWS Managed Blockchain Console: 
+that it's blank, check the details under your network in the AWS Managed Blockchain Console: 
 
 ```
-export VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
+export VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
 echo $VPCENDPOINTSERVICENAME
 ```
 
