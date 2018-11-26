@@ -30,7 +30,7 @@ and will not be required once the `managedblockchain` service has been included 
 
 ```
 cd ~
-aws s3 cp s3://taiga-beta-test/service-2.json .  
+aws s3 cp s3://managedblockchain-beta/service-2.json .  
 aws configure add-model --service-model file://service-2.json --service-name managedblockchain
 ```
 

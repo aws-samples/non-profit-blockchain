@@ -25,7 +25,7 @@ export MEMBERID=<your member ID, from the AWS Console>
 
 echo Downloading and installing model file for new service
 cd ~
-aws s3 cp s3://taiga-beta-test/service-2.json .  
+aws s3 cp s3://managedblockchain-beta/service-2.json  .  
 aws configure add-model --service-model file://service-2.json --service-name managedblockchain
 
 export ENDPOINT=https://taiga-beta.us-east-1.amazonaws.com
