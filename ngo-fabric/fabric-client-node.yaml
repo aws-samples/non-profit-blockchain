@@ -75,7 +75,7 @@ Resources:
     Properties:
         VpcId:                                    !Ref BlockchainWorkshopVPC
         MapPublicIpOnLaunch:                      false
-        CidrBlock:                                10.0.0.32/28
+        CidrBlock:                                10.0.0.0/16
         Tags:
         - Key:                                    ReInventBlockchainWorkshop
           Value:                                  PublicSubnet
