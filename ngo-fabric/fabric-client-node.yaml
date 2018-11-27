@@ -80,16 +80,6 @@ Resources:
         - Key:                                    ReInventBlockchainWorkshop
           Value:                                  PublicSubnet
  
-  BlockchainWorkshopPublicSubnetELB:
-    Type:                                         AWS::EC2::Subnet
-    Properties:
-        VpcId:                                    !Ref BlockchainWorkshopVPC
-        MapPublicIpOnLaunch:                      true
-        CidrBlock:                                10.0.0.16/28
-        Tags:
-        - Key:                                    Name
-          Value:                                  BlockchainWSPublicSubnetELB
- 
   BlockchainWorkshopSecurityGroupBase:
         Type:                                     AWS::EC2::SecurityGroup
         Properties:
@@ -154,12 +144,6 @@ Resources:
         SubnetId:                                 !Ref BlockchainWorkshopPublicSubnet
         RouteTableId:                             !Ref BlockchainWorkshopRouteTable
  
-  BlockchainWorkshopSubnetRouteTableAssociationELB:
-    Type:                                         AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-        SubnetId:                                 !Ref BlockchainWorkshopPublicSubnetELB
-        RouteTableId:                             !Ref BlockchainWorkshopRouteTable
-
   BlockchainWorkshopVPCEndpoint:
     Type:                                         AWS::EC2::VPCEndpoint
     Properties:
@@ -190,7 +174,7 @@ Resources:
     Type:                                         AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
       SecurityGroups:                             [!Ref BlockchainWorkshopSecurityGroupBase]
-      Subnets:                                    [!Ref BlockchainWorkshopPublicSubnetELB]
+      Subnets:                                    [!Ref BlockchainWorkshopPublicSubnet]
       Instances:
         - !Ref                                    BlockchainWorkshopEC2
       Listeners:
