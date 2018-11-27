@@ -48,7 +48,7 @@ peers:
     url: grpcs://%PEERSERVICEENDPOINT%
     eventUrl: grpcs://%PEEREVENTENDPOINT%
     grpcOptions:
-      ssl-target-name-override: %PEEREVENTENDPOINTNOPORT%
+      ssl-target-name-override: %PEERSERVICEENDPOINTNOPORT%
     tlsCACerts:
       path: %CAFILE%
 
