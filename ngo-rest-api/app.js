@@ -606,6 +606,9 @@ async function dummySpend() {
 		logger.info('##### dummySpend - no donations available');
 	}
 	logger.info('##### dummySpend - number of donation record: ' + len);
+	if (len < 1) {
+		return;
+	}
 	let ran = Math.floor(Math.random() * len);
 	logger.info('##### dummySpend - randomly selected donation record number: ' + ran);
 	logger.info('##### dummySpend - randomly selected donation record: ' + JSON.stringify(message[ran]));
