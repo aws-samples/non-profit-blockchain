@@ -30,7 +30,9 @@ sed -i "s|%PEERNODEID%|$PEERNODEID|g" $REPODIR/tmp/connection-profile/ngo-connec
 sed -i "s|%MEMBERID%|$MEMBERID|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
 sed -i "s|%CAFILE%|$LOCALCA|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
 sed -i "s|%ORDERINGSERVICEENDPOINT%|$ORDERINGSERVICEENDPOINT|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
+sed -i "s|%ORDERINGSERVICEENDPOINTNOPORT%|$ORDERINGSERVICEENDPOINTNOPORT|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
 sed -i "s|%PEERSERVICEENDPOINT%|$PEERSERVICEENDPOINT|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
+sed -i "s|%PEERSERVICEENDPOINTNOPORT%|$PEERSERVICEENDPOINTNOPORT|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
 sed -i "s|%PEEREVENTENDPOINT%|$PEEREVENTENDPOINT|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
 sed -i "s|%CASERVICEENDPOINT%|$CASERVICEENDPOINT|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
 sed -i "s|%ADMINUSER%|$ADMINUSER|g" $REPODIR/tmp/connection-profile/ngo-connection-profile.yaml
