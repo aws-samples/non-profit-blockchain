@@ -584,7 +584,7 @@ app.get('/blockinfos/:docType/keys/:key', awaitHandler(async (req, res) => {
  * spending funds, which are allocated against donations
  ************************************************************************************/
 
-var dummySpend = async function() {
+async function dummySpend() {
 	if (!username) {
 		return;
 	}
