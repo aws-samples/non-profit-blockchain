@@ -33,6 +33,7 @@ var util = require('util');
 var app = express();
 var cors = require('cors');
 var hfc = require('fabric-client');
+var uuid = require('uuid');
 
 var connection = require('./connection.js');
 var query = require('./query.js');
@@ -473,17 +474,17 @@ app.get('/spend/:spendId/spendallocations', awaitHandler(async (req, res) => {
 
 // POST Spend
 app.post('/spend', awaitHandler(async (req, res) => {
-	logger.info('================ POST on Spend');
+	logger.info('================ dummySpend');
 	var args = req.body;
 	var fcn = "createSpend";
 
-    logger.info('##### POST on Spend - username : ' + username);
-	logger.info('##### POST on Spend - userOrg : ' + orgName);
-	logger.info('##### POST on Spend - channelName : ' + channelName);
-	logger.info('##### POST on Spend - chaincodeName : ' + chaincodeName);
-	logger.info('##### POST on Spend - fcn : ' + fcn);
-	logger.info('##### POST on Spend - args : ' + JSON.stringify(args));
-	logger.info('##### POST on Spend - peers : ' + peers);
+    logger.info('##### dummySpend - username : ' + username);
+	logger.info('##### dummySpend - userOrg : ' + orgName);
+	logger.info('##### dummySpend - channelName : ' + channelName);
+	logger.info('##### dummySpend - chaincodeName : ' + chaincodeName);
+	logger.info('##### dummySpend - fcn : ' + fcn);
+	logger.info('##### dummySpend - args : ' + JSON.stringify(args));
+	logger.info('##### dummySpend - peers : ' + peers);
 
 	let message = await invoke.invokeChaincode(peers, channelName, chaincodeName, args, fcn, username, orgName);
 	res.send(message);
@@ -576,6 +577,66 @@ app.get('/blockinfos/:docType/keys/:key', awaitHandler(async (req, res) => {
 	logger.info('##### GET on blockinfo - queryHistoryForKey : ' + util.inspect(history));
 	res.send(history);
 }));
+
+
+/************************************************************************************
+ * Utility function for creating dummy spend records. Mimics the behaviour of an NGO
+ * spending funds, which are allocated against donations
+ ************************************************************************************/
+
+function dummySpend() {
+	// first, we get a list of donations and randomly choose one
+	let args = {};
+	let fcn = "queryAllDonations";
+
+    logger.info('##### dummySpend GET on Donation - username : ' + username);
+	logger.info('##### dummySpend GET on Donation - userOrg : ' + orgName);
+	logger.info('##### dummySpend GET on Donation - channelName : ' + channelName);
+	logger.info('##### dummySpend GET on Donation - chaincodeName : ' + chaincodeName);
+	logger.info('##### dummySpend GET on Donation - fcn : ' + fcn);
+	logger.info('##### dummySpend GET on Donation - args : ' + JSON.stringify(args));
+	logger.info('##### dummySpend GET on Donation - peers : ' + peers);
+
+	let message = await query.queryChaincode(peers, channelName, chaincodeName, args, fcn, username, orgName);
+	let len = message.length;
+	if (len < 1) {
+		logger.info('##### dummySpend - no donations available');
+	}
+	let ran = Math.floor(Math.random() * len) + 1;
+	logger.info('##### dummySpend - randomly selected donation record: ' + JSON.stringify(message[ran]));
+	let ngo = message[ran]['ngoRegistrationNumber'];
+	logger.info('##### dummySpend - randomly selected ngo: ' + ngo);
+
+	// then we create a spend record for the NGO that received the donation
+	var fcn = "createSpend";
+	let spendId = uuidv4();
+	let spendAmt = Math.floor(Math.random() * 100) + 1;
+
+	let args = {};
+	args["ngoRegistrationNumber"] = ngo;
+	args["spendId"] = spendId;
+	args["spendDescription"] = "Peter Pipers Poulty Portions for Pets";
+	args["spendDate"] = "2018-09-20T12:41:59.582Z";
+	args["spendAmount"] = spendAmt;
+
+	logger.info('##### dummySpend - username : ' + username);
+	logger.info('##### dummySpend - userOrg : ' + orgName);
+	logger.info('##### dummySpend - channelName : ' + channelName);
+	logger.info('##### dummySpend - chaincodeName : ' + chaincodeName);
+	logger.info('##### dummySpend - fcn : ' + fcn);
+	logger.info('##### dummySpend - args : ' + JSON.stringify(args));
+	logger.info('##### dummySpend - peers : ' + peers);
+
+	let message = await invoke.invokeChaincode(peers, channelName, chaincodeName, args, fcn, username, orgName);
+}
+
+(function loop() {
+    var rand = Math.round(Math.random() * (20000 - 5000)) + 5000;
+    setTimeout(function() {
+		dummySpend();
+        loop();  
+    }, rand);
+}());
 
 /************************************************************************************
  * Error handler

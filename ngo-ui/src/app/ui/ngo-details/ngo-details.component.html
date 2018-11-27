@@ -114,7 +114,7 @@
                   <input class="form-control font-size-1rem w-50" type="number" formControlName="donationAmount"
                     placeholder="$ 150.00">
                   <div *ngIf="submitted && donation.donationAmount.errors" class="invalid-feedback" [ngClass]="{ 'is-invalid': submitted && donation.donationAmount.errors}">
-                    <div *ngIf="donation.donationAmount.errors.required">Donatoion amount is required</div>
+                    <div *ngIf="donation.donationAmount.errors.required">Donation amount is required</div>
                   </div>
                   <a class="btn btn-warning ml-2 text-white" (click)='makeDonation()' role="button">
                     <i *ngIf="loading" class='fa fa-circle-o-notch fa-spin'> </i>
