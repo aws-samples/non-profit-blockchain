@@ -627,7 +627,7 @@ var dummySpend = async function() {
 	logger.info('##### dummySpend - args : ' + JSON.stringify(args));
 	logger.info('##### dummySpend - peers : ' + peers);
 
-	let message = await invoke.invokeChaincode(peers, channelName, chaincodeName, args, fcn, username, orgName);
+	message = await invoke.invokeChaincode(peers, channelName, chaincodeName, args, fcn, username, orgName);
 }
 
 (function loop() {
