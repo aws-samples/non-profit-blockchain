@@ -37,12 +37,12 @@ endpoint=$(aws managedblockchain get-node --region $REGION --network-id $NETWORK
 peerEventPort=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID --query 'Node.FrameworkAttributes.Fabric.PeerEventPort' --output text)
 eventEndPoint="${endpoint::-5}$peerEventPort"
 export ORDERINGSERVICEENDPOINT=$OrderingServiceEndpoint
-export ORDERINGSERVICEENDPOINTNOPORT=${ORDERINGSERVICEENDPOINT::-5}
+export ORDERINGSERVICEENDPOINTNOPORT=${ORDERINGSERVICEENDPOINT::-6}
 export VPCENDPOINTSERVICENAME=$VpcEndpointServiceName
 export CASERVICEENDPOINT=$CaEndpoint
 export PEERNODEID=$nodeID
 export PEERSERVICEENDPOINT=$endpoint
-export PEERSERVICEENDPOINTNOPORT=${PEERSERVICEENDPOINT::-5}
+export PEERSERVICEENDPOINTNOPORT=${PEERSERVICEENDPOINT::-6}
 export PEEREVENTENDPOINT=$eventEndPoint
 
 echo Useful information used in Cloud9
