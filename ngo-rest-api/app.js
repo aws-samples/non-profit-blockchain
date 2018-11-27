@@ -606,7 +606,7 @@ async function dummySpend() {
 		logger.info('##### dummySpend - no donations available');
 	}
 	logger.info('##### dummySpend - number of donation record: ' + len);
-	let ran = Math.floor(Math.random() * len) + 1;
+	let ran = Math.floor(Math.random() * len);
 	logger.info('##### dummySpend - randomly selected donation record number: ' + ran);
 	logger.info('##### dummySpend - randomly selected donation record: ' + JSON.stringify(message[ran]));
 	let ngo = message[ran]['ngoRegistrationNumber'];
