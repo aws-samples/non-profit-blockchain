@@ -33,7 +33,7 @@ var util = require('util');
 var app = express();
 var cors = require('cors');
 var hfc = require('fabric-client');
-var uuid = require('uuid');
+const uuidv4 = require('uuid/v4');
 
 var connection = require('./connection.js');
 var query = require('./query.js');
