@@ -38,6 +38,8 @@ organizations:
 orderers:
   orderer.com:
     url: grpcs://%ORDERINGSERVICEENDPOINT%
+    grpcOptions:
+      ssl-target-name-override: %ORDERINGSERVICEENDPOINTNOPORT%
     tlsCACerts:
       path: %CAFILE%
 
@@ -46,7 +48,7 @@ peers:
     url: grpcs://%PEERSERVICEENDPOINT%
     eventUrl: grpcs://%PEEREVENTENDPOINT%
     grpcOptions:
-      ssl-target-name-override: %PEERNODEID%
+      ssl-target-name-override: %PEEREVENTENDPOINTNOPORT%
     tlsCACerts:
       path: %CAFILE%
 

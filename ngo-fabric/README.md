@@ -185,7 +185,8 @@ exported to your current session.
 echo $MEMBERID
 ```
 
-Update the configtx.yaml file:
+Update the configtx.yaml file. Make sure you edit the configtx.yaml file you copied to your home
+directory, NOT the one in the repo:
 
 ```
 cp ~/non-profit-blockchain/ngo-fabric/configtx.yaml ~
@@ -341,7 +342,7 @@ $ ./11-invoke.sh
 2018-11-26 21:45:20.935 UTC [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 001 Chaincode invoke successful. result: status:200 
 ```
 
-## Step 10 - Query the chaincode again and check the change in value
+## Step 12 - Query the chaincode again and check the change in value
 On the Fabric client node.
 
 Query the chaincode on Fabric peer and check the change in value.
@@ -351,6 +352,12 @@ Execute the following script:
 ```
 cd ~/non-profit-blockchain/ngo-fabric
 ./10-query.sh
+```
+
+You should see:
+
+```
+90
 ```
 
 ## Move on to Part 2
