@@ -584,7 +584,7 @@ app.get('/blockinfos/:docType/keys/:key', awaitHandler(async (req, res) => {
  * spending funds, which are allocated against donations
  ************************************************************************************/
 
-function dummySpend() {
+var dummySpend = async function() {
 	// first, we get a list of donations and randomly choose one
 	let args = {};
 	let fcn = "queryAllDonations";
