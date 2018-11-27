@@ -50,7 +50,7 @@ export class UtilsService {
         try {
             const decimalIndex = floatStr.indexOf('.');
             if (decimalIndex > 0 && floatStr.length > decimalIndex + offset) {
-                return parseFloat(floatStr.substring(floatStr.indexOf('.'), floatStr.indexOf('.') + offset));
+                return parseFloat(floatStr.substring(0, decimalIndex + offset));
             }
             return parseFloat(floatStr);
         } catch (e) {

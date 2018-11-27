@@ -104,7 +104,7 @@ will call the Fabric CA and enroll a new user. This user will then be used to in
 execute queries against the Fabric network. You can register a new user in the UI application. The link
 is on the login page. You can then login as that user and explore the application.
 
-All of the information you see in the application is stored in the AWS Managed Blockchain Fabric network. 
+All of the information you see in the application is stored in the Amazon Managed Blockchain Fabric network. 
 You can check this by querying the REST API directly. You can cURL the REST API from the Fabric client 
 node. Examples of the cURL commands used with the REST API can be found in the files that load test data 
 into the network, such as [this one](../ngo-rest-api/ngo-load-workshop.sh)
@@ -113,13 +113,13 @@ You could also query the chaincode directly and see the same information. You qu
 the Fabric client node. An example of how to query the chaincode can be found in [this script](../ngo-chaincode/test-chaincode-aws.sh)
 
 ## Step 6 - Pat yourself on the back, you've completed the workshop
-You have successfully built a Hyperledger Fabric network using the AWS Managed Blockchain service, deployed
+You have successfully built a Hyperledger Fabric network using the Amazon Managed Blockchain service, deployed
 chaincode to the service, connected a RESTful API to the service and deployed an Angular application that
 communicates with the RESTful API.
 
 The workshop instructions can be found in the README files in parts 1-4:
 
-* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.
+* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Amazon Managed Blockchain Hyperledger Fabric network.
 * [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
 * [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
 * [Part 4:](../ngo-ui/README.md) Run the Application. 
