@@ -585,6 +585,9 @@ app.get('/blockinfos/:docType/keys/:key', awaitHandler(async (req, res) => {
  ************************************************************************************/
 
 var dummySpend = async function() {
+	if (!username) {
+		return;
+	}
 	// first, we get a list of donations and randomly choose one
 	let args = {};
 	let fcn = "queryAllDonations";
