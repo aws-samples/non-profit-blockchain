@@ -289,21 +289,21 @@ async function allocateSpend(stub, spend) {
         numberOfDonations++;
       }
     }
-    //calculate how much spend to allocate to each donation
-    let spendPerDonation = spendAmount / numberOfDonations;
-    console.log('##### allocateSpend - Allocating the total spend amount of: ' + spendAmount + ', to ' + numberOfDonations + ' donations, resulting in ' + spendPerDonation + ' per donation');
-
     //Validate that we have a valid spendAmount, numberOfDonations and spendAmountForDonor
     //Invalid values could be caused by a bug in this function, or invalid values passed to this function
     //that were not caught by the validation process earlier.
     if (!(spendAmount && typeof spendAmount === 'number' && isFinite(spendAmount))) {
       throw new Error('##### allocateSpend - spendAmount is not a valid number: ' + spendAmount);   
     }
-    if (!(spendPerDonation && typeof spendPerDonation === 'number' && isFinite(spendPerDonation))) {
-      throw new Error('##### allocateSpend - spendPerDonation is not a valid number: ' + spendPerDonation);   
-    }
     if (!(numberOfDonations && typeof numberOfDonations === 'number' && numberOfDonations > 0)) {
       throw new Error('##### allocateSpend - numberOfDonations is not a valid number or is < 1: ' + numberOfDonations);   
+    }
+    //calculate how much spend to allocate to each donation
+    let spendPerDonation = spendAmount / numberOfDonations;
+    console.log('##### allocateSpend - Allocating the total spend amount of: ' + spendAmount + ', to ' + numberOfDonations + ' donations, resulting in ' + spendPerDonation + ' per donation');
+
+    if (!(spendPerDonation && typeof spendPerDonation === 'number' && isFinite(spendPerDonation))) {
+      throw new Error('##### allocateSpend - spendPerDonation is not a valid number: ' + spendPerDonation);   
     }
 
     // create the SPENDALLOCATION records. Each record looks as follows:
