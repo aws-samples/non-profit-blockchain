@@ -608,11 +608,11 @@ var dummySpend = async function() {
 	logger.info('##### dummySpend - randomly selected ngo: ' + ngo);
 
 	// then we create a spend record for the NGO that received the donation
-	var fcn = "createSpend";
+	fcn = "createSpend";
 	let spendId = uuidv4();
 	let spendAmt = Math.floor(Math.random() * 100) + 1;
 
-	let args = {};
+	args = {};
 	args["ngoRegistrationNumber"] = ngo;
 	args["spendId"] = spendId;
 	args["spendDescription"] = "Peter Pipers Poulty Portions for Pets";
