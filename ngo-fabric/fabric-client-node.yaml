@@ -158,7 +158,7 @@ Resources:
     Type:                                         AWS::EC2::Instance
     Properties:
         KeyName:                                  !Ref KeyName
-        ImageId:                                  'ami-0be3ea1b4718d1297'
+        ImageId:                                  'ami-0434d5878c6ad6d4c'
         InstanceType:                             't2.small'
         IamInstanceProfile:                       !Ref BlockchainWorkshopRootInstanceProfile
         NetworkInterfaces:
