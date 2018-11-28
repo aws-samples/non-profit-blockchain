@@ -174,6 +174,11 @@ response:
 ]
 ```
 ## Step 6 - Load the workshop test data
+In your Cloud9 terminal.
+
+You can do this step from anywhere as it accesses the ELB DNS endpoint. Executing this from the SSH
+session is challenging as the SSH session will be outputting a range of INFO logs, which makes it
+challenging to edit files. So we'll do this from Cloud9.
 
 Loading the test data uses cURL commands similar to those you used above to test the API. You can 
 use the same endpoint (i.e. localhost), since you will load the test data from the Fabric client node,
@@ -216,7 +221,7 @@ using a command such as `pm2 start app.js`, which will keep the app running. The
 ## Move on to Part 4
 The workshop instructions can be found in the README files in parts 1-4:
 
-* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.
+* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Amazon Managed Blockchain Hyperledger Fabric network.
 * [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
 * [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
 * [Part 4:](../ngo-ui/README.md) Run the Application. 

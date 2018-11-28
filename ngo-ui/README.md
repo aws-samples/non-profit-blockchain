@@ -112,6 +112,35 @@ into the network, such as [this one](../ngo-rest-api/ngo-load-workshop.sh)
 You could also query the chaincode directly and see the same information. You query the chaincode from 
 the Fabric client node. An example of how to query the chaincode can be found in [this script](../ngo-chaincode/test-chaincode-aws.sh)
 
+If you want to run the RESTful API server and the user interface application in such a way that they continue
+to run after you close your SSH or Cloud9 session, you can use PM2, as follows:
+
+Install pm2 on both Cloud9 and the Fabric client node:
+
+```
+npm install pm2 -g
+```
+
+For Cloud9:
+
+```
+cd ~/non-profit-blockchain/ngo-ui
+pm2 start npm -- start
+```
+
+For the Fabric client node:
+
+```
+cd ~/non-profit-blockchain/ngo-rest-api
+pm2 start app.js
+```
+
+You can tail the logs:
+
+```
+tail -f ~/.pm2/logs/app-out.log     
+```
+
 ## Step 6 - Pat yourself on the back, you've completed the workshop
 You have successfully built a Hyperledger Fabric network using the Amazon Managed Blockchain service, deployed
 chaincode to the service, connected a RESTful API to the service and deployed an Angular application that
