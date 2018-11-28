@@ -243,6 +243,22 @@ $ ./6-channel.sh
 2018-11-26 21:41:30.174 UTC [cli/common] readBlock -> INFO 006 Got status: &{NOT_FOUND}
 2018-11-26 21:41:34.370 UTC [cli/common] readBlock -> INFO 026 Received block: 0
 ```
+
+This will create a file called `mychannel.block` in the CLI container in the directory `/opt/home/fabric-samples/chaincode/hyperledger/fabric/peer`. Since this directory is mounted from the host
+Fabric client node, you can see the block file here:
+
+```
+ls -lt /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer
+```
+
+If the channel creation times out, it's possible that the channel has still been created and you can get 
+the block from the channel itself. Executing the command below will read the channel config and save the
+genesis block in the same directory as mentioned above:
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem"  -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer channel fetch oldest /opt/home/fabric-samples/chaincode/hyperledger/fabric/peer/$CHANNEL.block -c $CHANNEL -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls   
+```
+
 ## Step 7 - Join your peer node to the channel
 On the Fabric client node.
 
