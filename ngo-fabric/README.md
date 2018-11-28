@@ -16,7 +16,7 @@ We will use Cloud9 to provide a Linux terminal which has the AWS CLI already ins
 1. Spin up a [Cloud9 IDE](https://us-east-1.console.aws.amazon.com/cloud9/home?region=us-east-1) from the AWS console.
 In the Cloud9 console, click 'Create Environment'. Using 'us-east-1' for the region will be easier.
 2. Provide a name for your environment, e.g. fabric-c9, and click **Next Step**
-3. Select `m4-large` (or an instance type with 4-8 GiB of RAM) and click **Next Step**
+3. Select `Other instance type`, then select `t2-medium` (or an instance type with 4 GiB of RAM) and click **Next Step**
 4. Click **Create environment**. It would typically take 30-60s to create your Cloud9 IDE
 5. In the Cloud9 terminal, in the home directory, clone this repo:
 
