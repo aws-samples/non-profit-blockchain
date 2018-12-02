@@ -87,7 +87,9 @@ echo $VPCENDPOINTSERVICENAME
 ```
 
 If the VPC endpoint is populated with a value, go ahead and run this script. This will create the
-CloudFormation stack:
+CloudFormation stack. You will see an error saying `Keypair not found`. This is expected as the script
+will check whether the keypair exists before creating it. I don't want to overwrite any existing
+keypairs you have, so just ignore this error and let the script continue:
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
@@ -95,8 +97,10 @@ cd ~/non-profit-blockchain/ngo-fabric
 ```
 
 Check the progress in the AWS CloudFormation console and wait until the stack is CREATE COMPLETE.
+You will find some useful information in the Outputs tab of the CloudFormation stack once the stack
+is complete. We will use this information in later steps.
 
-## Step 4 - Prepare the Fabric client node and enroll and identity
+## Step 4 - Prepare the Fabric client node and enroll an identity
 On the Fabric client node.
 
 Prior to executing any commands in the Fabric client node, you will need to export ENV variables
@@ -170,8 +174,17 @@ identity to administer the Fabric network and perform tasks such as creating cha
 and instantiating chaincode.
 
 ```
+export PATH=$PATH:/home/ec2-user/go/src/github.com/hyperledger/fabric-ca/bin
+cd ~
+fabric-ca-client enroll -u https://$ADMINUSER:$ADMINPWD@$CASERVICEENDPOINT --tls.certfiles /home/ec2-user/managedblockchain-tls-chain.pem -M /home/ec2-user/admin-msp 
+```
+
+Some final copying of the certificates is necessary:
+
+```
+mkdir -p /home/ec2-user/admin-msp/admincerts
+cp ~/admin-msp/signcerts/* ~/admin-msp/admincerts/
 cd ~/non-profit-blockchain/ngo-fabric
-./4-enroll-member-admin.sh
 ```
 
 ## Step 5 - Update the configtx channel configuration
@@ -185,27 +198,23 @@ exported to your current session.
 echo $MEMBERID
 ```
 
-Update the configtx.yaml file. Make sure you edit the configtx.yaml file you copied to your home
-directory, NOT the one in the repo:
+Update the configtx.yaml file. Make sure you edit the configtx.yaml file you copy to your home
+directory below, NOT the one in the repo:
 
 ```
 cp ~/non-profit-blockchain/ngo-fabric/configtx.yaml ~
 vi ~/configtx.yaml
 ```
 
-Generate the configtx channel configuration
-
-Execute the following script:
+Generate the configtx channel configuration by executing the following script:
 
 ```
-cd ~/non-profit-blockchain/ngo-fabric
-./5-configtx.sh
+docker exec cli configtxgen -outputCreateChannelTx /opt/home/$CHANNEL.pb -profile OneOrgChannel -channelID $CHANNEL --configPath /opt/home/
 ```
 
 You should see:
 
 ```
-$ ./5-configtx.sh
 2018-11-26 21:41:22.885 UTC [common/tools/configtxgen] main -> INFO 001 Loading configuration
 2018-11-26 21:41:22.887 UTC [common/tools/configtxgen] doOutputChannelCreateTx -> INFO 002 Generating new channel configtx
 2018-11-26 21:41:22.887 UTC [common/tools/configtxgen/encoder] NewApplicationGroup -> WARN 003 Default policy emission is deprecated, please include policy specificiations for the application group in configtx.yaml
@@ -227,14 +236,14 @@ Create a Fabric channel.
 Execute the following script:
 
 ```
-cd ~/non-profit-blockchain/ngo-fabric
-./6-channel.sh
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer channel create -c $CHANNEL -f /opt/home/$CHANNEL.pb -o $ORDERER --cafile $CAFILE --tls
 ```
 
 You should see:
 
 ```
-$ ./6-channel.sh
 2018-11-26 21:41:29.684 UTC [channelCmd] InitCmdFactory -> INFO 001 Endorser and orderer connections initialized
 2018-11-26 21:41:29.752 UTC [cli/common] readBlock -> INFO 002 Got status: &{NOT_FOUND}
 2018-11-26 21:41:29.761 UTC [channelCmd] InitCmdFactory -> INFO 003 Endorser and orderer connections initialized
@@ -256,7 +265,16 @@ the block from the channel itself. Executing the command below will read the cha
 genesis block in the same directory as mentioned above:
 
 ```
-docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem"  -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer channel fetch oldest /opt/home/fabric-samples/chaincode/hyperledger/fabric/peer/$CHANNEL.block -c $CHANNEL -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls   
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem"  \
+    -e "CORE_PEER_ADDRESS=$PEER"  -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer channel fetch oldest /opt/home/fabric-samples/chaincode/hyperledger/fabric/peer/$CHANNEL.block \
+    -c $CHANNEL -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls   
+```
+
+Check that the block file now exists:
+
+```
+ls -lt /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer
 ```
 
 ## Step 7 - Join your peer node to the channel
@@ -267,14 +285,14 @@ Join peer to Fabric channel.
 Execute the following script:
 
 ```
-cd ~/non-profit-blockchain/ngo-fabric
-./7-join.sh
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer channel join -b $CHANNEL.block  -o $ORDERER --cafile $CAFILE --tls
 ```
 
 You should see:
 
 ```
-$ ./7-join.sh
 2018-11-26 21:41:40.983 UTC [channelCmd] InitCmdFactory -> INFO 001 Endorser and orderer connections initialized
 2018-11-26 21:41:41.022 UTC [channelCmd] executeJoin -> INFO 002 Successfully submitted proposal to join channel
 ```
@@ -287,14 +305,14 @@ Install chaincode on Fabric peer.
 Execute the following script:
 
 ```
-cd ~/non-profit-blockchain/ngo-fabric
-./8-install.sh
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer chaincode install -n $CHAINCODENAME -v $CHAINCODEVERSION -p $CHAINCODEDIR
 ```
 
 You should see:
 
 ```
-$ ./8-install.sh
 2018-11-26 21:41:46.585 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
 2018-11-26 21:41:46.585 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
 2018-11-26 21:41:48.004 UTC [chaincodeCmd] install -> INFO 003 Installed remotely response:<status:200 payload:"OK" > 
@@ -309,14 +327,15 @@ won't see a specific success response.
 Execute the following script:
 
 ```
-cd ~/non-profit-blockchain/ngo-fabric
-./9-instantiate.sh
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer chaincode instantiate -o $ORDERER -C $CHANNEL -n $CHAINCODENAME -v $CHAINCODEVERSION \
+    -c '{"Args":["init","a","100","b","200"]}' --cafile $CAFILE --tls
 ```
 
 You should see:
 
 ```
-$ ./9-instantiate.sh
 2018-11-26 21:41:53.738 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
 2018-11-26 21:41:53.738 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
 ```
@@ -329,8 +348,9 @@ Query the chaincode on Fabric peer.
 Execute the following script:
 
 ```
-cd ~/non-profit-blockchain/ngo-fabric
-./10-query.sh
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer chaincode query -C $CHANNEL -n $CHAINCODENAME -c '{"Args":["query","a"]}' 
 ```
 
 You should see:
@@ -347,27 +367,42 @@ Invoke a Fabric transaction.
 Execute the following script:
 
 ```
-cd ~/non-profit-blockchain/ngo-fabric
-./11-invoke.sh
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer chaincode invoke -o $ORDERER -C $CHANNEL -n $CHAINCODENAME \
+    -c '{"Args":["invoke","a","b","10"]}' --cafile $CAFILE --tls
 ```
 
 You should see:
 
 ```
-$ ./11-invoke.sh
 2018-11-26 21:45:20.935 UTC [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 001 Chaincode invoke successful. result: status:200 
 ```
 
 ## Step 12 - Query the chaincode again and check the change in value
 On the Fabric client node.
 
-Query the chaincode on Fabric peer and check the change in value.
+Query the chaincode on Fabric peer and check the change in value. This proves the success of the invoke
+transaction. You should not execute the invoke and query at the same time. Instead, there should be a
+(roughly) 2 second gap between them. Any idea why?
+
+Invoking a transaction in Fabric involves a number of steps, including:
+
+* Sending the transaction to the endorsing peers for simulation and endorsement
+* Packaging the endorsements from the peers
+* Sending the packaged endorsements to the orderer for orderer
+* The orderer grouping the transactions into blocks (which are created every 2 seconds, by default)
+* The orderer sending the blocks to all peer nodes for validating and committing to the ledger
+
+Only after the transactions in the block have been committed to the ledger can you read the
+new value from the ledger.
 
 Execute the following script:
 
 ```
-cd ~/non-profit-blockchain/ngo-fabric
-./10-query.sh
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer chaincode query -C $CHANNEL -n $CHAINCODENAME -c '{"Args":["query","a"]}' 
 ```
 
 You should see:
