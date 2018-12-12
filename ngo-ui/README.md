@@ -142,13 +142,14 @@ tail -f ~/.pm2/logs/app-out.log
 ```
 
 ## Step 6 - Pat yourself on the back, you've completed the workshop
-You have successfully built a Hyperledger Fabric network using the Amazon Managed Blockchain service, deployed
-chaincode to the service, connected a RESTful API to the service and deployed an Angular application that
+You have successfully built a Hyperledger Fabric network using Amazon Managed Blockchain, deployed
+chaincode, connected a RESTful API to the Fabric network and deployed an Angular application that
 communicates with the RESTful API.
 
 The workshop instructions can be found in the README files in parts 1-4:
 
-* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Amazon Managed Blockchain Hyperledger Fabric network.
-* [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
-* [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
-* [Part 4:](../ngo-ui/README.md) Run the Application. 
+* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
+* [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
+* [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
+* [Part 4:](../ngo-ui/README.md) Run the application. 
+

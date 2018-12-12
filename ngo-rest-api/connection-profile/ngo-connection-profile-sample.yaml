@@ -11,7 +11,7 @@
 # express or implied. See the License for the specific language governing 
 # permissions and limitations under the License.
 
-# Sample connection profile for an AWS Managed Blockchain Fabric network
+# Sample connection profile for an Amazon Managed Blockchain Fabric network
 
 name: "ngo"
 x-type: "hlfv1"

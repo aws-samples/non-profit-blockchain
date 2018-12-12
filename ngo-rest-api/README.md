@@ -72,7 +72,7 @@ the Fabric network and provide information needed by the Node.js application in 
 Fabric network. The instructions below will auto-generate a connection profile. 
 
 Generate the connection profile using the script below and check that the connection profile contains 
-URL endpoints for the peer, orderer and CA, an 'mspid', a 'caName', and that the admin username and password
+URL endpoints for the peer, ordering service and CA, an 'mspid', a 'caName', and that the admin username and password
 match those you entered when creating the Fabric network. If they do not match, edit the connection profile
 and update them. The connection profile can be found here: `~/non-profit-blockchain/tmp/connection-profile/ngo-connection-profile.yaml`
 
@@ -221,7 +221,8 @@ using a command such as `pm2 start app.js`, which will keep the app running. The
 ## Move on to Part 4
 The workshop instructions can be found in the README files in parts 1-4:
 
-* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Amazon Managed Blockchain Hyperledger Fabric network.
-* [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
-* [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
-* [Part 4:](../ngo-ui/README.md) Run the Application. 
+* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
+* [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
+* [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
+* [Part 4:](../ngo-ui/README.md) Run the application. 
+

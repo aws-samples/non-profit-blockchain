@@ -13,7 +13,6 @@
 # express or implied. See the License for the specific language governing 
 # permissions and limitations under the License.
 
-
 # This script uses the template ngo-connection-profile.json to generate a connection profile
 # for the organisations in the Fabric network.
 
