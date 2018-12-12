@@ -41,7 +41,7 @@ Make sure you are in the correct AWS region (i.e. us-east-1, also known as N. Vi
 
 1. Click `Create a Network`
 2. Make sure `Hyperleger Fabric 1.2` is selected
-3. Enter a network name and an optional description, and click `Next`
+3. Enter a network name and an optional description, and click `Next`. Do not use special characters in the network name, as this name is used as a prefix when creating resources in step 3.
 4. Enter a member name (e.g. this could be the name of the organisation you belong to) and an optional description
 5. Enter an admin username and password, and note this down. You will need it later. Click `Next`
 6. Check your configuration and click `Create network and member`
@@ -390,7 +390,7 @@ Invoking a transaction in Fabric involves a number of steps, including:
 
 * Sending the transaction to the endorsing peers for simulation and endorsement
 * Packaging the endorsements from the peers
-* Sending the packaged endorsements to the orderer for orderer
+* Sending the packaged endorsements to the orderer for ordering
 * The orderer grouping the transactions into blocks (which are created every 2 seconds, by default)
 * The orderer sending the blocks to all peer nodes for validating and committing to the ledger
 
