@@ -2,8 +2,8 @@
 
 This section will create a Fabric network using the AWS CLI.
 
-## Pre-requisites - Cloud9
-We will use Cloud9 to provide a Linux shell.
+## Pre-requisites - AWS Cloud9
+We will use AWS Cloud9 to provide a Linux shell.
 
 1. Spin up a [Cloud9 IDE](https://us-east-1.console.aws.amazon.com/cloud9/home?region=us-east-1) from the AWS console.
 In the Cloud9 console, click 'Create Environment'

@@ -2,15 +2,15 @@
 
 This section will build a Hyperledger Fabric blockchain network using Amazon Managed Blockchain. A combination of the AWS Console and the AWS CLI will be used. The process to create the network is as follows:
 
-* Provision a Cloud9 instance. We will use the Linux terminal that Cloud9 provides
+* Provision an AWS Cloud9 instance. We will use the Linux terminal that Cloud9 provides
 * Use the Amazon Managed Blockchain console to create a Fabric network and provision a peer node
-* From Cloud9, run a CloudFormation template to provision a VPC and a Fabric client node. You 
+* From Cloud9, run an AWS CloudFormation template to provision a VPC and a Fabric client node. You 
 will use the Fabric client node to administer the Fabric network
 * From the Fabric client node, create a Fabric channel, install and instantiate chaincode, and 
 query and invoke transactions on the Fabric network
 
-## Pre-requisites - Cloud9
-We will use Cloud9 to provide a Linux terminal which has the AWS CLI already installed.
+## Pre-requisites - AWS Cloud9
+We will use AWS Cloud9 to provide a Linux terminal which has the AWS CLI already installed.
 
 1. Spin up a [Cloud9 IDE](https://us-east-1.console.aws.amazon.com/cloud9/home?region=us-east-1) from the AWS console.
 In the Cloud9 console, click 'Create Environment'. Using 'us-east-1' for the region will be easier.
@@ -63,10 +63,10 @@ In your Cloud9 terminal window.
 
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
 the Fabric network. The Fabric client node will be created in its own VPC in your AWS account, with VPC endpoints 
-pointing to the Fabric network you created in [Part 1](../ngo-fabric/README.md). CloudFormation 
+pointing to the Fabric network you created in [Part 1](../ngo-fabric/README.md). AWS CloudFormation 
 will be used to create the Fabric client node, the VPC and the VPC endpoints.
 
-The CloudFormation template requires a number of parameter values. We'll make sure these 
+The AWS CloudFormation template requires a number of parameter values. We'll make sure these 
 are available as export variables before running the script below.
 
 In Cloud9:

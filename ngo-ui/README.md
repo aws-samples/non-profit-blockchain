@@ -1,6 +1,6 @@
 # Part 4: The User Interface
 
-The UI is a Node.js / AngularJS application and will run on your Cloud9 instance.
+The UI is a Node.js / AngularJS application and will run on your AWS Cloud9 instance.
 The instructions in this README will help you to install the NGO User Interface application,
 and connect it to the REST API you created in [Part 3:](../ngo-rest-api/README.md).
 
@@ -25,8 +25,8 @@ simulating two users sharing the same IDE session.
 On Cloud9.
 
 Your REST API should be exposed via an AWS Elastic Load Balancer (ELB). The ELB was created for you
-by CloudFormation in [Part 1](../ngo-fabric/README.md). You can find the DNS endpoint for the ELB in
-the Outputs of your CloudFormation stack in the CloudFormation console.
+by AWS CloudFormation in [Part 1](../ngo-fabric/README.md). You can find the DNS endpoint for the ELB in
+the Outputs of your CloudFormation stack in the AWS CloudFormation console.
 
 You should have already cloned this repo in [Part 1](../ngo-fabric/README.md)
 

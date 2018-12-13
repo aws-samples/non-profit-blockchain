@@ -8,7 +8,7 @@ and the underlying Fabric network.
 For the Fabric workshop, the REST API server will run on the Fabric client node.
 
 From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
-The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
+The DNS of the Fabric client node EC2 instance can be found in the output of the AWS CloudFormation stack you 
 created in [Part 1](../ngo-fabric/README.md)
 
 ```

@@ -32,6 +32,14 @@ README instructions in parts 1-4, in this order:
 * [Part 3:](ngo-rest-api/README.md) Run the RESTful API server. 
 * [Part 4:](ngo-ui/README.md) Run the application. 
 
+## Cleanup
+
+To clean up your resources delete the Hyperledger Fabric network managed by Amazon Managed Blockchain and the AWS CloudFormation template as follows:
+
+* In the AWS CloudFormation console delete the stack with the stack name `<your network>-fabric-client-node`
+* In the Amazon Managed Blockchain console delete the member for your network. This will delete the peer node, the member, and finally, the Fabric network (assuming you created only one member)
+* In the AWS Cloud9 console delete your AWS Cloud9 instance
+
 ## License
 
 This library is licensed under the Apache 2.0 License. 
