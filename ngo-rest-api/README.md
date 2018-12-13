@@ -178,13 +178,15 @@ In your Cloud9 terminal.
 
 You can do this step from anywhere as it accesses the ELB DNS endpoint. Executing this from the SSH
 session is challenging as the SSH session will be outputting a range of INFO logs, which makes it
-challenging to edit files. So we'll do this from Cloud9.
+challenging to edit files. So you can open another terminal window in Cloud9 and load the test data
+from Cloud9.
 
-Loading the test data uses cURL commands similar to those you used above to test the API. You can 
-use the same endpoint (i.e. localhost), since you will load the test data from the Fabric client node,
-or you can use the AWS Elastic Load Balancer (ELB) that is used to expose your REST API. To find the 
+Loading the test data uses cURL commands similar to those you used above to test the API. If you load
+the test data from Cloud9 you'll need to point to the AWS Elastic Load Balancer (ELB) that is used to 
+expose your REST API (if you load the test data from your Fabric client node you could use 'localhost'
+as the endpoint since the REST API server is running on the Fabric client node). To find the 
 DNS endpoint for the ELB, go to the CloudFormation stack created in [Part 1](../ngo-fabric/README.md)
-and look in Outputs. If you receive an error using the ELB it might be because the underlying EC2 
+and look for ELBDNS in the Outputs. If you receive an error using the ELB it might be because the underlying EC2 
 instance has not moved to an 'InService' state. This will happen once the REST API server is running
 and the ELB is able to execute the desired number of health checks against it. You can check the 
 status in the EC2 console, under Load Balancers.
@@ -194,8 +196,8 @@ cd ~/non-profit-blockchain/ngo-rest-api
 vi ngo-load-workshop.sh
 ```
 
-The line to be changed is this one. It can either point to `localhost` or your ELB DNS. If you
-use `localhost` you also need to change the port to `3000`:
+The line to be changed is this one. It should point to your ELB DNS. (it could point to `localhost` 
+if you run this on the Fabric client node. If you use `localhost` you also need to change the port to `3000`):
 
 ```
 export ENDPOINT=ngo10-elb-2090058053.us-east-1.elb.amazonaws.com
@@ -210,9 +212,9 @@ cd ~/non-profit-blockchain/ngo-rest-api
 ```
 
 # Testing
-We can test the Node.js application locally or on an EC2 instance. The workshop runs the REST API on
-the Fabric client node. If you exit the SSH session on the Fabric client node, the running REST API 
-will automatically exit.
+The workshop runs the REST API server on the Fabric client node. If you exit the SSH session on the Fabric client node, 
+the running REST API server will automatically exit. You would need to restart it after SSH'ing back into 
+the Fabric client node.
 
 For purposes of the workshop we can just leave the SSH session open. However, if we need to keep the REST 
 API application running after we exit the SSH session, we can use various methods to do this. I use `PM2`,
