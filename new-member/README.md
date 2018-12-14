@@ -190,11 +190,16 @@ cd ~/non-profit-blockchain/ngo-fabric
 ```
 
 ## Step 5: Account B shares the public keys for its member with Account A
+On the Fabric client node in Account B.
+
 Account B needs to share two certificates with Account A:
+
+* the admin cert, stored in /home/ec2-user/admin-msp/admincerts
+* the root CA cert, store in /home/ec2-user/admin-msp/cacerts 
 
 Information will be shared via S3. Account B will copy the certs to S3, and Account A will fetch them from S3.
 
-Update the region and member ID in the following script:
+Update the region and member ID in the following script. The member ID is the ID of the new member in Account B:
 
 ```
 cd ~/non-profit-blockchain
@@ -210,7 +215,25 @@ cd ~/non-profit-blockchain
 ```
 
 ## Step 6: Account A creates an MSP for the new Account A member 
-Account A stores the certificates provided by Account B on its Fabric client node
+On the Fabric client node in Account A.
+
+Account A stores the certificates provided by Account B on its Fabric client node.
+
+Update the region and member ID in the following script. The member ID is the ID of the new member in Account B, so this 
+file should look identical to the one created in the previous step:
+
+```
+cd ~/non-profit-blockchain
+vi new-member/s3-handler.sh 
+```
+
+Copy the Account B public keys from S3 to the MSP directory on the Fabric client node in Account A:
+
+```bash
+cd ~/non-profit-blockchain
+./new-member/s3-handler.sh copyCertsFromS3
+```
+
 
 ## Step 7: Account A updates the channel configuration with the MSP for Account B
 This step generates a new channel configuration block that includes the new member belonging to Account B. A configuration block is similar to the genesis block, defining the members and policies for a channel. In fact, you can consider a configuration block to be the genesis block plus the delta of configuration changes that have occurred since the channel was created. 
