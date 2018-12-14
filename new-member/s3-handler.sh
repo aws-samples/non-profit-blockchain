@@ -45,6 +45,7 @@ function copyCertsFromS3 {
         mkdir -p /home/ec2-user/${memberID}-msp/cacerts
         aws s3api get-object --bucket $S3BucketNameNewMember --key ${memberID}/admincerts /home/ec2-user/${memberID}-msp/admincerts/cert.pem
         aws s3api get-object --bucket $S3BucketNameNewMember --key ${memberID}/cacerts /home/ec2-user/${memberID}-msp/cacerts/cacert.pem
+        ls -lR /home/ec2-user/${memberID}-msp/
     else
         echo "AWS CLI is not configured on this node. To run this script install and configure the AWS CLI"
     fi

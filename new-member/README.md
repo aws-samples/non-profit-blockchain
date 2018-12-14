@@ -19,6 +19,45 @@ Adding a new member to an existing Fabric network involves a number of steps. Th
 ## Pre-requisites - Account A, the network creator
 There are multiple parts to the workshop. Before starting on Part 5, a network creator should haved completed [Part 1](../ngo-fabric/README.md). You need an existing Fabric network before starting Part 5. The network creator would have also created a peer node under a member belonging to Account A.
 
+From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
+The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
+created in [Part 1](../ngo-fabric/README.md)
+
+```
+ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
+```
+
+You should have already cloned this repo in [Part 1](../ngo-fabric/README.md)
+
+```
+cd ~
+git clone https://github.com/aws-samples/non-profit-blockchain.git
+```
+
+You will need to set the context before carrying out any Fabric CLI commands. We do this 
+using the export files that were generated for us in [Part 1](../ngo-fabric/README.md)
+
+Source the file, so the exports are applied to your current session. If you exit the SSH 
+session and re-connect, you'll need to source the file again. The `source` command below
+will print out the values of the key ENV variables. Make sure they are all populated. If
+they are not, follow Step 4 in [Part 1](../ngo-fabric/README.md) to repopulate them:
+
+```
+cd ~/non-profit-blockchain/ngo-fabric
+source fabric-exports.sh
+```
+
+Check the peer export file exists and that it contains a number of export keys with values:
+
+```
+cat ~/peer-exports.sh 
+```
+If the file has values for all keys, source it:
+
+```
+source ~/peer-exports.sh 
+```
+
 ## Pre-requisites - Account B
 We will use Cloud9 to provide a Linux terminal which has the AWS CLI already installed.
 
@@ -234,11 +273,223 @@ cd ~/non-profit-blockchain
 ./new-member/s3-handler.sh copyCertsFromS3
 ```
 
+## Step 7: Account A updates the configtx.yaml configuration with the MSP for Account B
+On the Fabric client node in Account A.
+
+The configtx.yaml file contains details of the organisations in a Fabric network as well as channel configuration profiles that can be used when creating new channels. The channel creator originally created this file just before creating the channel. The channel creator now needs to add the new member to this file.
+
+You will find the file to be edited in the home directory of the Fabric client node:
+
+```
+vi ~/configtx.yaml
+```
+
+You will make two changes to the file:
+
+1. Add Org2 (or Org3, Org4, etc. - just copy &Org2 under Organizations from the template below), replacing `Member2ID` with the ID of your member as copied directly from the Amazon Managed Blockchain console. For the MSPDir, `Member2ID` must be replaced by a lowercase member ID. Instead of typing this, you can copy it from your Fabric client node. Enter: `ls ~` and find the directory with your lower case member ID. The end result of the MSPDir in configtx.yaml should look as follows: `MSPDir: /opt/home/m-trd4xpjborem7bdmbv6wlg3nkm-msp`
+2. Add the TwoOrgChannel under Organizations, under Profiles, at the end of the file.
+
+Save the file.
+
+Important
+
+This file is sensitive and must be indented properly. Artifacts from pasting can cause the file to fail with marshalling errors. We recommend using emacs to edit it. You can also use VI, but before making any changes in VI, enter `:set paste`, press i to enter insert mode, paste the contents, press escape, and then enter `:set nopaste` before saving.
+
+### Template for configtx.yaml
+
+```
+################################################################################
+#
+#   Section: Organizations
+#
+#   - This section defines the different organizational identities which will
+#   be referenced later in the configuration.
+#
+################################################################################
+Organizations:
+    - &Org1
+            # member id defines the organization
+        Name: Member1ID
+            # ID to load the MSP definition as
+        ID: Member1ID
+            #msp dir of org1 in the docker container
+        MSPDir: /opt/home/admin-msp
+            # AnchorPeers defines the location of peers which can be used
+            # for cross org gossip communication.  Note, this value is only
+            # encoded in the genesis block in the Application section context
+        AnchorPeers:
+            - Host:
+              Port:
+    - &Org2
+        Name: Member2ID
+        ID: Member2ID
+        MSPDir: /opt/home/Member2ID-msp
+        AnchorPeers:
+            - Host:
+              Port:
+
+################################################################################
+#
+#   SECTION: Application
+#
+#   - This section defines the values to encode into a config transaction or
+#   genesis block for application related parameters
+#
+################################################################################
+Application: &ApplicationDefaults
+        # Organizations is the list of orgs which are defined as participants on
+        # the application side of the network
+     Organizations:
+
+################################################################################
+#
+#   Profile
+#
+#   - Different configuration profiles may be encoded here to be specified
+#   as parameters to the configtxgen tool
+#
+################################################################################
+Profiles:
+    OneOrgChannel:
+        Consortium: AWSSystemConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1
+    TwoOrgChannel:
+        Consortium: AWSSystemConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1
+                - *Org2
+```
+
+### Working example of a complete configtx.yaml
+
+```
+################################################################################
+#
+#   Section: Organizations
+#
+#   - This section defines the different organizational identities which will
+#   be referenced later in the configuration.
+#
+################################################################################
+Organizations:
+    - &Org1
+        Name: m-TEW3EJGTPBBW7BMGXYOIXV5364
+
+        # ID to load the MSP definition as
+        ID: m-TEW3EJGTPBBW7BMGXYOIXV5364
+
+        MSPDir: /opt/home/admin-msp
+
+        AnchorPeers:
+            # AnchorPeers defines the location of peers which can be used
+            # for cross org gossip communication.  Note, this value is only
+            # encoded in the genesis block in the Application section context
+            - Host: 
+              Port: 
+
+    - &Org2
+        Name: m-TRD4XPJBOREM7BDMBV6WLG3NKM
+        ID: m-TRD4XPJBOREM7BDMBV6WLG3NKM
+        MSPDir: /opt/home/m-trd4xpjborem7bdmbv6wlg3nkm-msp
+        AnchorPeers:
+            - Host:
+              Port:
+
+################################################################################
+#
+#   SECTION: Application
+#
+#   - This section defines the values to encode into a config transaction or
+#   genesis block for application related parameters
+#
+################################################################################
+Application: &ApplicationDefaults
+
+    # Organizations is the list of orgs which are defined as participants on
+    # the application side of the network
+    Organizations:
+
+################################################################################
+#
+#   Profile
+#
+#   - Different configuration profiles may be encoded here to be specified
+#   as parameters to the configtxgen tool
+#
+################################################################################
+Profiles:
+    OneOrgChannel:
+        Consortium: AWSSystemConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1
+    TwoOrgChannel:
+        Consortium: AWSSystemConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1
+                - *Org2
+```
 
 ## Step 7: Account A updates the channel configuration with the MSP for Account B
-This step generates a new channel configuration block that includes the new member belonging to Account B. A configuration block is similar to the genesis block, defining the members and policies for a channel. In fact, you can consider a configuration block to be the genesis block plus the delta of configuration changes that have occurred since the channel was created. 
+On the Fabric client node in Account A.
+
+This step generates a new channel configuration block that includes the new member owned by Account B. A configuration block is similar to the genesis block, defining the members and policies for a channel. In fact, you can consider a configuration block to be the genesis block plus the delta of configuration changes that have occurred since the channel was created. 
 
 A new channel configuration block is created by fetching the latest configuration block from the channel, generating a new channel configuration, then comparing the old and new configurations to generate a 'diff'. 
+
+Generating a new channel configuration involves a number of steps, which we will work through below.
+
+### Generate configtx channel configuration
+Generate the configtx channel configuration by executing the following script:
+
+```
+docker exec cli configtxgen -outputCreateChannelTx /opt/home/$CHANNEL.pb -profile TwoOrgChannel -channelID $CHANNEL --configPath /opt/home/
+```
+
+You should see:
+
+```
+2018-11-26 21:41:22.885 UTC [common/tools/configtxgen] main -> INFO 001 Loading configuration
+2018-11-26 21:41:22.887 UTC [common/tools/configtxgen] doOutputChannelCreateTx -> INFO 002 Generating new channel configtx
+2018-11-26 21:41:22.887 UTC [common/tools/configtxgen/encoder] NewApplicationGroup -> WARN 003 Default policy emission is deprecated, please include policy specificiations for the application group in configtx.yaml
+2018-11-26 21:41:22.887 UTC [common/tools/configtxgen/encoder] NewApplicationOrgGroup -> WARN 004 Default policy emission is deprecated, please include policy specificiations for the application org group m-BHX24CQGP5CUNFS3YZTO2MPSRI in configtx.yaml
+2018-11-26 21:41:22.888 UTC [common/tools/configtxgen] doOutputChannelCreateTx -> INFO 005 Writing new channel tx
+```
+
+Check that the channel configuration has been generated:
+
+```
+ls -lt ~/$CHANNEL.pb 
+```
+
+### Fetch the latest config block from the channel
+The genesis block for the channel exists here:
+
+```
+ls -lt /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer
+```
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem"  \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer channel fetch config /opt/home/fabric-samples/chaincode/hyperledger/fabric/peer/$CHANNEL.config.block \
+    -c $CHANNEL -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls   
+```
+
+Check that the latest config block file now exists:
+
+```
+ls -lt /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer
+```
+
 
 ## Step 8: Endorsing peers must sign the new channel configuration
 The 'diff' must be signed by the existing network members, i.e. the network members must endorse the changes to the channel configuration and approve the new member joining the channel. A channel configuration update is really just another transaction in Fabric, known as a 'configuration transaction', and as such it must be endorsed by network members in accordance with the modification policy for the channel. The default modification policy for the channel Application group is MAJORITY, which means a majority of members need to sign the channel configuration update.
