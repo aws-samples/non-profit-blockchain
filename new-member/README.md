@@ -190,8 +190,24 @@ cd ~/non-profit-blockchain/ngo-fabric
 ```
 
 ## Step 5: Account B shares the public keys for its member with Account A
-I’m assuming this step is not required as Amazon Managed Blockchain will handle copying the certs after step 2.
-Account B will also have a copy of the orderer PEM file, so no need to copy this
+Account B needs to share two certificates with Account A:
+
+Information will be shared via S3. Account B will copy the certs to S3, and Account A will fetch them from S3.
+
+Update the region and member ID in the following script:
+
+```
+cd ~/non-profit-blockchain
+vi new-member/s3-handler.sh 
+```
+
+Copy the Account B public keys to S3:
+
+```bash
+cd ~/non-profit-blockchain
+./new-member/s3-handler.sh createS3BucketForNewMember
+./new-member/s3-handler.sh copyCertsToS3
+```
 
 ## Step 6: Account A creates an MSP for the new Account A member 
 Account A stores the certificates provided by Account B on its Fabric client node

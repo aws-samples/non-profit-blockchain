@@ -20,6 +20,9 @@ memberID=m-TRD4XPJBOREM7BDMBV6WLG3NKM
 S3BucketNameCreator=${memberID}-creator
 S3BucketNameNewMember=${memberID}-newmember
 
+# convert memberID to lowercase. S3 buckets must be lower case
+memberID=$(echo "$memberID" | tr '[:upper:]' '[:lower:]')
+
 # copy the certificates for the new Fabric member to S3
 function copyCertsToS3 {
     echo "Copying the certs for the new org to S3"
