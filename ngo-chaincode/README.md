@@ -165,7 +165,7 @@ docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt
 ## Move on to Part 3
 The workshop instructions can be found in the README files in parts 1-4:
 
-* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.
+* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Amazon Managed Blockchain Hyperledger Fabric network.
 * [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
 * [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
 * [Part 4:](../ngo-ui/README.md) Run the Application. 

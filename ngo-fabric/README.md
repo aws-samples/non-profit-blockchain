@@ -1,10 +1,10 @@
 # Part1: Setup a Fabric network
 
-This section will create an AWS Managed Blockchain Fabric network. A combination of the AWS Console and the AWS CLI 
+This section will create an Amazon Managed Blockchain Fabric network. A combination of the AWS Console and the AWS CLI 
 will be used. The process to create the network is as follows:
 
 * Provision a Cloud9 instance. We will use the Linux terminal that Cloud9 provides
-* Use the AWS Managed Blockchain console to create a Fabric network and provision a peer node
+* Use the Amazon Managed Blockchain Console to create a Fabric network and provision a peer node
 * From Cloud9, run a CloudFormation template to provision a VPC and a Fabric client node. You 
 will use the Fabric client node to administer the Fabric network
 * From the Fabric client node, create a Fabric channel, install & instantiate chaincode, and 
@@ -25,7 +25,7 @@ cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-Download the model file for the new AWS Managed Blockchain service. This is a temporary step
+Download the model file for the new Amazon Managed Blockchain service. This is a temporary step
 and will not be required once the `managedblockchain` service has been included in the latest CLI.
 
 ```
@@ -35,7 +35,7 @@ aws configure add-model --service-model file://service-2.json --service-name man
 ```
 
 ## Step 1 - Create the Fabric network
-In the AWS Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
+In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 
 Make sure you are in the correct AWS region (i.e. us-east-1, also known as N. Virginia) and follow the steps below:
 
@@ -51,7 +51,7 @@ Before continuing, check to see that your Fabric network has been created and is
 wait for it to complete. Otherwise the steps below may fail.
 
 ## Step 2 - Create the Fabric Peer
-In the AWS Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
+In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 
 1. In the new network you have created, click on the member in the Members section.
 2. Click `Create peer node`
@@ -74,12 +74,12 @@ In Cloud9:
 
 ```
 export REGION=us-east-1
-export NETWORKID=<the network ID you created in Step1, from the AWS Managed Blockchain Console>
+export NETWORKID=<the network ID you created in Step1, from the Amazon Managed Blockchain Console>
 export NETWORKNAME=<the name you gave the network>
 ```
 
 Set the VPC endpoint. Make sure it has been populated and exported. If the `echo` statement below shows
-that it's blank, check the details under your network in the AWS Managed Blockchain Console: 
+that it's blank, check the details under your network in the Amazon Managed Blockchain Console: 
 
 ```
 export VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
@@ -135,7 +135,7 @@ vi fabric-exports.sh
 
 Update the export statements at the top of the file. The info you need either matches what you 
 entered when creating the Fabric network in [Part 1](../ngo-fabric/README.md), or can be found 
-in the AWS Managed Blockchain Console, under your network.
+in the Amazon Managed Blockchain Console, under your network.
 
 Source the file, so the exports are applied to your current session. If you exit the SSH 
 session and re-connect, you'll need to source the file again.
@@ -191,7 +191,7 @@ cd ~/non-profit-blockchain/ngo-fabric
 On the Fabric client node.
 
 Update the configtx channel configuration. The Name and ID fields should be updated with the member ID. 
-You can obtain the member ID from the AWS Managed Blockchain Console, or from the ENV variables 
+You can obtain the member ID from the Amazon Managed Blockchain Console, or from the ENV variables 
 exported to your current session.
 
 ```
@@ -414,7 +414,7 @@ You should see:
 ## Move on to Part 2
 The workshop instructions can be found in the README files in parts 1-4:
 
-* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the AWS Managed Blockchain Hyperledger Fabric network.
+* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Amazon Managed Blockchain Hyperledger Fabric network.
 * [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
 * [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
 * [Part 4:](../ngo-ui/README.md) Run the Application. 
