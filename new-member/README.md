@@ -225,7 +225,6 @@ Some final copying of the certificates is necessary:
 ```
 mkdir -p /home/ec2-user/admin-msp/admincerts
 cp ~/admin-msp/signcerts/* ~/admin-msp/admincerts/
-cd ~/non-profit-blockchain/ngo-fabric
 ```
 
 ## Step 5: Account B shares the public keys for its member with Account A
@@ -284,7 +283,7 @@ You will find the file to be edited in the home directory of the Fabric client n
 vi ~/configtx.yaml
 ```
 
-You will make two changes to the file:
+You will make two changes to the file. A working example of the updated configtx.yaml file can be found below the template example below:
 
 1. Add Org2 (or Org3, Org4, etc. - just copy &Org2 under Organizations from the template below), replacing `Member2ID` with the ID of your member as copied directly from the Amazon Managed Blockchain console. For the MSPDir, `Member2ID` must be replaced by a lowercase member ID. Instead of typing this, you can copy it from your Fabric client node. Enter: `ls ~` and find the directory with your lower case member ID. The end result of the MSPDir in configtx.yaml should look as follows: `MSPDir: /opt/home/m-trd4xpjborem7bdmbv6wlg3nkm-msp`
 2. Add the TwoOrgChannel under Organizations, under Profiles, at the end of the file.
@@ -451,7 +450,7 @@ Generating a new channel configuration involves a number of steps, which we will
 Generate the configtx channel configuration by executing the following script:
 
 ```
-docker exec cli configtxgen -outputCreateChannelTx /opt/home/$CHANNEL.pb -profile TwoOrgChannel -channelID $CHANNEL --configPath /opt/home/
+docker exec cli configtxgen -outputCreateChannelTx /opt/home/$CHANNEL-two-org.pb -profile TwoOrgChannel -channelID $CHANNEL --configPath /opt/home/
 ```
 
 You should see:
@@ -467,7 +466,7 @@ You should see:
 Check that the channel configuration has been generated:
 
 ```
-ls -lt ~/$CHANNEL.pb 
+ls -lt $CHANNEL-two-org.pb
 ```
 
 ### Fetch the latest config block from the channel
