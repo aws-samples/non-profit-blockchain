@@ -69,7 +69,7 @@ function copyChannelGenesisToS3 {
 function copyChannelGenesisFromS3 {
     echo "Copying the Channel Genesis block from S3"
     if [[ $(aws configure list) && $? -eq 0 ]]; then
-        sudo chown ec2-user /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer/mychannel.block
+        sudo chown -R ec2-user /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer
         aws s3api get-object --bucket $S3BucketNameCreator --key org0/mychannel.block /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer/mychannel.block
     else
         echo "AWS CLI is not configured on this node. To run this script install and configure the AWS CLI"

@@ -648,14 +648,7 @@ On the Fabric client node in Account B.
 ```bash
 cd ~/non-profit-blockchain
 ./new-member/s3-handler.sh copyChannelGenesisFromS3
-```
-
-On the EC2 bastion in the new org.
-```bash
-cd
-cd hyperledger-on-kubernetes
-./remote-org/scripts/copy-tofrom-S3.sh copyChannelGenesisFromS3
-ls -l /opt/share/rca-data/mychannel.block
+ls -l /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer/mychannel.block
 ```
 
 ## Step 11: Account B starts its peer node and joins the channel
