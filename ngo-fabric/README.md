@@ -206,7 +206,7 @@ cp ~/non-profit-blockchain/ngo-fabric/configtx.yaml ~
 vi ~/configtx.yaml
 ```
 
-Generate the configtx channel configuration by executing the following script:
+Generate the configtx channel configuration by executing the following script. When the channel is created, this channel configuration will become the genesis block (i.e. block 0) on the channel:
 
 ```
 docker exec cli configtxgen -outputCreateChannelTx /opt/home/$CHANNEL.pb -profile OneOrgChannel -channelID $CHANNEL --configPath /opt/home/

@@ -56,7 +56,7 @@ function copyCertsFromS3 {
 function copyChannelGenesisToS3 {
     echo "Copying the Channel Genesis block to S3"
     if [[ $(aws configure list) && $? -eq 0 ]]; then
-        aws s3api put-object --bucket $S3BucketNameCreator --key org0/mychannel.block --body ${DATA}/mychannel.block
+        aws s3api put-object --bucket $S3BucketNameCreator --key org0/mychannel.block --body /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer/mychannel.block
         aws s3api put-object-acl --bucket $S3BucketNameCreator --key org0/mychannel.block --grant-read uri=http://acs.amazonaws.com/groups/global/AllUsers
         aws s3api put-object-acl --bucket $S3BucketNameCreator --key org0/mychannel.block --acl public-read
     else
@@ -69,8 +69,8 @@ function copyChannelGenesisToS3 {
 function copyChannelGenesisFromS3 {
     echo "Copying the Channel Genesis block from S3"
     if [[ $(aws configure list) && $? -eq 0 ]]; then
-        sudo chown ec2-user ${DATA}/mychannel.block
-        aws s3api get-object --bucket $S3BucketNameCreator --key org0/mychannel.block ${DATA}/mychannel.block
+        sudo chown ec2-user /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer/mychannel.block
+        aws s3api get-object --bucket $S3BucketNameCreator --key org0/mychannel.block /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer/mychannel.block
     else
         echo "AWS CLI is not configured on this node. To run this script install and configure the AWS CLI"
     fi

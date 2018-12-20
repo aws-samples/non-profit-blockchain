@@ -442,12 +442,16 @@ On the Fabric client node in Account A.
 
 This step generates a new channel configuration block that includes the new member owned by Account B. A configuration block is similar to the genesis block, defining the members and policies for a channel. In fact, you can consider a configuration block to be the genesis block plus the delta of configuration changes that have occurred since the channel was created. 
 
+> For interest, 'genesis block' appears in two places in Fabric:
+>   1) The orderer is bootstrapped using a genesis block, which is used to create the orderer system channel. The genesis block is created using this command: `configtxgen -outputBlock`, and is passed to the orderer on startup, usually via an ENV variable or parameter (named `General.GenesisFile`). The system channel name defaults to 'testchainid' unless you override it.
+>   2) Application channels are created using a channel configuration block. The first of these becomes the genesis block for the channel. This is created using this command: `configtxgen -outputCreateChannelTx`.
+
 A new channel configuration block is created by fetching the latest configuration block from the channel, generating a new channel configuration, then comparing the old and new configurations to generate a 'diff'. 
 
 Generating a new channel configuration involves a number of steps, which we will work through below.
 
-### Generate configtx channel configuration
-Generate the configtx channel configuration by executing the following script:
+### Generate new configtx.yaml channel creation configuration
+Generate the configtx channel creation configuration by executing the following script:
 
 ```
 docker exec cli configtxgen -outputCreateChannelTx /opt/home/$CHANNEL-two-org.pb -profile TwoOrgChannel -channelID $CHANNEL --configPath /opt/home/
@@ -466,11 +470,34 @@ You should see:
 Check that the channel configuration has been generated:
 
 ```
-ls -lt $CHANNEL-two-org.pb
+ls -lt ~/$CHANNEL-two-org.pb
 ```
 
-### Fetch the latest config block from the channel
-The genesis block for the channel exists here:
+### Print the new member configuration
+Generate a member definition for the new member. It reads the information for the member from configtx.yaml, created in the previous step:
+
+```
+export NEWMEMBERID=m-TRD4XPJBOREM7BDMBV6WLG3NKM
+docker exec cli /bin/bash -c "configtxgen -printOrg $NEWMEMBERID --configPath /opt/home/ > /tmp/$NEWMEMBERID.json"
+```
+
+You should see:
+
+```
+2018-12-20 09:03:18.175 UTC [common/tools/configtxgen] main -> WARN 001 Omitting the channel ID for configtxgen is deprecated.  Explicitly passing the channel ID will be required in the future, defaulting to 'testchainid'.
+2018-12-20 09:03:18.175 UTC [common/tools/configtxgen] main -> INFO 002 Loading configuration
+2018-12-20 09:03:18.177 UTC [common/tools/configtxgen/encoder] NewOrdererOrgGroup -> WARN 003 Default policy emission is deprecated, please include policy specificiations for the orderer org group m-TRD4XPJBOREM7BDMBV6WLG3NKM in configtx.yaml
+```
+
+Check that the new member configuration has been generated and that is has more than 0 bytes:
+
+```
+$ docker exec cli ls -lt /tmp/$NEWMEMBERID.json    
+-rw-r--r-- 1 root root 4678 Dec 20 09:03 /tmp/m-TRD4XPJBOREM7BDMBV6WLG3NKM.json 
+```
+
+### Fetch the latest configuration block from the channel
+The channel creation block for the channel exists in the location below. It was created just prior to the creation of the channel in [Part 1:](../ngo-fabric/README.md). 
 
 ```
 ls -lt /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer
@@ -489,26 +516,169 @@ Check that the latest config block file now exists:
 ls -lt /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer
 ```
 
+### Create an updated channel config including the new member
+We will use a bash script to create an updated channel config since the process involves quite a few steps. We need to execute the bash script in the CLI container, so we copy it to the home directory on the Fabric client node, as this is mounted into the CLI container.
+
+```
+cd ~/non-profit-blockchain/new-member
+cp create-config-update.sh ~
+```
+
+A utility program called 'configtxlator' is used to create the new channel config - it translates the JSON channel configurations to/from binary protobuf structures. 'configtxlator' can run as a REST API server, so we start it in this mode since we need to make a few calls to it. 
+
+```
+docker exec -e "CHANNEL=mychannel" -e "MEMBERID=m-TRD4XPJBOREM7BDMBV6WLG3NKM" -e "BLOCKDIR=/opt/home/fabric-samples/chaincode/hyperledger/fabric/peer" cli /opt/home/create-config-update.sh
+```
+
+You should see:
+
+```
+$ docker exec -e "CHANNEL=mychannel" -e "MEMBERID=m-TRD4XPJBOREM7BDMBV6WLG3NKM" -e "BLOCKDIR=/opt/home/fabric-samples/chaincode/hyperledger/fabric/peer" cli /opt/home/create-config-update.sh
+Creating config update payload for the new member 'm-TRD4XPJBOREM7BDMBV6WLG3NKM'
+configtxlator_pid:983
+Sleeping 5 seconds for configtxlator to start...
+2018-12-20 09:15:42.578 UTC [configtxlator] startServer -> INFO 001 Serving HTTP requests on 0.0.0.0:7059
+/tmp /opt/home
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 43033    0 30048  100 12985   963k   416k --:--:-- --:--:-- --:--:--  978k
+Checking whether member 'm-TRD4XPJBOREM7BDMBV6WLG3NKM' already exists in the channel config
+About to execute jq '.channel_group.groups.Application.groups | contains({m-TRD4XPJBOREM7BDMBV6WLG3NKM})'
+Member 'm-TRD4XPJBOREM7BDMBV6WLG3NKM' does not exist in the channel config. This is expected as we are about to add the member
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 31213    0  8844  100 22369   432k  1093k --:--:-- --:--:-- --:--:-- 1149k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 40085    0 11271  100 28814   507k  1297k --:--:-- --:--:-- --:--:-- 1339k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 23284    0  2635  100 20649  44324   339k --:--:-- --:--:-- --:--:--  341k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  8926    0  6291  100  2635   327k   137k --:--:-- --:--:-- --:--:--  341k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  7651    0  2661  100  4990   137k   258k --:--:-- --:--:-- --:--:--  270k
+Created config update payload for the new organization 'm-TRD4XPJBOREM7BDMBV6WLG3NKM', in file /opt/home/fabric-samples/chaincode/hyperledger/fabric/peer/m-TRD4XPJBOREM7BDMBV6WLG3NKM_config_update_as_envelope.pb
+/opt/home
+/opt/home/create-config-update.sh: line 92:   983 Terminated              configtxlator start
+```
+
+Check that the update channel config block file now exists. You should see the files below. You have just created the file ending in `config_update_as_envelope.pb`.
+
+```
+$ ls -lt /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer
+total 36
+-rw-r--r-- 1 root root  2661 Dec 20 10:41 m-TRD4XPJBOREM7BDMBV6WLG3NKM_config_update_as_envelope.pb
+-rw-r--r-- 1 root root 12985 Dec 20 10:40 mychannel.config.block
+-rw-r--r-- 1 root root 12985 Dec 13 06:44 mychannel.block
+```
 
 ## Step 8: Endorsing peers must sign the new channel configuration
-The 'diff' must be signed by the existing network members, i.e. the network members must endorse the changes to the channel configuration and approve the new member joining the channel. A channel configuration update is really just another transaction in Fabric, known as a 'configuration transaction', and as such it must be endorsed by network members in accordance with the modification policy for the channel. The default modification policy for the channel Application group is MAJORITY, which means a majority of members need to sign the channel configuration update.
+On the Fabric client node in Account A.
+
+In this step, when we refer to 'diff', we mean the binary protobuf version of the 'diff' file, which we wrapped in an envelope in the final step in the script `create-config-update.sh`. This file is titled `m-TRD4XPJBOREM7BDMBV6WLG3NKM_config_update_as_envelope.pb` in the previous step, and can be found by executing this command:
+
+```
+ls -lt /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer
+```
+ 
+The 'diff' created above must be signed by the existing network members, i.e. the network members must endorse the changes to the channel configuration and approve the new member joining the channel. A channel configuration update is really just another transaction in Fabric, known as a 'configuration transaction', and as such it must be endorsed by network members in accordance with the modification policy for the channel. The default modification policy for the channel Application group is MAJORITY, which means a majority of members need to sign the channel configuration update.
+
+Since our network currently contains only one member, the network creator, this step isn't strictly required as only the network creator would need to sign the package. However, I've made it an explicit step as you will need it when your Fabric network grows to 2 or more members.
 
 To allow admins belonging to different members to sign the channel configuration you will need to pass the channel configuration ‘diff’ file to each member in the network, one-by-one, and have them sign the channel configuration. Each member signature must be applied in turn so that we end up with a package that has the signatures of all endorsing members. Alternatively, you could send the channel config to all members simultaneously and wait to receive signed responses, but then you would have to extract the signatures from the individual responses and create a single package which contains the configuration update plus all the required signatures.
 
-At this point you may only have two members: the member owned by the network creator, and the new member. In this case, only the member owned by the network creator needs to sign the package. However, I have made this step explicit because you will need to 
-include this step as more members join the network.
+```
+export NEWMEMBERID=m-TRD4XPJBOREM7BDMBV6WLG3NKM
+export BLOCKDIR=/opt/home/fabric-samples/chaincode/hyperledger/fabric/peer
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli bash -c "peer channel signconfigtx -f ${BLOCKDIR}/${NEWMEMBERID}_config_update_as_envelope.pb"
+```
+
+If you compare the size of the file now you will see it is larger. This is due to the digital signature that is now included:
+
+```
+ls -lt /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer
+```
 
 Once we have a signed channel configuration we can apply it to the channel.
 
 ## Step 9: Account A updates the channel with the new configuration
+On the Fabric client node in Account A.
+
 In this step we update the channel with the new channel configuration. Since the new channel configuration now includes details
 of the new organisation, this will allow the new organisation to join the channel.
 
+```
+export NEWMEMBERID=m-TRD4XPJBOREM7BDMBV6WLG3NKM
+export BLOCKDIR=/opt/home/fabric-samples/chaincode/hyperledger/fabric/peer
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli bash -c "peer channel update -f ${BLOCKDIR}/${NEWMEMBERID}_config_update_as_envelope.pb -c $CHANNEL -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls"
+```
+
+You should see:
+
+```
+2018-12-20 10:45:10.899 UTC [channelCmd] InitCmdFactory -> INFO 001 Endorser and orderer connections initialized
+2018-12-20 10:45:10.988 UTC [channelCmd] update -> INFO 002 Successfully submitted channel update
+```
+
+You can now join a peer owned by the new member to the channel. 
+
 ## Step 10: Account A shares the genesis block for the channel with Account B
-Before the peer node in Account B joins the channel, it must be able to connect to the Ordering Service managed by Amazon Managed Blockchain. It obtains the Ordering Service endpoint from the channel genesis block. The file mychannel.block ('mychannel' refers to the channel name and may differ if you have changed the channel name) would have been created when you first created the channel. Make sure the mychannel.block file is available to the peer node in Account B.
+On the Fabric client node in Account A.
+
+Before the peer node in Account B joins the channel, it must be able to connect to the Ordering Service managed by Amazon Managed Blockchain. The peer obtains the Ordering Service endpoint from the channel genesis block. The file mychannel.block ('mychannel' refers to the channel name and may differ if you have changed the channel name) would have been created when you first created the channel in [Part 1](../ngo-fabric/README.md). Make sure the mychannel.block file is available to the peer node in Account B.
+
+Copy the channel genesis from from Account A to S3:
+
+
+```bash
+cd ~/non-profit-blockchain
+./new-member/s3-handler.sh createS3BucketForCreator
+./new-member/s3-handler.sh copyChannelGenesisToS3
+```
+
+On the Fabric client node in Account B.
+
+```bash
+cd ~/non-profit-blockchain
+./new-member/s3-handler.sh copyChannelGenesisFromS3
+```
+
+On the EC2 bastion in the new org.
+```bash
+cd
+cd hyperledger-on-kubernetes
+./remote-org/scripts/copy-tofrom-S3.sh copyChannelGenesisFromS3
+ls -l /opt/share/rca-data/mychannel.block
+```
 
 ## Step 11: Account B starts its peer node and joins the channel
+On the Fabric client node in Account B.
+
 The next step is to join the peer node to the channel. After the peer successfully joins the channel it will start receiving blocks of transactions and build its own copy of the ledger, creating the blockchain and populating the world state key-value store.
+
+Join peer to Fabric channel.
+
+Execute the following script:
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer channel join -b $CHANNEL.block -o $ORDERER --cafile $CAFILE --tls
+```
+
+You should see:
+
+```
+2018-11-26 21:41:40.983 UTC [channelCmd] InitCmdFactory -> INFO 001 Endorser and orderer connections initialized
+2018-11-26 21:41:41.022 UTC [channelCmd] executeJoin -> INFO 002 Successfully submitted proposal to join channel
+```
 
 ## Step 12: Account B installs chaincode
 After install the chaincode, the peer node in Account B will be able to run queries and endorse transactions.
