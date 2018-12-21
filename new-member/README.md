@@ -5,16 +5,26 @@ node to the channel created in [Part 1](../ngo-fabric/README.md). The new peer n
 on the next channel and will build its own copy of the ledger. We will also configure the Fabric network so the new
 member can take part in endorsing transactions.
 
-Adding a new member to an existing Fabric network involves a number of steps. The new member is located in a different AWS account, and the steps therefore involve cooperation between administrators for the Fabric member in the existing account (let’s call this Account A), and the new account (let’s call this Account B). The steps look as follows:
+Adding a new member to an existing Fabric network involves a number of steps. The new member is located in a different AWS account, and the steps therefore involve cooperation between administrators for the Fabric member in the existing creator account (let’s call this Account A), and the new account (let’s call this Account B). The steps look as follows:
 
 1.	Account A invites Account B to join the Fabric network
 2.	Account B creates a member in the Fabric network
 3.	Account B creates a peer node
-4.	Account B shares the public keys for its member with Account A
-5.	Account A updates the channel configuration with the MSP for Account B
-6.	Account A shares the genesis block for the channel with Account B
-7.	Account B starts its peer node and joins the channel
-8.	If Account B will take part in endorsing transaction proposals, Account B will install chaincode
+4.  Account B creates a Fabric client node
+5.  Account B prepares the Fabric client node and enrolls an identity
+6.  Account B shares the public keys for its member with Account A
+7.  Account A creates an MSP for the new Account A member
+8.  Account A updates the configtx.yaml configuration with the MSP for Account B
+9.  Account A updates the channel configuration with the MSP for Account B
+10. Endorsing peers sign the new channel configuration
+11. Account A updates the channel with the new configuration
+12. Account A shares the genesis block for the channel with Account B
+13. Account B starts its peer node and joins the channel
+14. Account B installs chaincode
+15. Account B queries the chaincode
+16. Account B invokes a transaction
+17. Account A updates the endorsement policy for the chaincode on the channel
+18. Account B installs the latest version of the chaincode
 
 ## Pre-requisites - Account A, the network creator
 There are multiple parts to the workshop. Before starting on Part 5, a network creator should haved completed [Part 1](../ngo-fabric/README.md). You need an existing Fabric network before starting Part 5. The network creator would have also created a peer node under a member belonging to Account A.
@@ -141,7 +151,7 @@ Check the progress in the AWS CloudFormation console and wait until the stack is
 You will find some useful information in the Outputs tab of the CloudFormation stack once the stack
 is complete. We will use this information in later steps.
 
-## Step 4 - Account B prepares the Fabric client node and enrolls an identity
+## Step 5: Account B prepares the Fabric client node and enrolls an identity
 On the Fabric client node.
 
 Prior to executing any commands in the Fabric client node, you will need to export ENV variables
@@ -227,7 +237,7 @@ mkdir -p /home/ec2-user/admin-msp/admincerts
 cp ~/admin-msp/signcerts/* ~/admin-msp/admincerts/
 ```
 
-## Step 5: Account B shares the public keys for its member with Account A
+## Step 6: Account B shares the public keys for its member with Account A
 On the Fabric client node in Account B.
 
 Account B needs to share two certificates with Account A:
@@ -252,7 +262,7 @@ cd ~/non-profit-blockchain
 ./new-member/s3-handler.sh copyCertsToS3
 ```
 
-## Step 6: Account A creates an MSP for the new Account A member 
+## Step 7: Account A creates an MSP for the new Account A member 
 On the Fabric client node in Account A.
 
 Account A stores the certificates provided by Account B on its Fabric client node.
@@ -272,7 +282,7 @@ cd ~/non-profit-blockchain
 ./new-member/s3-handler.sh copyCertsFromS3
 ```
 
-## Step 7: Account A updates the configtx.yaml configuration with the MSP for Account B
+## Step 8: Account A updates the configtx.yaml configuration with the MSP for Account B
 On the Fabric client node in Account A.
 
 The configtx.yaml file contains details of the organisations in a Fabric network as well as channel configuration profiles that can be used when creating new channels. The channel creator originally created this file just before creating the channel. The channel creator now needs to add the new member to this file.
@@ -437,7 +447,7 @@ Profiles:
                 - *Org2
 ```
 
-## Step 7: Account A updates the channel configuration with the MSP for Account B
+## Step 9: Account A updates the channel configuration with the MSP for Account B
 On the Fabric client node in Account A.
 
 This step generates a new channel configuration block that includes the new member owned by Account B. A configuration block is similar to the genesis block, defining the members and policies for a channel. In fact, you can consider a configuration block to be the genesis block plus the delta of configuration changes that have occurred since the channel was created. 
@@ -575,7 +585,7 @@ total 36
 -rw-r--r-- 1 root root 12985 Dec 13 06:44 mychannel.block
 ```
 
-## Step 8: Endorsing peers must sign the new channel configuration
+## Step 10: Endorsing peers must sign the new channel configuration
 On the Fabric client node in Account A.
 
 In this step, when we refer to 'diff', we mean the binary protobuf version of the 'diff' file, which we wrapped in an envelope in the final step in the script `create-config-update.sh`. This file is titled `m-TRD4XPJBOREM7BDMBV6WLG3NKM_config_update_as_envelope.pb` in the previous step, and can be found by executing this command:
@@ -606,7 +616,7 @@ ls -lt /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer
 
 Once we have a signed channel configuration we can apply it to the channel.
 
-## Step 9: Account A updates the channel with the new configuration
+## Step 11: Account A updates the channel with the new configuration
 On the Fabric client node in Account A.
 
 In this step we update the channel with the new channel configuration. Since the new channel configuration now includes details
@@ -629,7 +639,7 @@ You should see:
 
 You can now join a peer owned by the new member to the channel. 
 
-## Step 10: Account A shares the genesis block for the channel with Account B
+## Step 12: Account A shares the genesis block for the channel with Account B
 On the Fabric client node in Account A.
 
 Before the peer node in Account B joins the channel, it must be able to connect to the Ordering Service managed by Amazon Managed Blockchain. The peer obtains the Ordering Service endpoint from the channel genesis block. The file mychannel.block ('mychannel' refers to the channel name and may differ if you have changed the channel name) would have been created when you first created the channel in [Part 1](../ngo-fabric/README.md). Make sure the mychannel.block file is available to the peer node in Account B.
@@ -651,7 +661,7 @@ cd ~/non-profit-blockchain
 ls -l /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer/mychannel.block
 ```
 
-## Step 11: Account B starts its peer node and joins the channel
+## Step 13: Account B starts its peer node and joins the channel
 On the Fabric client node in Account B.
 
 The next step is to join the peer node to the channel. After the peer successfully joins the channel it will start receiving blocks of transactions and build its own copy of the ledger, creating the blockchain and populating the world state key-value store.
@@ -673,7 +683,7 @@ You should see:
 2018-11-26 21:41:41.022 UTC [channelCmd] executeJoin -> INFO 002 Successfully submitted proposal to join channel
 ```
 
-## Step 12: Account B installs chaincode
+## Step 14: Account B installs chaincode
 On the Fabric client node in Account B.
 
 After install the chaincode, the peer node in Account B will be able to run queries and endorse transactions.
@@ -696,7 +706,7 @@ You should see:
 2018-11-26 21:41:48.004 UTC [chaincodeCmd] install -> INFO 003 Installed remotely response:<status:200 payload:"OK" > 
 ```
 
-## Step 13: Account B queries the chaincode
+## Step 15: Account B queries the chaincode
 On the Fabric client node in Account B.
 
 Query the chaincode on Fabric peer.
@@ -715,7 +725,7 @@ You should see the latest balance for account holder 'a'. If you have executed o
 90
 ```
 
-## Step 14: Account B invokes a transaction
+## Step 16: Account B invokes a transaction
 On the Fabric client node in Account B.
 
 Invoke a Fabric transaction.
@@ -757,7 +767,7 @@ docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt
 
 2. Add the new member to the endorsement policy. To do this, the chaincode on the channel needs to be updated with a new endorsement policy that includes the new member. This will be done in the next step.
 
-## Step 15: Account A updates the endorsement policy for the channel
+## Step 17: Account A updates the endorsement policy for the chaincode on the channel
 On the Fabric client node in Account A.
 
 Upgrade the chaincode on the Fabric channel. This requires us to increment the chaincode version, which we do using the `export` statement below, then install a new version of the chaincode. The chaincode itself is not changing, only the version number and the endorsement policy applied to it on this channel. 
@@ -799,7 +809,7 @@ You should see:
 
 Now query and invoke transactions to confirm that the upgrade was successful. 
 
-## Step 16: Account B updates the endorsement policy for the channel
+## Step 18: Account B installs the latest version of the chaincode
 On the Fabric client node in Account B.
 
 If you run the query statement again it will fail. This is because the peer node in Account B does not have the latest version of the chaincode:
