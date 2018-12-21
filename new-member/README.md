@@ -674,10 +674,164 @@ You should see:
 ```
 
 ## Step 12: Account B installs chaincode
+On the Fabric client node in Account B.
+
 After install the chaincode, the peer node in Account B will be able to run queries and endorse transactions.
 
-## Step 13: Account B queries chaincode and invokes transactions
-To check that the new member owned by Account B is a full member of the Fabric network, the peer node will execute queries against its own ledger and invoke transactions on the network. Since the new member is included in the endorsement policy we expect to this transactions endorsed by the new member.
+Install chaincode on Fabric peer.
+
+Execute the following script:
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer chaincode install -n $CHAINCODENAME -v $CHAINCODEVERSION -p $CHAINCODEDIR
+```
+
+You should see:
+
+```
+2018-11-26 21:41:46.585 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
+2018-11-26 21:41:46.585 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
+2018-11-26 21:41:48.004 UTC [chaincodeCmd] install -> INFO 003 Installed remotely response:<status:200 payload:"OK" > 
+```
+
+## Step 13: Account B queries the chaincode
+On the Fabric client node in Account B.
+
+Query the chaincode on Fabric peer.
+
+Execute the following script:
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer chaincode query -C $CHANNEL -n $CHAINCODENAME -c '{"Args":["query","a"]}' 
+```
+
+You should see the latest balance for account holder 'a'. If you have executed only the single 'invoke' transaction in Account A when you setup the Fabric network, the balance would be '90'. If you executed more than one 'invoke', the balance would have been reduced by 10 each time, so it will be some value less than 90.
+
+```
+90
+```
+
+## Step 14: Account B invokes a transaction
+On the Fabric client node in Account B.
+
+Invoke a Fabric transaction.
+
+Execute the following script:
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer chaincode invoke -o $ORDERER -C $CHANNEL -n $CHAINCODENAME \
+    -c '{"Args":["invoke","a","b","10"]}' --cafile $CAFILE --tls
+```
+
+You should see:
+
+```
+2018-11-26 21:45:20.935 UTC [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 001 Chaincode invoke successful. result: status:200 
+```
+
+However, if you query the balance again you will find the balance has not changed. Any idea why?
+
+Your Account B peer node is now a committer peer, which means the peer is able to validate the blocks it receives and maintain its own ledger. However, it is not yet an endorsing peer and cannot take part in endorsing transactions. The `docker exec` statement we used above sends the transaction to the Account B peer node for endorsement. The Account B peer node will follow the standard Fabric process of simulating the transaction and endorsing it. The endorsed transaction is then sent to the ordering service, which groups transactions into blocks and sends to the peer nodes. Each peer node will then validate the transactions in the block. The transaction endorsed by Account B will fail the validation step as it does not meet the endorsement policy of the chaincode on this channel. The transaction will be written to the blockchain on each peer as an 'invalid' transaction, while the world state will not be updated.
+
+You can check the block height on the channel to confirm that the transactions you invoke do result in new blocks, even though there is no update to the world state. Run this before and after you run the `peer chaincode invoke`. 
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem"  \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH"  \
+    cli peer channel getinfo -o $ORDERER -c $CHANNEL --cafile $CAFILE --tls   
+```
+
+We can resolve the invalid transaction in two ways:
+
+1. Send the `peer chaincode invoke` transaction to peer nodes in Account A and Account B. Since Account A is able to endorse transactions, the statement below should work. It will obtain endorsements from peers in Account A and Account B. When the endorsement policy is checked during the validation step, it will succeed as the transaction has an endorsement from a member included in the policy. If you review [Part 1](../ngo-fabric/README.md) where we instantiated the chaincode, we did not provide an endorsement policy, so the default endorsement policy would have been applied. In this case it would be `“OR(‘Org1.member’)”`.
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem"     -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH"     cli peer chaincode invoke -o $ORDERER -C $CHANNEL -n $CHAINCODENAME     -c '{"Args":["invoke","a","b","10"]}' --cafile $CAFILE --tls --peerAddresses nd-JZMD3XB7R5ARXA5HVM4GPZ2CFI.m-TEW3EJGTPBBW7BMGXYOIXV5364.n-BAWJYVPCQBE5ZKAM323FNRG3ZU.managedblockchain.us-east-1.amazonaws.com:30003 --peerAddresses nd-KSQ2ACC3PZBNBNBPYWKUEAEABY.m-TRD4XPJBOREM7BDMBV6WLG3NKM.n-BAWJYVPCQBE5ZKAM323FNRG3ZU.managedblockchain.us-east-1.amazonaws.com:30006 --tlsRootCertFiles  /opt/home/managedblockchain-tls-chain.pem --tlsRootCertFiles /opt/home/managedblockchain-tls-chain.pem
+```
+
+2. Add the new member to the endorsement policy. To do this, the chaincode on the channel needs to be updated with a new endorsement policy that includes the new member. This will be done in the next step.
+
+## Step 15: Account A updates the endorsement policy for the channel
+On the Fabric client node in Account A.
+
+Upgrade the chaincode on the Fabric channel. This requires us to increment the chaincode version, which we do using the `export` statement below, then install a new version of the chaincode. The chaincode itself is not changing, only the version number and the endorsement policy applied to it on this channel. 
+
+Execute the following script:
+
+```
+export CHAINCODEVERSION=v2
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer chaincode install -n $CHAINCODENAME -v $CHAINCODEVERSION -p $CHAINCODEDIR
+```
+
+You should see:
+
+```
+2018-12-21 04:38:18.006 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
+2018-12-21 04:38:18.006 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
+2018-12-21 04:38:18.130 UTC [chaincodeCmd] install -> INFO 003 Installed remotely response:<status:200 payload:"OK" > 
+```
+
+Then upgrade the new chaincode on the channel. This is very similar to instantiating chaincode, and should take around 30 seconds to complete as Fabric creates a new Docker chaincode container, installs the chaincode, and calls the 'init' function. Keep this in mind when you design your own chaincode: the 'init' function is going to run each time the chaincode is upgraded, so don't make the mistake made in the fabric-samples where the state is initialised in the init function. Best practice for Fabric is to have a separate function to initialise the state, and only call this once, during chaincode instantiation.
+
+Before running this, change the members in your endorsement policy to match your own member IDs. You can find the member IDs for both Account A and Account B in the Amazon Managed Blockchain console, or you can look in Step 7 above where you added both member IDs to configtx.yaml, in the section `Organizations->Name`.
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer chaincode upgrade -o $ORDERER -C $CHANNEL -n $CHAINCODENAME -v $CHAINCODEVERSION \
+    -c '{"Args":["init","a","100","b","200"]}' --cafile $CAFILE --tls -P "OR('m-TEW3EJGTPBBW7BMGXYOIXV5364.member','m-TRD4XPJBOREM7BDMBV6WLG3NKM.member')"
+```
+
+You should see:
+
+```
+2018-12-21 04:38:26.615 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
+2018-12-21 04:38:26.615 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
+```
+
+Now query and invoke transactions to confirm that the upgrade was successful. 
+
+## Step 16: Account B updates the endorsement policy for the channel
+On the Fabric client node in Account B.
+
+If you run the query statement again it will fail. This is because the peer node in Account B does not have the latest version of the chaincode:
+
+```
+$ docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+>     -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+>     cli peer chaincode query -C $CHANNEL -n $CHAINCODENAME -c '{"Args":["query","a"]}' 
+Error: endorsement failure during query. response: status:500 message:"cannot retrieve package for chaincode mycc/v2, error open /var/hyperledger/production/chaincodes/mycc.v2: no such file or directory" 
+```
+
+Execute the following script to install the latest version of the chaincode:
+
+```
+export CHAINCODEVERSION=v2
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer chaincode install -n $CHAINCODENAME -v $CHAINCODEVERSION -p $CHAINCODEDIR
+```
+
+Run the query again. It should take around 30 seconds as a new Docker image is prepared with the latest version of the chaincode.
+
+Now for the final test - check whether the peer node on Account B can invoke a transaction and endorse it:
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer chaincode invoke -o $ORDERER -C $CHANNEL -n $CHAINCODENAME \
+    -c '{"Args":["invoke","a","b","10"]}' --cafile $CAFILE --tls
+```
+
+Rerunning the query should confirm that the peer node in Account B can now endorse transactions. The validation checks performed on each peer node have confirmed that a transaction endorsed by Account B is valid, and the world state on each peer will be updated. You can double check this by invoking transactions on peer nodes in Account A or Account B, then running the same query on peer nodes in Account A and Account B, and you will see the same results on both peers.
 
 ## The workshop sections
 The workshop instructions can be found in the README files in parts 1-4:
