@@ -10,7 +10,7 @@ will use the Fabric client node to administer the Fabric network
 * From the Fabric client node, create a Fabric channel, install & instantiate chaincode, and 
 query and invoke transactions on the Fabric network
 
-## Pre-requisites - Cloud9
+## [Pre-requisites - Cloud9](#prerequisites)
 We will use Cloud9 to provide a Linux terminal which has the AWS CLI already installed.
 
 1. Spin up a [Cloud9 IDE](https://us-east-1.console.aws.amazon.com/cloud9/home?region=us-east-1) from the AWS console.
@@ -34,7 +34,7 @@ aws s3 cp s3://managedblockchain-beta/service-2.json .
 aws configure add-model --service-model file://service-2.json --service-name managedblockchain
 ```
 
-## Step 1 - Create the Fabric network
+## [Step 1 - Create the Fabric network](#step1)
 In the AWS Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 
 Make sure you are in the correct AWS region (i.e. us-east-1, also known as N. Virginia) and follow the steps below:
@@ -50,7 +50,7 @@ Make sure you are in the correct AWS region (i.e. us-east-1, also known as N. Vi
 Before continuing, check to see that your Fabric network has been created and is ACTIVE. If not,
 wait for it to complete. Otherwise the steps below may fail.
 
-## Step 2 - Create the Fabric Peer
+## [Step 2 - Create the Fabric Peer](#step2)
 In the AWS Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 
 1. In the new network you have created, click on the member in the Members section.
@@ -59,7 +59,7 @@ In the AWS Managed Blockchain Console: https://console.aws.amazon.com/managedblo
 
 We'll continue with the next steps while we wait for the peer node to become HEALTHY.
 
-## Step 3 - Create the Fabric client node
+## [Step 3 - Create the Fabric client node](#step3)
 In your Cloud9 terminal window.
 
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
