@@ -1,11 +1,15 @@
-# Part 5: Adding a new member to an existing channel
+# Part 5: Adding a new member to a Fabric network on Amazon Managed Blockchain
 
 Part 5 will help you to add a new member running in a different AWS Account to the Fabric network you created in [Part 1](../ngo-fabric/README.md). After adding the new member you will create a peer node for the member and join the peer
 node to the channel created in [Part 1](../ngo-fabric/README.md). The new peer node will receive the blocks that exist
-on the next channel and will build its own copy of the ledger. We will also configure the Fabric network so the new
+on the new channel and will build its own copy of the ledger. We will also configure the Fabric network so the new
 member can take part in endorsing transactions.
 
-Adding a new member to an existing Fabric network involves a number of steps. The new member is located in a different AWS account, and the steps therefore involve cooperation between administrators for the Fabric member in the existing creator account (let’s call this Account A), and the new account (let’s call this Account B). The steps look as follows:
+The architecture of a multi-member Fabric network on Amazon Managed Blockchain is shown in the figure below.
+
+![Multi-member Fabric network on Amazon Managed Blockchain](images/MultimemberNetwork.png "Multi-member Fabric network on Amazon Managed Blockchain")
+
+Adding a new member to an existing Fabric network involves a number of steps. The new member will be located in a different AWS account, and the steps therefore involve cooperation between Fabric administrators in the existing account (let’s call this Account A, where the Fabric network was originally created), and the new account (let’s call this Account B, where the new member will be created). The steps look as follows:
 
 1.	Account A invites Account B to join the Fabric network
 2.	Account B creates a member in the Fabric network
@@ -13,9 +17,9 @@ Adding a new member to an existing Fabric network involves a number of steps. Th
 4.  Account B creates a Fabric client node
 5.  Account B prepares the Fabric client node and enrolls an identity
 6.  Account B shares the public keys for its member with Account A
-7.  Account A creates an MSP for the new Account A member
-8.  Account A updates the configtx.yaml configuration with the MSP for Account B
-9.  Account A updates the channel configuration with the MSP for Account B
+7.  Account A creates an MSP folder for the new Account B member
+8.  Account A creates a configtx.yaml which includes the new Account B member
+9.  Account A generates a channel configuration
 10. Endorsing peers sign the new channel configuration
 11. Account A updates the channel with the new configuration
 12. Account A shares the genesis block for the channel with Account B
@@ -25,6 +29,21 @@ Adding a new member to an existing Fabric network involves a number of steps. Th
 16. Account B invokes a transaction
 17. Account A updates the endorsement policy for the chaincode on the channel
 18. Account B installs the latest version of the chaincode
+
+## Two scenarios involving new members
+There are two potential scenarios when adding new members to an existing Fabric network:
+
+### The new member joins an existing channel
+In this case, the member needs to be added to the channel configuration for an existing channel. To do this, follow all of the steps above.
+
+### A new channel is created with both new members and existing members
+In this case a new channel configuration can be created which contains both new and existing members. This configuration can be used to create a new channel. To do this, follow these steps from those listed above:
+
+* Steps 1-9 
+* Step 12b
+* Steps 13-16
+
+This scenario is simpler as it does not involve updating the existing channel configuration.
 
 ## Pre-requisites - Account A, the network creator
 There are multiple parts to the workshop. Before starting on Part 5, a network creator should haved completed [Part 1](../ngo-fabric/README.md). You need an existing Fabric network before starting Part 5. The network creator would have also created a peer node under a member belonging to Account A.
@@ -95,17 +114,17 @@ aws configure add-model --service-model file://service-2.json --service-name man
 ## Step 1: Account A invites Account B to join the Fabric network
 In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 
-The admin user for Account A invites another AWS account to join the Fabric network. In the Amazon Managed Blockchain console, select your network and click the ‘Invite account’ button. Enter the 12-digit AWS account number. You should see a confirmation message indicating your invitation has been sent successfully.
+The Fabric administrator for Account A invites another AWS account to join the Fabric network. In the Managed Blockchain console, select your Fabric network and click the ‘Invite account’ button. Enter the 12-digit AWS account number of the account you wish to invite. You should see a confirmation message indicating your invitation has been sent successfully.
 
 ## Step 2: Account B creates a member in the Fabric network
 In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 
-The admin user for Account B can view the invitation in the Amazon Managed Blockchain console. Clicking on the network name will show the details of the network that Account B has been invited to join. Click ‘Create member’ to create a member in the network, entering a unique member name and an administrator username and password for the member. Note down the admin username and password.
+A user logged in to Account B can view the invitation in the Managed Blockchain console. Clicking on the network name will show the details of the network that Account B has been invited to join. Click ‘Create member’ to create a member in the network, entering a unique member name and an administrator username and password for the member. Make a note of the administrator username and password as you will need them later.
 
 ## Step 3: Account B creates a peer node
 In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 
-Once the Fabric network and member for Account B have an ACTIVE status, it’s time to create a Fabric peer node. Each member on a network creates their own peer nodes, so select the member you created above and click the link to create a peer node. Select an instance type, the amount of storage for that node, and create the peer node.
+Once the Fabric network and member for Account B have an ACTIVE status, it’s time to create a Fabric peer node. Each member on a network creates their own peer nodes, so select the member you created above and click the link to create a peer node. Select an instance type, the amount of storage for the node, and create the peer node.
 
 ## Step 4: Account B creates a Fabric client node
 These steps are identical to those performed by Account A when the Fabric network was originally created. See Step 3 in [Part 1:](../ngo-fabric/README.md). The steps have been replicated below.
@@ -262,7 +281,7 @@ cd ~/non-profit-blockchain
 ./new-member/s3-handler.sh copyCertsToS3
 ```
 
-## Step 7: Account A creates an MSP for the new Account A member 
+## Step 7: Account A creates an MSP folder for the new Account B member 
 On the Fabric client node in Account A.
 
 Account A stores the certificates provided by Account B on its Fabric client node.
@@ -282,7 +301,7 @@ cd ~/non-profit-blockchain
 ./new-member/s3-handler.sh copyCertsFromS3
 ```
 
-## Step 8: Account A updates the configtx.yaml configuration with the MSP for Account B
+## Step 8: Account A creates a configtx.yaml which includes the new Account B member
 On the Fabric client node in Account A.
 
 The configtx.yaml file contains details of the organisations in a Fabric network as well as channel configuration profiles that can be used when creating new channels. The channel creator originally created this file just before creating the channel. The channel creator now needs to add the new member to this file.
@@ -300,7 +319,7 @@ You will make two changes to the file. A working example of the updated configtx
 
 Save the file.
 
-Important
+### Important
 
 This file is sensitive and must be indented properly. Artifacts from pasting can cause the file to fail with marshalling errors. We recommend using emacs to edit it. You can also use VI, but before making any changes in VI, enter `:set paste`, press i to enter insert mode, paste the contents, press escape, and then enter `:set nopaste` before saving.
 
@@ -447,12 +466,12 @@ Profiles:
                 - *Org2
 ```
 
-## Step 9: Account A updates the channel configuration with the MSP for Account B
+## Step 9: Account A generates a channel configuration
 On the Fabric client node in Account A.
 
 This step generates a new channel configuration block that includes the new member owned by Account B. A configuration block is similar to the genesis block, defining the members and policies for a channel. In fact, you can consider a configuration block to be the genesis block plus the delta of configuration changes that have occurred since the channel was created. 
 
-> For interest, 'genesis block' appears in two places in Fabric:
+For interest, 'genesis block' appears in two places in Fabric:
 >   1) The orderer is bootstrapped using a genesis block, which is used to create the orderer system channel. The genesis block is created using this command: `configtxgen -outputBlock`, and is passed to the orderer on startup, usually via an ENV variable or parameter (named `General.GenesisFile`). The system channel name defaults to 'testchainid' unless you override it.
 >   2) Application channels are created using a channel configuration block. The first of these becomes the genesis block for the channel. This is created using this command: `configtxgen -outputCreateChannelTx`.
 
@@ -661,10 +680,23 @@ cd ~/non-profit-blockchain
 ls -l /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer/mychannel.block
 ```
 
+## Step 12b: Account B obtains the Genesis Block directly from the channel
+On the Fabric client node in Account B.
+
+This step is only executed when a new channel is being created with both new members and existing members. It is not to be executed if you joining the new member to an existing channel.
+
+Since the member in Account B is already part of the new channel config, it can directly get the channel configuration block from the channel itself. 
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer channel fetch oldest $CHANNEL.block -c $CHANNEL -o $ORDERER --cafile $CAFILE --tls
+```
+
 ## Step 13: Account B starts its peer node and joins the channel
 On the Fabric client node in Account B.
 
-The next step is to join the peer node to the channel. After the peer successfully joins the channel it will start receiving blocks of transactions and build its own copy of the ledger, creating the blockchain and populating the world state key-value store.
+The next step is to join the peer node belonging to the new member to the channel. After the peer successfully joins the channel it will start receiving blocks of transactions and build its own copy of the ledger, creating the blockchain and populating the world state key-value store.
 
 Join peer to Fabric channel.
 
@@ -747,7 +779,7 @@ You should see:
 
 However, if you query the balance again you will find the balance has not changed. Any idea why?
 
-Your Account B peer node is now a committer peer, which means the peer is able to validate the blocks it receives and maintain its own ledger. However, it is not yet an endorsing peer and cannot take part in endorsing transactions. The `docker exec` statement we used above sends the transaction to the Account B peer node for endorsement. The Account B peer node will follow the standard Fabric process of simulating the transaction and endorsing it. The endorsed transaction is then sent to the ordering service, which groups transactions into blocks and sends to the peer nodes. Each peer node will then validate the transactions in the block. The transaction endorsed by Account B will fail the validation step as it does not meet the endorsement policy of the chaincode on this channel. The transaction will be written to the blockchain on each peer as an 'invalid' transaction, while the world state will not be updated.
+Your Account B peer node is now a committer peer, which means the peer is able to validate the blocks it receives from the Ordering Service and maintain its own ledger. However, it is not yet an endorsing peer and cannot take part in endorsing transactions. The `docker exec` statement we used above sends the transaction to the Account B peer node for endorsement. The Account B peer node will follow the standard Fabric process of simulating the transaction and endorsing it. The endorsed transaction is then sent to the ordering service, which groups transactions into blocks and sends to the peer nodes. Each peer node will then validate the transactions in the block. The transaction endorsed by Account B will fail the validation step as it does not meet the endorsement policy of the chaincode on this channel. The transaction will be written to the blockchain on each peer as an 'invalid' transaction, while the world state will not be updated.
 
 You can check the block height on the channel to confirm that the transactions you invoke do result in new blocks, even though there is no update to the world state. Run this before and after you run the `peer chaincode invoke`. 
 
@@ -789,7 +821,7 @@ You should see:
 2018-12-21 04:38:18.130 UTC [chaincodeCmd] install -> INFO 003 Installed remotely response:<status:200 payload:"OK" > 
 ```
 
-Then upgrade the new chaincode on the channel. This is very similar to instantiating chaincode, and should take around 30 seconds to complete as Fabric creates a new Docker chaincode container, installs the chaincode, and calls the 'init' function. Keep this in mind when you design your own chaincode: the 'init' function is going to run each time the chaincode is upgraded, so don't make the mistake made in the fabric-samples where the state is initialised in the init function. Best practice for Fabric is to have a separate function to initialise the state, and only call this once, during chaincode instantiation.
+Then upgrade the new chaincode on the channel. Upgrading chaincode is very similar to instantiating, and should take around 30 seconds to complete as Fabric creates a new Docker chaincode container, installs the chaincode, and calls the 'init' function. Keep this in mind when you design your own chaincode: the 'init' function is going to run each time the chaincode is upgraded, so don't make the mistake you see in the fabric-samples where the state is initialised in the ‘init’ function. This results in the current world state being reset to the values defined in the ‘init’ function each time the chaincode is upgraded. Best practice for Fabric is to have a separate function to initialise the state, and only call this once, during chaincode instantiation.
 
 Before running this, change the members in your endorsement policy to match your own member IDs. You can find the member IDs for both Account A and Account B in the Amazon Managed Blockchain console, or you can look in Step 7 above where you added both member IDs to configtx.yaml, in the section `Organizations->Name`.
 
@@ -850,3 +882,4 @@ The workshop instructions can be found in the README files in parts 1-4:
 * [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
 * [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
 * [Part 4:](../ngo-ui/README.md) Run the Application. 
+* [Part 5:](../new-member/README.md) Add a new member to the network. 

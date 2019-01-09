@@ -32,6 +32,7 @@ README instructions in parts 1-4, in this order:
 * [Part 2:](ngo-chaincode/README.md) Deploy the NGO chaincode. 
 * [Part 3:](ngo-rest-api/README.md) Run the REST API. 
 * [Part 4:](ngo-ui/README.md) Run the Application. 
+* [Part 5:](new-member/README.md) Add a new member to the network. 
 
 ## License
 
