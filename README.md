@@ -31,6 +31,7 @@ README instructions in parts 1-4, in this order:
 * [Part 2:](ngo-chaincode/README.md) Deploy the non-profit chaincode. 
 * [Part 3:](ngo-rest-api/README.md) Run the RESTful API server. 
 * [Part 4:](ngo-ui/README.md) Run the application. 
+* [Part 5:](new-member/README.md) Add a new member to the network. 
 
 ## Cleanup
 
