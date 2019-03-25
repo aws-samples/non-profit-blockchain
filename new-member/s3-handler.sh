@@ -16,7 +16,7 @@
 set +e
 
 region=us-east-1
-memberID=m-TRD4XPJBOREM7BDMBV6WLG3NKM
+memberID=<your member ID, from the AWS Console>
 
 # convert memberID to lowercase. S3 buckets must be lower case
 memberID=$(echo "$memberID" | tr '[:upper:]' '[:lower:]')

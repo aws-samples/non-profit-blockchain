@@ -87,7 +87,7 @@ echo $VPCENDPOINTSERVICENAME
 ```
 
 If the VPC endpoint is populated with a value, go ahead and run this script. This will create the
-CloudFormation stack. You will see an error saying `Keypair not found`. This is expected as the script
+CloudFormation stack. You will see an error saying `key pair does not exist`. This is expected as the script
 will check whether the keypair exists before creating it. I don't want to overwrite any existing
 keypairs you have, so just ignore this error and let the script continue:
 

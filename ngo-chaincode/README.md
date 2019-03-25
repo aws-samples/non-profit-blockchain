@@ -91,7 +91,7 @@ Expected response:
 
 ## Step 3 - Instantiate the chaincode on the channel
 
-Instantiation initlizes the chaincode on the channel, i.e. it binds the chaincode to a specific channel.
+Instantiation initializes the chaincode on the channel, i.e. it binds the chaincode to a specific channel.
 Instantiation is treated as a Fabric transaction. In fact, when chaincode is instantiated, the Init function
 on the chaincode is called. Instantiation also sets the endorsement policy for this version of the chaincode
 on this channel. In the example below we are not explictly passing an endorsement policy, so the default

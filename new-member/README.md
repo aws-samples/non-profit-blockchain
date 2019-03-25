@@ -7,7 +7,7 @@ member can take part in endorsing transactions.
 
 The architecture of a multi-member Fabric network on Amazon Managed Blockchain is shown in the figure below.
 
-![Multi-member Fabric network on Amazon Managed Blockchain](images/MultimemberNetwork.png "Multi-member Fabric network on Amazon Managed Blockchain")
+![Multi-member Fabric network on Amazon Managed Blockchain](../images/MultimemberNetwork.png "Multi-member Fabric network on Amazon Managed Blockchain")
 
 Adding a new member to an existing Fabric network involves a number of steps. The new member will be located in a different AWS account, and the steps therefore involve cooperation between Fabric administrators in the existing account (let’s call this Account A, where the Fabric network was originally created), and the new account (let’s call this Account B, where the new member will be created). The steps look as follows:
 
@@ -34,10 +34,10 @@ Adding a new member to an existing Fabric network involves a number of steps. Th
 There are two potential scenarios when adding new members to an existing Fabric network:
 
 ### The new member joins an existing channel
-In this case, the member needs to be added to the channel configuration for an existing channel. To do this, follow all of the steps above.
+In this case, the member needs to be added to the channel configuration for an existing channel. To do this, follow all of the steps in this README.
 
 ### A new channel is created with both new members and existing members
-In this case a new channel configuration can be created which contains both new and existing members. This configuration can be used to create a new channel. To do this, follow these steps from those listed above:
+In this case a new channel configuration can be created which contains both new and existing members. This configuration can be used to create a new channel. To do this, follow these steps in this README:
 
 * Steps 1-9 
 * Step 12b
@@ -46,11 +46,9 @@ In this case a new channel configuration can be created which contains both new 
 This scenario is simpler as it does not involve updating the existing channel configuration.
 
 ## Pre-requisites - Account A, the network creator
-There are multiple parts to the workshop. Before starting on Part 5, a network creator should haved completed [Part 1](../ngo-fabric/README.md). You need an existing Fabric network before starting Part 5. The network creator would have also created a peer node under a member belonging to Account A.
+There are multiple parts to the workshop. Before starting on Part 5, a network creator should have completed [Part 1](../ngo-fabric/README.md). You need an existing Fabric network before starting Part 5. The network creator would have also created a peer node under a member belonging to Account A.
 
-From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
-The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
-created in [Part 1](../ngo-fabric/README.md)
+In the AWS account where you create the [Part 1](../ngo-fabric/README.md) Fabric network, use Cloud9 to SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you created in [Part 1](../ngo-fabric/README.md)
 
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
@@ -157,7 +155,7 @@ echo $VPCENDPOINTSERVICENAME
 ```
 
 If the VPC endpoint is populated with a value, go ahead and run this script. This will create the
-CloudFormation stack. You will see an error saying `Keypair not found`. This is expected as the script
+CloudFormation stack. You will see an error saying `key pair does not exist`. This is expected as the script
 will check whether the keypair exists before creating it. I don't want to overwrite any existing
 keypairs you have, so just ignore this error and let the script continue:
 
@@ -284,7 +282,7 @@ cd ~/non-profit-blockchain
 ## Step 7: Account A creates an MSP folder for the new Account B member 
 On the Fabric client node in Account A.
 
-Account A stores the certificates provided by Account B on its Fabric client node.
+Account A stores the certificates provided by Account B on its Fabric client node. The script below will create a new MSP directory for the Account B member on the Account A Fabric client node.
 
 Update the region and member ID in the following script. The member ID is the ID of the new member in Account B, so this 
 file should look identical to the one created in the previous step:
@@ -296,9 +294,15 @@ vi new-member/s3-handler.sh
 
 Copy the Account B public keys from S3 to the MSP directory on the Fabric client node in Account A:
 
-```bash
+```
 cd ~/non-profit-blockchain
 ./new-member/s3-handler.sh copyCertsFromS3
+```
+
+Check the new MSP directory. The directory name will be the lowercase member ID:
+
+```
+ls -l ~
 ```
 
 ## Step 8: Account A creates a configtx.yaml which includes the new Account B member
@@ -314,7 +318,7 @@ vi ~/configtx.yaml
 
 You will make two changes to the file. A working example of the updated configtx.yaml file can be found below the template example below:
 
-1. Add Org2 (or Org3, Org4, etc. - just copy &Org2 under Organizations from the template below), replacing `Member2ID` with the ID of your member as copied directly from the Amazon Managed Blockchain console. For the MSPDir, `Member2ID` must be replaced by a lowercase member ID. Instead of typing this, you can copy it from your Fabric client node. Enter: `ls ~` and find the directory with your lower case member ID. The end result of the MSPDir in configtx.yaml should look as follows: `MSPDir: /opt/home/m-trd4xpjborem7bdmbv6wlg3nkm-msp`
+1. Add Org2 (or Org3, Org4, etc. - just copy &Org2 under Organizations from the template below), replacing `Member2ID` with the ID of the new member from Account B as copied directly from the Amazon Managed Blockchain console. For the MSPDir, `Member2ID` must be replaced by a lowercase member ID. Instead of typing this, you can copy it from the Fabric client node in Account A, where you created the MSP dir in Step 7. Enter: `ls ~` and find the directory with your lower case member ID. The end result of the MSPDir in configtx.yaml should look as follows: `MSPDir: /opt/home/m-trd4xpjborem7bdmbv6wlg3nkm-msp`
 2. Add the TwoOrgChannel under Organizations, under Profiles, at the end of the file.
 
 Save the file.
@@ -503,10 +507,17 @@ ls -lt ~/$CHANNEL-two-org.pb
 ```
 
 ### Print the new member configuration
-Generate a member definition for the new member. It reads the information for the member from configtx.yaml, created in the previous step:
+Generate a member definition for the new member. It reads the information for the member from configtx.yaml, created in the previous step. Replace the value of NEWMEMBERID below:
+
+First, export the new member id, from Account B:
 
 ```
-export NEWMEMBERID=m-TRD4XPJBOREM7BDMBV6WLG3NKM
+export NEWMEMBERID=<Account B Member ID>
+```
+
+Then generate the new member config:
+
+```
 docker exec cli /bin/bash -c "configtxgen -printOrg $NEWMEMBERID --configPath /opt/home/ > /tmp/$NEWMEMBERID.json"
 ```
 
@@ -526,11 +537,7 @@ $ docker exec cli ls -lt /tmp/$NEWMEMBERID.json
 ```
 
 ### Fetch the latest configuration block from the channel
-The channel creation block for the channel exists in the location below. It was created just prior to the creation of the channel in [Part 1:](../ngo-fabric/README.md). 
-
-```
-ls -lt /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer
-```
+The channel creation block for the channel was created in [Part 1:](../ngo-fabric/README.md), but just in case the configuration was updated at some point, we will pull the latest version of the config block directly from the channel. 
 
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem"  \
@@ -539,7 +546,7 @@ docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt
     -c $CHANNEL -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls   
 ```
 
-Check that the latest config block file now exists:
+Check that the latest config block file exists. The latest config block will be called $CHANNEL.config.block, whereas the original config block (used to create the genesis block) will be called $CHANNEL.block:
 
 ```
 ls -lt /home/ec2-user/fabric-samples/chaincode/hyperledger/fabric/peer
@@ -555,8 +562,10 @@ cp create-config-update.sh ~
 
 A utility program called 'configtxlator' is used to create the new channel config - it translates the JSON channel configurations to/from binary protobuf structures. 'configtxlator' can run as a REST API server, so we start it in this mode since we need to make a few calls to it. 
 
+Replace MEMBERID in the statement below with the member ID of the new member in Account B: 
+
 ```
-docker exec -e "CHANNEL=mychannel" -e "MEMBERID=m-TRD4XPJBOREM7BDMBV6WLG3NKM" -e "BLOCKDIR=/opt/home/fabric-samples/chaincode/hyperledger/fabric/peer" cli /opt/home/create-config-update.sh
+docker exec -e "CHANNEL=mychannel" -e "MEMBERID=<Account B Member ID>" -e "BLOCKDIR=/opt/home/fabric-samples/chaincode/hyperledger/fabric/peer" cli /opt/home/create-config-update.sh
 ```
 
 You should see:
@@ -620,7 +629,6 @@ Since our network currently contains only one member, the network creator, this 
 To allow admins belonging to different members to sign the channel configuration you will need to pass the channel configuration ‘diff’ file to each member in the network, one-by-one, and have them sign the channel configuration. Each member signature must be applied in turn so that we end up with a package that has the signatures of all endorsing members. Alternatively, you could send the channel config to all members simultaneously and wait to receive signed responses, but then you would have to extract the signatures from the individual responses and create a single package which contains the configuration update plus all the required signatures.
 
 ```
-export NEWMEMBERID=m-TRD4XPJBOREM7BDMBV6WLG3NKM
 export BLOCKDIR=/opt/home/fabric-samples/chaincode/hyperledger/fabric/peer
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
     -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
@@ -639,11 +647,9 @@ Once we have a signed channel configuration we can apply it to the channel.
 On the Fabric client node in Account A.
 
 In this step we update the channel with the new channel configuration. Since the new channel configuration now includes details
-of the new organisation, this will allow the new organisation to join the channel.
+of the new member, this will allow the new member to join the channel.
 
 ```
-export NEWMEMBERID=m-TRD4XPJBOREM7BDMBV6WLG3NKM
-export BLOCKDIR=/opt/home/fabric-samples/chaincode/hyperledger/fabric/peer
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
     -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
     cli bash -c "peer channel update -f ${BLOCKDIR}/${NEWMEMBERID}_config_update_as_envelope.pb -c $CHANNEL -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls"

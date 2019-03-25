@@ -72,17 +72,17 @@ export class SignupComponent implements OnInit {
             },
             err => {
               this.loading = false;
-              this.error = 'Username or email already in used!';
+              this.error = 'Username or email already in use!';
             }
           );
         } else {
           this.loading = false;
-          this.error = 'Username or email already in used!';
+          this.error = 'Username or email already in use!';
         }
       },
       err => {
         this.loading = false;
-        this.error = 'Username or email already in used!';
+        this.error = 'Username or email already in use!';
       }
     );
   }

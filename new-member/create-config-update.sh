@@ -25,7 +25,10 @@ function createConfigUpdate {
    sleep 5
 
    pushd /tmp
-
+   # Remove any previously generated config or protobuf files
+   rm /tmp/${MEMBERID}_config*.*
+   rm /tmp/${MEMBERID}_updated*.*
+   
    CTLURL=http://127.0.0.1:7059
    # Convert the config block protobuf to JSON
    curl -X POST --data-binary @$BLOCKDIR/$CHANNEL.config.block $CTLURL/protolator/decode/common.Block > ${MEMBERID}_config_block.json
