@@ -1,17 +1,16 @@
-# Part1: Setup a Fabric network
+# Part1: Build a Hyperledger Fabric blockchain network using Amazon Managed Blockchain
 
-This section will create an Amazon Managed Blockchain Fabric network. A combination of the AWS Console and the AWS CLI 
-will be used. The process to create the network is as follows:
+This section will build a Hyperledger Fabric blockchain network using Amazon Managed Blockchain. A combination of the AWS Console and the AWS CLI will be used. The process to create the network is as follows:
 
-* Provision a Cloud9 instance. We will use the Linux terminal that Cloud9 provides
-* Use the Amazon Managed Blockchain Console to create a Fabric network and provision a peer node
-* From Cloud9, run a CloudFormation template to provision a VPC and a Fabric client node. You 
+* Provision an AWS Cloud9 instance. We will use the Linux terminal that Cloud9 provides
+* Use the Amazon Managed Blockchain console to create a Fabric network and provision a peer node
+* From Cloud9, run an AWS CloudFormation template to provision a VPC and a Fabric client node. You 
 will use the Fabric client node to administer the Fabric network
-* From the Fabric client node, create a Fabric channel, install & instantiate chaincode, and 
+* From the Fabric client node, create a Fabric channel, install and instantiate chaincode, and 
 query and invoke transactions on the Fabric network
 
-## Pre-requisites - Cloud9
-We will use Cloud9 to provide a Linux terminal which has the AWS CLI already installed.
+## Pre-requisites - AWS Cloud9
+We will use AWS Cloud9 to provide a Linux terminal which has the AWS CLI already installed.
 
 1. Spin up a [Cloud9 IDE](https://us-east-1.console.aws.amazon.com/cloud9/home?region=us-east-1) from the AWS console.
 In the Cloud9 console, click 'Create Environment'. Using 'us-east-1' for the region will be easier.
@@ -34,14 +33,14 @@ aws s3 cp s3://managedblockchain-beta/service-2.json .
 aws configure add-model --service-model file://service-2.json --service-name managedblockchain
 ```
 
-## Step 1 - Create the Fabric network
+## Step 1 - Create the Hyperledger Fabric blockchain network
 In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 
 Make sure you are in the correct AWS region (i.e. us-east-1, also known as N. Virginia) and follow the steps below:
 
 1. Click `Create a Network`
 2. Make sure `Hyperleger Fabric 1.2` is selected
-3. Enter a network name and an optional description, and click `Next`
+3. Enter a network name and an optional description, and click `Next`. Do not use special characters in the network name, as this name is used as a prefix when creating resources in step 3.
 4. Enter a member name (e.g. this could be the name of the organisation you belong to) and an optional description
 5. Enter an admin username and password, and note this down. You will need it later. Click `Next`
 6. Check your configuration and click `Create network and member`
@@ -63,11 +62,11 @@ We'll continue with the next steps while we wait for the peer node to become HEA
 In your Cloud9 terminal window.
 
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
-the Fabric network. The Fabric client node will be created in its own VPC, with VPC endpoints 
-pointing to the Fabric network you created in [Part 1](../ngo-fabric/README.md). CloudFormation 
+the Fabric network. The Fabric client node will be created in its own VPC in your AWS account, with VPC endpoints 
+pointing to the Fabric network you created in [Part 1](../ngo-fabric/README.md). AWS CloudFormation 
 will be used to create the Fabric client node, the VPC and the VPC endpoints.
 
-The CloudFormation template requires a number of parameter values. We'll make sure these 
+The AWS CloudFormation template requires a number of parameter values. We'll make sure these 
 are available as export variables before running the script below.
 
 In Cloud9:
@@ -103,7 +102,7 @@ is complete. We will use this information in later steps.
 ## Step 4 - Prepare the Fabric client node and enroll an identity
 On the Fabric client node.
 
-Prior to executing any commands in the Fabric client node, you will need to export ENV variables
+Prior to executing any commands on the Fabric client node, you will need to export ENV variables
 that provide a context to Hyperledger Fabric. These variables will tell the client node which peer
 node to interact with, which TLS certs to use, etc. 
 
@@ -382,20 +381,20 @@ You should see:
 ## Step 12 - Query the chaincode again and check the change in value
 On the Fabric client node.
 
-Query the chaincode on Fabric peer and check the change in value. This proves the success of the invoke
-transaction. You should not execute the invoke and query at the same time. Instead, there should be a
-(roughly) 2 second gap between them. Any idea why?
+Query the chaincode on the Fabric peer and check the change in value. This proves the success of the invoke
+transaction. If you execute the query immediately after the invoke, you may notice that the data hasn't changed.
+Any idea why? There should be a gap of (roughly) 2 seconds between the invoke and query.
 
 Invoking a transaction in Fabric involves a number of steps, including:
 
 * Sending the transaction to the endorsing peers for simulation and endorsement
 * Packaging the endorsements from the peers
-* Sending the packaged endorsements to the orderer for orderer
-* The orderer grouping the transactions into blocks (which are created every 2 seconds, by default)
-* The orderer sending the blocks to all peer nodes for validating and committing to the ledger
+* Sending the packaged endorsements to the ordering service for ordering
+* The ordering service grouping the transactions into blocks (which are created every 2 seconds, by default)
+* The ordering service sending the blocks to all peer nodes for validating and committing to the ledger
 
 Only after the transactions in the block have been committed to the ledger can you read the
-new value from the ledger.
+new value from the ledger (or more specifically, from the world state key-value store).
 
 Execute the following script:
 
@@ -414,8 +413,8 @@ You should see:
 ## Move on to Part 2
 The workshop instructions can be found in the README files in parts 1-4:
 
-* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Amazon Managed Blockchain Hyperledger Fabric network.
-* [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
-* [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
-* [Part 4:](../ngo-ui/README.md) Run the Application. 
+* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
+* [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
+* [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
+* [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network. 

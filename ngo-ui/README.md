@@ -1,6 +1,6 @@
 # Part 4: The User Interface
 
-The UI is a Node.js / AngularJS application and will run on your Cloud9 instance.
+The UI is a Node.js / AngularJS application and will run on your AWS Cloud9 instance.
 The instructions in this README will help you to install the NGO User Interface application,
 and connect it to the REST API you created in [Part 3:](../ngo-rest-api/README.md).
 
@@ -25,8 +25,8 @@ simulating two users sharing the same IDE session.
 On Cloud9.
 
 Your REST API should be exposed via an AWS Elastic Load Balancer (ELB). The ELB was created for you
-by CloudFormation in [Part 1](../ngo-fabric/README.md). You can find the DNS endpoint for the ELB in
-the Outputs of your CloudFormation stack in the CloudFormation console.
+by AWS CloudFormation in [Part 1](../ngo-fabric/README.md). You can find the DNS endpoint for the ELB in
+the Outputs of your CloudFormation stack in the AWS CloudFormation console.
 
 You should have already cloned this repo in [Part 1](../ngo-fabric/README.md)
 
@@ -101,10 +101,29 @@ makes HTTP calls.
 ## Step 5 - Register a user in the application
 Registering a user is necessary before you carry out any tasks in the UI application. User registration
 will call the Fabric CA and enroll a new user. This user will then be used to invoke transactions and
-execute queries against the Fabric network. You can register a new user in the UI application. The link
-is on the login page. You can then login as that user and explore the application.
+execute queries against the Fabric network. You can register a new user in the UI application, using the 
+'Sign up' link on the login page. You can then login as that user and explore the application. Note that
+user names should be 4 characters or more.
 
-All of the information you see in the application is stored in the Amazon Managed Blockchain Fabric network. 
+## Step 6 - Exploring the application
+
+The application allows you to view non-profit organisations and see their details, the causes they support,
+the total donations they have received and how much of those donations they have spent. You can also view
+a gallery of images which elaborate on the projects the non-profit is involved in.
+
+You can donate funds to any non-profit and see all of your donations by clicking the 'My Donations' link
+in the main menu, near your user name. When viewing a non-profit you can select 'Utilized fund' to check
+how they are spending the funds.
+
+Behind the scenes is a function that automatically and randomly spends the donations. As donations are spent,
+new 'spend' transactions are created in Fabric, which result in new blocks added to the Fabric network. You
+will see the blocks appearing in the 'Block-chain Events' on the main NGO list. Hovering your mouse over the
+block will show you the transaction ID's of all transactions appearing in that block. Blocks will also be created
+as you donate funds to a non-profit.
+
+See the function `dummySpend()` in `ngo-rest-api/app.js` for details on how spend records are randomly created.
+
+All of the information you see in the application is stored in the Fabric network Amazon Managed Blockchain . 
 You can check this by querying the REST API directly. You can cURL the REST API from the Fabric client 
 node. Examples of the cURL commands used with the REST API can be found in the files that load test data 
 into the network, such as [this one](../ngo-rest-api/ngo-load-workshop.sh)
@@ -112,6 +131,7 @@ into the network, such as [this one](../ngo-rest-api/ngo-load-workshop.sh)
 You could also query the chaincode directly and see the same information. You query the chaincode from 
 the Fabric client node. An example of how to query the chaincode can be found in [this script](../ngo-chaincode/test-chaincode-aws.sh)
 
+## Long lived RESTful API server and User Interface application using PM2
 If you want to run the RESTful API server and the user interface application in such a way that they continue
 to run after you close your SSH or Cloud9 session, you can use PM2, as follows:
 
@@ -142,14 +162,14 @@ tail -f ~/.pm2/logs/app-out.log
 ```
 
 ## Step 6 - Pat yourself on the back, you've completed the workshop
-You have successfully built a Hyperledger Fabric network using the Amazon Managed Blockchain service, deployed
-chaincode to the service, connected a RESTful API to the service and deployed an Angular application that
+You have successfully built a Hyperledger Fabric network using Amazon Managed Blockchain, deployed
+chaincode, connected a RESTful API to the Fabric network and deployed an Angular application that
 communicates with the RESTful API.
 
 The workshop instructions can be found in the README files in parts 1-4:
 
-* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Amazon Managed Blockchain Hyperledger Fabric network.
-* [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
-* [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
-* [Part 4:](../ngo-ui/README.md) Run the Application. 
+* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
+* [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
+* [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
+* [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network. 

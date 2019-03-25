@@ -1,6 +1,6 @@
-# Part 2: NGO Chaincode
+# Part 2: Non-profit (NGO) Chaincode
 
-The instructions in this README will help you to install the NGO chaincode into the
+The instructions in this README will help you to install the NGO chaincode on the
 Fabric network you created in [Part 1](../ngo-fabric/README.md)
 
 All steps are carried out on the Fabric client node you created in [Part 1](../ngo-fabric/README.md)
@@ -165,8 +165,9 @@ docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt
 ## Move on to Part 3
 The workshop instructions can be found in the README files in parts 1-4:
 
-* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Amazon Managed Blockchain Hyperledger Fabric network.
-* [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
-* [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
-* [Part 4:](../ngo-ui/README.md) Run the Application. 
+* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
+* [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
+* [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
+* [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
+

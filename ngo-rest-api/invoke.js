@@ -52,7 +52,7 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, args
 
 		// the returned object has both the endorsement results
 		// and the actual proposal, the proposal will be needed
-		// later when we send a transaction to the orderer
+		// later when we send a transaction to the ordering service
 		var proposalResponses = results[0];
 		var proposal = results[1];
 
@@ -125,14 +125,14 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, args
 				proposal: proposal
 			};
 			var sendPromise = channel.sendTransaction(orderer_request);
-			// put the send to the orderer last so that the events get registered and
+			// put the send to the ordering service last so that the events get registered and
 			// are ready for the orderering and committing
 			promises.push(sendPromise);
 			let results = await Promise.all(promises);
 			logger.info(util.format('##### invokeChaincode ------->>> R E S P O N S E : %j', results));
-			let response = results.pop(); //  orderer results are last in the results
+			let response = results.pop(); //  ordering service results are last in the results
 			if (response.status === 'SUCCESS') {
-				logger.info('##### invokeChaincode - Successfully sent transaction to the orderer.');
+				logger.info('##### invokeChaincode - Successfully sent transaction to the ordering service.');
 			} else {
 				error_message = util.format('##### invokeChaincode - Failed to order the transaction. Error code: %s',response.status);
 				logger.info(error_message);

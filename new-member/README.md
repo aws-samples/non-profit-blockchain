@@ -891,8 +891,8 @@ Rerunning the query should confirm that the peer node in Account B can now endor
 ## The workshop sections
 The workshop instructions can be found in the README files in parts 1-4:
 
-* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Amazon Managed Blockchain Hyperledger Fabric network.
-* [Part 2:](../ngo-chaincode/README.md) Deploy the NGO chaincode. 
-* [Part 3:](../ngo-rest-api/README.md) Run the REST API. 
-* [Part 4:](../ngo-ui/README.md) Run the Application. 
+* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
+* [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
+* [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
+* [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
