@@ -85,8 +85,8 @@ export VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --region $REGI
 echo $VPCENDPOINTSERVICENAME
 ```
 
-If the VPC endpoint is populated with a value, go ahead and run the script below. This will create the
-CloudFormation stack. You will see an error saying `Keypair not found`. This is expected as the script
+If the VPC endpoint is populated with a value, go ahead and run this script. This will create the
+CloudFormation stack. You will see an error saying `key pair does not exist`. This is expected as the script
 will check whether the keypair exists before creating it. I don't want to overwrite any existing
 keypairs you have, so just ignore this error and let the script continue:
 
@@ -205,7 +205,7 @@ cp ~/non-profit-blockchain/ngo-fabric/configtx.yaml ~
 vi ~/configtx.yaml
 ```
 
-Generate the configtx channel configuration by executing the following script:
+Generate the configtx channel configuration by executing the following script. When the channel is created, this channel configuration will become the genesis block (i.e. block 0) on the channel:
 
 ```
 docker exec cli configtxgen -outputCreateChannelTx /opt/home/$CHANNEL.pb -profile OneOrgChannel -channelID $CHANNEL --configPath /opt/home/
@@ -417,4 +417,4 @@ The workshop instructions can be found in the README files in parts 1-4:
 * [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
 * [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
 * [Part 4:](../ngo-ui/README.md) Run the application. 
-
+* [Part 5:](../new-member/README.md) Add a new member to the network. 

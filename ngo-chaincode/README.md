@@ -91,7 +91,7 @@ Expected response:
 
 ## Step 3 - Instantiate the chaincode on the channel
 
-Instantiation initlizes the chaincode on the channel, i.e. it binds the chaincode to a specific channel.
+Instantiation initializes the chaincode on the channel, i.e. it binds the chaincode to a specific channel.
 Instantiation is treated as a Fabric transaction. In fact, when chaincode is instantiated, the Init function
 on the chaincode is called. Instantiation also sets the endorsement policy for this version of the chaincode
 on this channel. In the example below we are not explictly passing an endorsement policy, so the default
@@ -169,4 +169,5 @@ The workshop instructions can be found in the README files in parts 1-4:
 * [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
 * [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
 * [Part 4:](../ngo-ui/README.md) Run the application. 
+* [Part 5:](../new-member/README.md) Add a new member to the network. 
 
