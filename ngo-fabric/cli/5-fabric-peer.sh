@@ -28,7 +28,7 @@ echo Peer Node ID: $nodeID
 echo Waiting for peer node to become HEALTHY
 while (true); do
     STATUS=$(aws managedblockchain get-node --endpoint-url $ENDPOINT --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID --query 'Node.Status' --output text)
-    if  [[ "$STATUS" == "HEALTHY" ]]; then
+    if  [[ "$STATUS" == "AVAILABLE" ]]; then
         echo Status of Fabric node $nodeID is $STATUS
         break
     else
