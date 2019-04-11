@@ -33,17 +33,16 @@ VpcEndpointServiceName=$(aws managedblockchain get-network --region $REGION --ne
 OrderingServiceEndpoint=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.FrameworkAttributes.Fabric.OrderingServiceEndpoint' --output text)
 CaEndpoint=$(aws managedblockchain get-member --region $REGION --network-id $NETWORKID --member-id $MEMBERID --query 'Member.FrameworkAttributes.Fabric.CaEndpoint' --output text)
 nodeID=$(aws managedblockchain list-nodes --region $REGION --network-id $NETWORKID --member-id $MEMBERID --query 'Nodes[0].Id' --output text)
-endpoint=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID --query 'Node.FrameworkAttributes.Fabric.PeerEndpoint' --output text)
-peerEventPort=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID --query 'Node.FrameworkAttributes.Fabric.PeerEventPort' --output text)
-eventEndPoint="${endpoint::-5}$peerEventPort"
+peerEndpoint=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID --query 'Node.FrameworkAttributes.Fabric.PeerEndpoint' --output text)
+peerEventEndpoint=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID --query 'Node.FrameworkAttributes.Fabric.PeerEventEndpoint' --output text)
 export ORDERINGSERVICEENDPOINT=$OrderingServiceEndpoint
 export ORDERINGSERVICEENDPOINTNOPORT=${ORDERINGSERVICEENDPOINT::-6}
 export VPCENDPOINTSERVICENAME=$VpcEndpointServiceName
 export CASERVICEENDPOINT=$CaEndpoint
 export PEERNODEID=$nodeID
-export PEERSERVICEENDPOINT=$endpoint
+export PEERSERVICEENDPOINT=$peerEndpoint
 export PEERSERVICEENDPOINTNOPORT=${PEERSERVICEENDPOINT::-6}
-export PEEREVENTENDPOINT=$eventEndPoint
+export PEEREVENTENDPOINT=$peerEventEndpoint
 
 echo Useful information used in Cloud9
 echo REGION: $REGION
