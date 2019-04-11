@@ -25,8 +25,8 @@ export MEMBERID=<your member ID, from the AWS Console>
 
 echo Downloading and installing model file for new service
 cd ~
-aws s3 cp s3://managedblockchain-beta/service-2.json  .  
-aws configure add-model --service-model file://service-2.json --service-name managedblockchain
+aws s3 cp s3://us-east-1.managedblockchain-preview/etc/service-2.json .
+aws configure add-model --service-model file://service-2.json
 
 # No need to change anything below here
 VpcEndpointServiceName=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
