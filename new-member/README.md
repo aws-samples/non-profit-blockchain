@@ -105,8 +105,8 @@ and will not be required once the `managedblockchain` service has been included 
 
 ```
 cd ~
-aws s3 cp s3://managedblockchain-beta/service-2.json .  
-aws configure add-model --service-model file://service-2.json --service-name managedblockchain
+aws s3 cp s3://us-east-1.managedblockchain-preview/etc/service-2.json .
+aws configure add-model --service-model file://service-2.json
 ```
 
 ## Step 1: Account A invites Account B to join the Fabric network
