@@ -44,9 +44,9 @@ Make sure you are in the correct AWS region (i.e. us-east-1, also known as N. Vi
 4. Enter a member name (e.g. this could be the name of the organisation you belong to) and an optional description
 5. Enter an admin username and password, and note this down. You will need it later. Click `Next`
 6. Check your configuration and click `Create network and member`
-7. Wait until the status of your network and your network member become ACTIVE.
+7. Wait until the status of your network and your network member become Available.
 
-Before continuing, check to see that your Fabric network has been created and is ACTIVE. If not,
+Before continuing, check to see that your Fabric network has been created and is Available. If not,
 wait for it to complete. Otherwise the steps below may fail.
 
 ## Step 2 - Create the Fabric Peer
@@ -56,7 +56,7 @@ In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managed
 2. Click `Create peer node`
 3. Enter 20 for storage, accept the other defaults, and click `Create peer node`
 
-We'll continue with the next steps while we wait for the peer node to become HEALTHY.
+We'll continue with the next steps while we wait for the peer node to become Available.
 
 ## Step 3 - Create the Fabric client node
 In your Cloud9 terminal window.
