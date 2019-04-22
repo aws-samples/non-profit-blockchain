@@ -106,7 +106,7 @@ config.json should look something like this:
     "admins":[
        {
           "username":"admin",
-          "secret":"adminpwd"
+          "secret":"Adminpwd1!"
        }
     ]
  }
