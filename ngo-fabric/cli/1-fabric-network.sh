@@ -17,10 +17,8 @@ echo Pre-requisities
 echo installing jq
 sudo yum -y install jq
 
-echo Downloading and installing model file for new service
-cd ~
-aws s3 cp s3://us-east-1.managedblockchain-preview/etc/service-2.json .
-aws configure add-model --service-model file://service-2.json
+echo Updating AWS CLI to the latest version
+sudo pip install awscli --upgrade
 
 token=$(uuidgen)
 echo Creating Fabric network $NETWORKNAME

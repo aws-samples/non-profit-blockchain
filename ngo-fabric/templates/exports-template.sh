@@ -23,10 +23,8 @@ export ADMINPWD=<the admin user name you entered when creating your Fabric netwo
 export NETWORKID=<your network ID, from the AWS Console>
 export MEMBERID=<your member ID, from the AWS Console>
 
-echo Downloading and installing model file for new service
-cd ~
-aws s3 cp s3://us-east-1.managedblockchain-preview/etc/service-2.json .
-aws configure add-model --service-model file://service-2.json
+echo Updating AWS CLI to the latest version
+sudo pip install awscli --upgrade
 
 # No need to change anything below here
 VpcEndpointServiceName=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
