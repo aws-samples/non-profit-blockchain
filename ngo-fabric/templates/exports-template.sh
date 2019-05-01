@@ -23,10 +23,11 @@ export ADMINPWD=<the admin user name you entered when creating your Fabric netwo
 export NETWORKID=<your network ID, from the AWS Console>
 export MEMBERID=<your member ID, from the AWS Console>
 
+# No need to change anything below here
 echo Updating AWS CLI to the latest version
 sudo pip install awscli --upgrade
+cd ~
 
-# No need to change anything below here
 VpcEndpointServiceName=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
 OrderingServiceEndpoint=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.FrameworkAttributes.Fabric.OrderingServiceEndpoint' --output text)
 CaEndpoint=$(aws managedblockchain get-member --region $REGION --network-id $NETWORKID --member-id $MEMBERID --query 'Member.FrameworkAttributes.Fabric.CaEndpoint' --output text)
