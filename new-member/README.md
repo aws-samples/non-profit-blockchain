@@ -234,6 +234,12 @@ If the file has values for all keys, source it:
 source ~/peer-exports.sh 
 ```
 
+Get the latest version of the Managed Blockchain PEM file. This will overwrite the existing file in the home directory with the latest version of this file:
+
+```
+aws s3 cp s3://us-east-1.managedblockchain/etc/managedblockchain-tls-chain.pem  /home/ec2-user/managedblockchain-tls-chain.pem
+```
+
 Enroll an admin identity with the Fabric CA (certificate authority). We will use this
 identity to administer the Fabric network and perform tasks such as creating channels
 and instantiating chaincode.
