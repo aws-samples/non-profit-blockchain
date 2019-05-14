@@ -15,7 +15,7 @@ We will use AWS Cloud9 to provide a Linux terminal which has the AWS CLI already
 1. Spin up a [Cloud9 IDE](https://us-east-1.console.aws.amazon.com/cloud9/home?region=us-east-1) from the AWS console.
 In the Cloud9 console, click 'Create Environment'. Using 'us-east-1' for the region will be easier.
 2. Provide a name for your environment, e.g. fabric-c9, and click **Next Step**
-3. Select `Other instance type`, then select `t2-medium` and click **Next Step**
+3. Select `Other instance type`, then select `t2.medium` and click **Next Step**
 4. Click **Create environment**. It would typically take 30-60s to create your Cloud9 IDE
 5. In the Cloud9 terminal, in the home directory, clone this repo:
 
@@ -51,7 +51,7 @@ In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managed
 
 1. In the new network you have created, click on the member in the Members section.
 2. Click `Create peer node`
-3. Enter 20 for storage, accept the other defaults, and click `Create peer node`
+3. Leave the defaults, and click `Create peer node`
 
 We'll continue with the next steps while we wait for the peer node to become Available.
 
