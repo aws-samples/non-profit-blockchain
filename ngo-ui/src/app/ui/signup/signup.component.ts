@@ -72,7 +72,7 @@ export class SignupComponent implements OnInit {
             },
             err => {
               this.loading = false;
-              this.error = 'Username or email already in use!';
+              this.error = err.statusText;
             }
           );
         } else {
@@ -82,7 +82,7 @@ export class SignupComponent implements OnInit {
       },
       err => {
         this.loading = false;
-        this.error = 'Username or email already in use!';
+        this.error = err.statusText + ". Ensure you are using HTTP, not HTTPS, to access the site.";
       }
     );
   }
