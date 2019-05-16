@@ -54,7 +54,7 @@ In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managed
 
 1. In the new network you have created, click on the member in the Members section.
 2. Click `Create peer node`
-3. Enter 20 for storage, accept the other defaults, and click `Create peer node`
+3. Accept the defaults and click `Create peer node`
 
 We'll continue with the next steps while we wait for the peer node to become HEALTHY.
 
