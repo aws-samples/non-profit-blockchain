@@ -311,7 +311,7 @@ ls -l ~
 ## Step 8: Account A creates a configtx.yaml which includes the new Account B member
 On the Fabric client node in Account A.
 
-The configtx.yaml file contains details of the organisations in a Fabric network as well as channel configuration profiles that can be used when creating new channels. The channel creator originally created this file just before creating the channel. The channel creator now needs to add the new member to this file.
+The configtx.yaml file contains details of the organizations in a Fabric network as well as channel configuration profiles that can be used when creating new channels. The channel creator originally created this file just before creating the channel. The channel creator now needs to add the new member to this file.
 
 You will find the file to be edited in the home directory of the Fabric client node:
 
