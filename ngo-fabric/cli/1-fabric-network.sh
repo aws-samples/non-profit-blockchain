@@ -25,22 +25,22 @@ echo Creating Fabric network $NETWORKNAME
 echo Executing command: aws managedblockchain create-network --region $REGION \
     --client-request-token $token \
     --name "${NETWORKNAME}" \
-    --description "NGO Fabric network"
+    --description "Fabric network"
     --framework "HYPERLEDGER_FABRIC"
     --framework-version "${NETWORKVERSION}" \
     --voting-policy "ApprovalThresholdPolicy={ThresholdPercentage=20,ProposalDurationInHours=24,ThresholdComparator=GREATER_THAN}" \
     --framework-configuration 'Fabric={Edition=STARTER}' \
-    --member-configuration "Name=\"${MEMBERNAME}\",Description=\"NGO Fabric member\",FrameworkConfiguration={Fabric={AdminUsername=${ADMINUSER},AdminPassword=${ADMINPWD}}}"
+    --member-configuration "Name=\"${MEMBERNAME}\",Description=\"Fabric member\",FrameworkConfiguration={Fabric={AdminUsername=${ADMINUSER},AdminPassword=${ADMINPWD}}}"
 
 result=$(aws managedblockchain create-network --region $REGION \
     --client-request-token $token \
     --name ${NETWORKNAME} \
-    --description "NGO Fabric network"
+    --description "Fabric network"
     --framework HYPERLEDGER_FABRIC
     --framework-version ${NETWORKVERSION} \
     --voting-policy "ApprovalThresholdPolicy={ThresholdPercentage=20,ProposalDurationInHours=24,ThresholdComparator=GREATER_THAN}" \
     --framework-configuration 'Fabric={Edition=STARTER}' \
-    --member-configuration "Name=\"${MEMBERNAME}\",Description=\"NGO Fabric member\",FrameworkConfiguration={Fabric={AdminUsername=${ADMINUSER},AdminPassword=${ADMINPWD}}}")
+    --member-configuration "Name=\"${MEMBERNAME}\",Description=\"Fabric member\",FrameworkConfiguration={Fabric={AdminUsername=${ADMINUSER},AdminPassword=${ADMINPWD}}}")
 
 echo Result is: $result
 networkID=$(jq -r '.NetworkId' <<< $result)
