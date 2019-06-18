@@ -34,6 +34,67 @@ Organizations:
             # encoded in the genesis block in the Application section context
             - Host: 
               Port: 
+        
+    - &Org2
+        Name: <REPLACE WITH MEMBER_ID> 
+
+        # ID to load the MSP definition as
+        ID: <REPLACE WITH MEMBER_ID>
+
+        MSPDir: /opt/home/admin-msp
+
+        AnchorPeers:
+            # AnchorPeers defines the location of peers which can be used
+            # for cross org gossip communication.  Note, this value is only
+            # encoded in the genesis block in the Application section context
+            - Host: 
+              Port: 
+
+    - &Org3
+        Name: <REPLACE WITH MEMBER_ID> 
+
+        # ID to load the MSP definition as
+        ID: <REPLACE WITH MEMBER_ID>
+
+        MSPDir: /opt/home/admin-msp
+
+        AnchorPeers:
+            # AnchorPeers defines the location of peers which can be used
+            # for cross org gossip communication.  Note, this value is only
+            # encoded in the genesis block in the Application section context
+            - Host: 
+              Port: 
+
+    - &Org4
+        Name: <REPLACE WITH MEMBER_ID> 
+
+        # ID to load the MSP definition as
+        ID: <REPLACE WITH MEMBER_ID>
+
+        MSPDir: /opt/home/admin-msp
+
+        AnchorPeers:
+            # AnchorPeers defines the location of peers which can be used
+            # for cross org gossip communication.  Note, this value is only
+            # encoded in the genesis block in the Application section context
+            - Host: 
+              Port: 
+
+    - &Org5
+        Name: <REPLACE WITH MEMBER_ID> 
+
+        # ID to load the MSP definition as
+        ID: <REPLACE WITH MEMBER_ID>
+
+        MSPDir: /opt/home/admin-msp
+
+        AnchorPeers:
+            # AnchorPeers defines the location of peers which can be used
+            # for cross org gossip communication.  Note, this value is only
+            # encoded in the genesis block in the Application section context
+            - Host: 
+              Port: 
+
 
 ################################################################################
 #
@@ -65,3 +126,8 @@ Profiles:
             <<: *ApplicationDefaults
             Organizations:
                 - *Org1
+                - *Org2
+                - *Org3
+                - *Org4
+                - *Org5
+                
