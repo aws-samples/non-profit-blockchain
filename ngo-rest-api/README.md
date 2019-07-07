@@ -79,9 +79,9 @@ and update them. The connection profile can be found here: `~/non-profit-blockch
 ```
 cd ~/non-profit-blockchain/ngo-rest-api/connection-profile
 ./gen-connection-profile.sh
-more ~/non-profit-blockchain/tmp/connection-profile/ngo-connection-profile.yaml
 cd ~/non-profit-blockchain/tmp/connection-profile/
-ln -s ngo-connection-profile.yaml client-.yaml
+cat ngo-connection-profile.yaml
+ls -lR
 ```
 
 Check the config file used by app.js. Make sure the peer name in config.json (under 'peers:') is 
