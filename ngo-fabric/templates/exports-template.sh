@@ -19,7 +19,7 @@ export NETWORKNAME=<your network name>
 export MEMBERNAME=<the member name you entered when creating your Fabric network>
 export NETWORKVERSION=1.2
 export ADMINUSER=<the admin user name you entered when creating your Fabric network>
-export ADMINPWD=<the admin user name you entered when creating your Fabric network>
+export ADMINPWD=<the admin password you entered when creating your Fabric network>
 export NETWORKID=<your network ID, from the AWS Console>
 export MEMBERID=<your member ID, from the AWS Console>
 
