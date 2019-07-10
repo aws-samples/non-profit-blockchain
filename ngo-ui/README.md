@@ -117,7 +117,7 @@ how they are spending the funds.
 
 Behind the scenes is a function that automatically and randomly spends the donations. As donations are spent,
 new 'spend' transactions are created in Fabric, which result in new blocks added to the Fabric network. You
-will see the blocks appearing in the 'Block-chain Events' on the main NGO list. Hovering your mouse over the
+will see the blocks appearing in the 'Blockchain Events' on the main NGO list. Hovering your mouse over the
 block will show you the transaction ID's of all transactions appearing in that block. Blocks will also be created
 as you donate funds to a non-profit.
 
