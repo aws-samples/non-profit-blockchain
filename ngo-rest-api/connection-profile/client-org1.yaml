@@ -18,6 +18,6 @@ version: "1.0"
 client:
   organization: Org1
   credentialStore:
-    path: "./fabric-client-kv-org1"
+    path: "./fabric-client-kv-org1-cred"
     cryptoStore:
-      path: "/tmp/fabric-client-kv-org1"
+      path: "./fabric-client-kv-org1-keys"
