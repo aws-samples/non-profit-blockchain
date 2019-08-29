@@ -6,8 +6,8 @@
 
 const config = require("./config");
 const query = require("./query");
-const syncCrypto = require("../syncCrypto");
-const logger = require("../logging").getLogger("lambdaFunction");
+const syncCrypto = require("./syncCrypto");
+const logger = require("./logging").getLogger("lambdaFunction");
 
 function buildRequest(donorName) {
     const args = JSON.stringify({donorUserName: donorName});
