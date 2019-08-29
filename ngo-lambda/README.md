@@ -43,9 +43,10 @@ The steps we will execute in this part are:
 4. Put the certificates and credentials on S3
 5. Copy the Fabric client configuration files
 6. Install the npm dependencies
-7. Create the Lambda archive
-8. Create the Lambda function
-9. Test the Lambda function
+7. Create the IAM role and policies
+8. Apply a policy to S3
+9. Create the Lambda function
+10. Test the Lambda function
 
 
 ## Step 1 - Download the Managed Blockchain certificate
@@ -107,24 +108,16 @@ nvm use lts/carbon
 npm install
 ```
 
-## Step 7 - Create the Lambda archive
+## Step 7 - Create the IAM role and policies for Lambda
 
-Archive the Lambda code into a zip file.
-
-```
-cd ~/non-profit-blockchain/ngo-lambda
-zip -r /tmp/ngo-lambda-query.zip  .
-```
-
-## Step 8.12 - Create the IAM role for Lambda
-
+### Step 7a - Create the role
 ```
 aws iam create-role --role-name Lambda-Fabric-Role --assume-role-policy-document file://Lambda-Fabric-Role-Trust-Policy.json
 ```
 
 This will output a JSON representation of the new role.  Copy the output to a local document so you can refer back to it later.
 
-## Step 8.13 - Add policies to the role
+### Step 7b - Add policies to the role
 
 We need to grant an S3 and an execution policy to the role.
 
@@ -133,8 +126,32 @@ aws iam attach-role-policy --role-name Lambda-Fabric-Role --policy-arn arn:aws:i
 aws iam attach-role-policy --role-name Lambda-Fabric-Role --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
 ```
 
-## Step 8.14 - Create the Lambda function
+## Step 8 - Add a policy to S3 bucket
 
+Edit `s3policy.json` and replace:
+* `Statement.Principal.AWS` with the value of the `Role.Arn` attribute from the `create-role` output above.
+* The instances of `mybucket` within `Statement.Resource` with your bucket name.
+
+Save the file and exit the editor.
+
+Replace `mybucket` with your bucket name in the command below, and then execute it.
+
+```
+aws s3api put-bucket-policy --bucket mybucket --policy file://s3policy.json
+```
+
+## Step 9 - Create the Lambda function
+
+### Step 9a - Create the Lambda archive
+
+Archive the Lambda code into a zip file.
+
+```
+cd ~/non-profit-blockchain/ngo-lambda
+zip -r /tmp/ngo-lambda-query.zip  .
+```
+
+### Step 9b - Prepare and create the function
 Before running `create-function` you will need to replace a few parameters with those from your environment.
 
 From the AWS console, view the output of the [AWS Cloudformation](https://console.aws.amazon.com/cloudformation/home?region=us-east-1) stack you created in [Part 1](../ngo-fabric/README.md).  Click the 'Outputs' tab.
@@ -153,21 +170,7 @@ Once you have updated those environment variables, execute the `create-function`
 aws lambda create-function --function-name ngo-lambda-query --runtime nodejs8.10 --handler index.handler --role arn:aws:iam::XXXXXXXXXXXX:role/Lambda-Fabric-Role --vpc-config SubnetIds=string,SecurityGroupIds=string --environment Variables="{CA_ENDPOINT=$CASERVICEENDPOINT,PEER_ENDPOINT=$PEERSERVICEENDPOINT,ORDERER_ENDPOINT=$ORDERINGSERVICEENDPOINT,CHANNEL_NAME=$CHANNEL,CHAIN_CODE_ID=ngo,S3_CRYPTO_BUCKET=mybucket,S3_ACCESS_KEY_ID=string,S3_SECRET_ACCESS_KEY=string,CRYPTO_FOLDER=/tmp,ORG_MSP=Org1MSP,FABRIC_USERNAME=lambdaUser}" --zip-file fileb:///tmp/ngo-lambda-query.zip --region us-east-1
 ```
 
-## Step 8.2 - Add a policy to S3 bucket
-
-Edit `s3policy.json` and replace:
-* `Statement.Principal.AWS` with the value of the `Role.Arn` attribute from the `create-role` output above.
-* The instances of `mybucket` within `Statement.Resource` with your bucket name.
-
-Save the file and exit the editor.
-
-Replace `mybucket` with your bucket name in the command below, and then execute it.
-
-```
-aws s3api put-bucket-policy --bucket mybucket --policy file://s3policy.json
-```
-
-## Step 9 - Test the Lambda function
+## Step 10 - Test the Lambda function
 
 You can test the Lambda function from the [Lambda console](https://console.aws.amazon.com/lambda), or from the cli.
 
