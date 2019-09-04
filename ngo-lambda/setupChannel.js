@@ -16,7 +16,7 @@ function setupChannel(client) {
         channel.addPeer(peer);
     }
 
-	const order = fabric_client.newOrderer(config.ordererEndpoint, {pem:pemfile})
+	const order = client.newOrderer(config.ordererEndpoint, {pem:pemfile})
 	channel.addOrderer(order);
 	return channel;
 }

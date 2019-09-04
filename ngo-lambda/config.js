@@ -8,7 +8,7 @@ let configObject = {
     "s3SecretAccessKey": process.env.S3_SECRET_ACCESS_KEY || "secretaccesskey",
     "s3CryptoBucket": process.env.S3_CRYPTO_BUCKET || "cryptobucketname",
     "cryptoFolder": process.env.CRYPTO_FOLDER || '/tmp',
-    "orgMSP": process.env.ORG_MSP || 'Org1MSP',
+    "mspID": process.env.MSP_ID || 'Org1MSPID',
     'fabricUsername': process.env.FABRIC_USERNAME || 'fabricLambdaUser'
 }
 

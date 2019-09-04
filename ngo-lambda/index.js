@@ -10,11 +10,11 @@ const syncCrypto = require("./syncCrypto");
 const logger = require("./logging").getLogger("lambdaFunction");
 
 function buildRequest(donorName) {
-    const args = JSON.stringify({donorUserName: donorName});
+    const argsString = JSON.stringify({donorUserName: donorName});
 	const request = {
 		chaincodeId: config.chaincodeId,
         fcn: 'queryDonor',
-        args,
+        args: [argsString],
 		chainId: config.channelName,
     };
     

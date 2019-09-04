@@ -1,19 +1,12 @@
 'use strict';
 
-const config = require("./config");
 const setupCrypto = require("./setupCrypto");
 const setupChannel = require("./setupChannel");
 const logger = require("./logging").getLogger("query");
 
 async function query(request) {
+    logger.info("=== Query Function Start ===");
     let { fabric_client } = await setupCrypto();  
-    const username = config.fabricUsername;  
-
-    // first check to see if the user is already enrolled
-    let user = await fabric_client.getUserContext(username, true);
-    if (!user || !user.isEnrolled()) {
-        throw new Error('Failed to get ' + username + '.... run enrollUsers.js');
-	}
 
     // send the query proposal to the peer
     let channel = setupChannel(fabric_client);
@@ -32,6 +25,7 @@ async function query(request) {
         } else {
             logger.info("No payloads were returned from query");
         }
+        logger.info("=== Query Function End ===");
     }).catch((err) => {
 	    logger.error('Failed to query successfully :: ' + err);
     });

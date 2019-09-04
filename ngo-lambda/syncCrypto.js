@@ -13,12 +13,6 @@ const logger = require("./logging").getLogger("syncCrypto");
 const cryptoFolder = config.cryptoFolder;
 const bucketName = config.s3CryptoBucket;
 
-// const s3 = new AWS.S3({
-//   signatureVersion: 'v4',
-//   accessKeyId: config.s3AccessKeyId,
-//   secretAccessKey: config.s3SecretAccessKey
-// });
-
 const s3 = new AWS.S3({
     signatureVersion: 'v4'
 });
@@ -42,7 +36,15 @@ async function downloadFile(s3Object) {
 */
 async function downloadCredentials() {
     logger.info("Start of downloadCredentials");
-    const listParams = {Bucket: bucketName};
+
+    const username = config.fabricUsername;
+    const userCryptoFolder = cryptoFolder + username;
+    fs.mkdirSync(path.join(cryptoFolder, username));
+    fs.mkdirSync(path.join(userCryptoFolder, "cacerts"));
+    fs.mkdirSync(path.join(userCryptoFolder, "keystore"));
+    fs.mkdirSync(path.join(userCryptoFolder, "signcerts"));
+
+    const listParams = {Bucket: bucketName, Prefix: username};
     let listPromise = s3.listObjectsV2(listParams).promise();
 
     return listPromise.then((data) => {

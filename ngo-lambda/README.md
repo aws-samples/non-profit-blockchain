@@ -65,7 +65,7 @@ Register and enroll an identity with the Fabric CA (certificate authority). We w
 export PATH=$PATH:/home/ec2-user/go/src/github.com/hyperledger/fabric-ca/bin
 cd ~
 fabric-ca-client register --id.name lambdaUser --id.affiliation NGOEmile --tls.certfiles ~/managedblockchain-tls-chain.pem --id.type user --id.secret Welcome123
-fabric-ca-client enroll -u https://lambdaUser:Welcome123@$CASERVICEENDPOINT --tls.certfiles /home/ec2-user/managedblockchain-tls-chain.pem -M /tmp/certs
+fabric-ca-client enroll -u https://lambdaUser:Welcome123@$CASERVICEENDPOINT --tls.certfiles /home/ec2-user/managedblockchain-tls-chain.pem -M /tmp/certs/lambdaUser
 ```
 
 ## Step 3 - Create an S3 bucket
@@ -84,7 +84,7 @@ Replace `mybucket` with your bucket name in each of the commands below, and then
 
 ```
 aws s3 cp ~/non-profit-blockchain/ngo-lambda/certs/managedblockchain-tls-chain.pem s3://mybucket  --region us-east-1
-aws s3 cp /tmp/certs s3://mybucket --recursive --region us-east-1
+aws s3 cp /tmp/certs/lambdaUser s3://mybucket/lambdaUser --recursive --region us-east-1
 ```
 
 ## Step 5 - Copy the Fabric client configuration files
@@ -167,7 +167,7 @@ For S3_CRYPTO_BUCKET, replace `mybucket` with the name of the bucket you created
 Once you have updated those environment variables, execute the `create-function` call below.
 
 ```
-aws lambda create-function --function-name ngo-lambda-query --runtime nodejs8.10 --handler index.handler --role arn:aws:iam::XXXXXXXXXXXX:role/Lambda-Fabric-Role --vpc-config SubnetIds=string,SecurityGroupIds=string --environment Variables="{CA_ENDPOINT=$CASERVICEENDPOINT,PEER_ENDPOINT=$PEERSERVICEENDPOINT,ORDERER_ENDPOINT=$ORDERINGSERVICEENDPOINT,CHANNEL_NAME=$CHANNEL,CHAIN_CODE_ID=ngo,S3_CRYPTO_BUCKET=mybucket,S3_ACCESS_KEY_ID=string,S3_SECRET_ACCESS_KEY=string,CRYPTO_FOLDER=/tmp,ORG_MSP=Org1MSP,FABRIC_USERNAME=lambdaUser}" --zip-file fileb:///tmp/ngo-lambda-query.zip --region us-east-1
+aws lambda create-function --function-name ngo-lambda-query --runtime nodejs8.10 --handler index.handler --role arn:aws:iam::XXXXXXXXXXXX:role/Lambda-Fabric-Role --vpc-config SubnetIds=string,SecurityGroupIds=string --environment Variables="{CA_ENDPOINT=$CASERVICEENDPOINT,PEER_ENDPOINT=$PEERSERVICEENDPOINT,ORDERER_ENDPOINT=$ORDERINGSERVICEENDPOINT,CHANNEL_NAME=$CHANNEL,CHAIN_CODE_ID=ngo,S3_CRYPTO_BUCKET=mybucket,S3_ACCESS_KEY_ID=string,S3_SECRET_ACCESS_KEY=string,CRYPTO_FOLDER=/tmp,ORG_MSP=Org1MSP,FABRIC_USERNAME=lambdaUser}" --zip-file fileb:///tmp/ngo-lambda-query.zip --region us-east-1 --timeout 60
 ```
 
 ## Step 10 - Test the Lambda function
