@@ -39,10 +39,12 @@ async function downloadCredentials() {
 
     const username = config.fabricUsername;
     const userCryptoFolder = cryptoFolder + username;
-    fs.mkdirSync(path.join(cryptoFolder, username));
-    fs.mkdirSync(path.join(userCryptoFolder, "cacerts"));
-    fs.mkdirSync(path.join(userCryptoFolder, "keystore"));
-    fs.mkdirSync(path.join(userCryptoFolder, "signcerts"));
+    if (!fs.existsSync(path.join(cryptoFolder, username))){
+        fs.mkdirSync(path.join(cryptoFolder, username));
+        fs.mkdirSync(path.join(userCryptoFolder, "cacerts"));
+        fs.mkdirSync(path.join(userCryptoFolder, "keystore"));
+        fs.mkdirSync(path.join(userCryptoFolder, "signcerts"));
+    }
 
     const listParams = {Bucket: bucketName, Prefix: username};
     let listPromise = s3.listObjectsV2(listParams).promise();

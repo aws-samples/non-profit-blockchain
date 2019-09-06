@@ -1,3 +1,4 @@
+const fs = require("fs");
 const path = require('path');
 const Fabric_Client = require('fabric-client');
 const config = require("./config");
@@ -9,7 +10,7 @@ function getPrivateKeyPEM(username) {
 }
 
 function getCertPEM(username) {
-	return fs.readFileSync(config.cryptoFolder + username + "/signcerts/cert.pem").toString();
+	return fs.readFileSync(config.cryptoFolder + "/" + username + "/signcerts/cert.pem").toString();
 }
 
 async function setupCrypto() {    
