@@ -1,23 +1,3 @@
-To Do and Questions:
-
-Questions:
-    lambda policy - what does it need?
-    s3 permissions - what does it need?
-    s3 vpc endpoint - do we need it?
-    s3 access key and id - how to get it?  maybe we don't need it?
-
-To do:
-    add a diagram showing lambda running in same vpc as ec2 instance / node app
-    test end to end from lambda
-
-Done:
-    create a trust policy file called Lambda-Fabric-Role-Trust-Policy.json
-
-scratchpad on how to create the roles
-
-    AmazonS3FullAccess
-    AWSLambdaVPCAccessExecutionRole
-
 # Part 6: Lambda functions to query and invoke chaincode
 
 In this blog post we will learn how to publish a Lambda function to query a Hyperledger Fabric blockchain running on Amazon Managed Blockchain.  We will use the NodeJS Hyperledger Fabric SDK within the Lambda function to interface with the blockchain.
@@ -188,7 +168,7 @@ For S3_CRYPTO_BUCKET, replace `mybucket` with the name of the bucket you created
 Once you have updated those environment variables, execute the `create-function` call below.
 
 ```
-aws lambda create-function --function-name ngo-lambda-query --runtime nodejs8.10 --handler index.handler --role arn:aws:iam::XXXXXXXXXXXX:role/Lambda-Fabric-Role --vpc-config SubnetIds=string,SecurityGroupIds=string --environment Variables="{CA_ENDPOINT=$CASERVICEENDPOINT,PEER_ENDPOINT=grpcs://$PEERSERVICEENDPOINT,ORDERER_ENDPOINT=grpcs://$ORDERINGSERVICEENDPOINT,CHANNEL_NAME=$CHANNEL,CHAIN_CODE_ID=ngo,S3_CRYPTO_BUCKET=mybucket,S3_ACCESS_KEY_ID=string,S3_SECRET_ACCESS_KEY=string,CRYPTO_FOLDER=/tmp,MSP_ID=$MSP,FABRIC_USERNAME=lambdaUser}" --zip-file fileb:///tmp/ngo-lambda-query.zip --region us-east-1 --timeout 60
+aws lambda create-function --function-name ngo-lambda-query --runtime nodejs8.10 --handler index.handler --role arn:aws:iam::XXXXXXXXXXXX:role/Lambda-Fabric-Role --vpc-config SubnetIds=string,SecurityGroupIds=string --environment Variables="{CA_ENDPOINT=$CASERVICEENDPOINT,PEER_ENDPOINT=grpcs://$PEERSERVICEENDPOINT,ORDERER_ENDPOINT=grpcs://$ORDERINGSERVICEENDPOINT,CHANNEL_NAME=$CHANNEL,CHAIN_CODE_ID=ngo,S3_CRYPTO_BUCKET=mybucket,CRYPTO_FOLDER=/tmp,MSP_ID=$MSP,FABRIC_USERNAME=lambdaUser}" --zip-file fileb:///tmp/ngo-lambda-query.zip --region us-east-1 --timeout 60
 ```
 
 ## Step 10 - Test the Lambda function
