@@ -153,22 +153,38 @@ zip -r /tmp/ngo-lambda-query.zip  .
 ```
 
 ### Step 9b - Prepare and create the function
+
 Before running `create-function` you will need to replace a few parameters with those from your environment.
 
 From the AWS console, view the output of the [AWS Cloudformation](https://console.aws.amazon.com/cloudformation/home?region=us-east-1) stack you created in [Part 1](../ngo-fabric/README.md).  Click the 'Outputs' tab.
 
-For SecurityGroupIds, replace `string` with the Cloudformation value for the key `SecurityGroupID`.
-For SubnetIds, replace `string` with the Cloudformation value for the key `PublicSubnetID`.
-For `role`, replace the arn from the output of step 8.
-
-// Use the S3 information from Step 3 above for the `S3` settings.
-For S3_CRYPTO_BUCKET, replace `mybucket` with the name of the bucket you created.
-!! may not need the access key or secret access key !!
+For `--role`, replace `arn:aws...XXX` from the output of step 8.
+Within `--vpc-config`, for SubnetIds, replace `string` with the Cloudformation value for the key `PublicSubnetID`.
+Within `--vpc-config`, for SecurityGroupIds, replace `string` with the Cloudformation value for the key `SecurityGroupID`.
+Within `Variables`, for S3_CRYPTO_BUCKET, replace `mybucket` with the name of the bucket you created.
 
 Once you have updated those environment variables, execute the `create-function` call below.
 
 ```
 aws lambda create-function --function-name ngo-lambda-query --runtime nodejs8.10 --handler index.handler --role arn:aws:iam::XXXXXXXXXXXX:role/Lambda-Fabric-Role --vpc-config SubnetIds=string,SecurityGroupIds=string --environment Variables="{CA_ENDPOINT=$CASERVICEENDPOINT,PEER_ENDPOINT=grpcs://$PEERSERVICEENDPOINT,ORDERER_ENDPOINT=grpcs://$ORDERINGSERVICEENDPOINT,CHANNEL_NAME=$CHANNEL,CHAIN_CODE_ID=ngo,S3_CRYPTO_BUCKET=mybucket,CRYPTO_FOLDER=/tmp,MSP_ID=$MSP,FABRIC_USERNAME=lambdaUser}" --zip-file fileb:///tmp/ngo-lambda-query.zip --region us-east-1 --timeout 60
+```
+
+## Step 9c - Create the VPC Endpoint to S3
+
+The Lambda function will run within a VPC, and therefore requires a VPC Endpoint to communicate with S3.  We will do this with the `create-vpc-endpoint` command.
+
+Before executing this command, we'll need to set some parameters.
+
+From the AWS console, view the output of the [AWS Cloudformation](https://console.aws.amazon.com/cloudformation/home?region=us-east-1) stack you created in [Part 1](../ngo-fabric/README.md).
+
+Click the 'Outputs' tab.
+For `--vpc-id`, replace `string` with the value of `VPCID`.
+
+Click the 'Resources' tab.
+For `--route-table-ids`, replace `string` with the value of `BlockchainWorkshopRouteTable`.
+
+```
+aws ec2 create-vpc-endpoint --vpc-id string --service-name com.amazonaws.us-east-1.s3 --route-table-ids string --region us-east-1
 ```
 
 ## Step 10 - Test the Lambda function
