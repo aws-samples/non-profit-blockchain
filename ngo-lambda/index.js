@@ -12,10 +12,10 @@ const logger = require("./logging").getLogger("lambdaFunction");
 function buildRequest(donorName) {
     const argsString = JSON.stringify({donorUserName: donorName});
 	const request = {
-		chaincodeId: config.chaincodeId,
+        chaincodeId: config.chaincodeId,
         fcn: 'queryDonor',
         args: [argsString],
-		chainId: config.channelName,
+        chainId: config.channelName,
     };
     
     return request;

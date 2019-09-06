@@ -16,9 +16,9 @@ function setupChannel(client) {
         channel.addPeer(peer);
     }
 
-	const order = client.newOrderer(config.ordererEndpoint, {pem:pemfile})
-	channel.addOrderer(order);
-	return channel;
+    const order = client.newOrderer(config.ordererEndpoint, {pem:pemfile})
+    channel.addOrderer(order);
+    return channel;
 }
 
 module.exports = setupChannel;
