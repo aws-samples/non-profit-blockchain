@@ -414,7 +414,7 @@ You should see:
 ```
 
 ## Move on to Part 2
-The workshop instructions can be found in the README files in parts 1-6:
+The workshop instructions can be found in the README files in parts 1-4:
 
 * [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
 * [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
