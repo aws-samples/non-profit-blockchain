@@ -37,7 +37,7 @@ Make sure you are in the correct AWS region (i.e. us-east-1, also known as N. Vi
 
 1. Click `Create a Network`
 2. Make sure `Hyperleger Fabric 1.2` is selected
-3. Enter a network name and an optional description, and click `Next`. Do not use special characters in the network name, as this name is used as a prefix when creating resources in step 3.
+3. Enter a network name and an optional description, and click `Next`. DO NOT use spaces OR special characters in the network name, as this name is used as a prefix when creating resources in step 3. 
 4. Enter a member name (e.g. this could be the name of the organisation you belong to) and an optional description
 5. Enter an admin username and password, and note this down. You will need it later. Click `Next`
 6. Check your configuration and click `Create network and member`

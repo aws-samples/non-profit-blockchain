@@ -236,29 +236,3 @@ The workshop instructions can be found in the README files in parts 1-4:
 * [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
 * [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network.
-
-## Known Issues
-
-1. API server thows the error with the following message: "TypeError: Cannot read property 'curve' of undefined"
-
-    The most common problem causing this error is that API server can't access the keys and certificates of the user that is used to initilize Hyperledger Fabric client. A quick fix is the following:
-   
-   * In `./connection-profile/client-org1.yaml`: look up the location path of the Key/Value store that keeps the keys and certs of API users. By default it's `./fabric-client-kv-org1-keys` for crypto store (the keys) and `./fabric-client-kv-org1-cred` for credentials store (certificates and other config info). 
-   * Delete both folders and re-start the server.
-   * Trigger a call to the blockchain peer. That will re-enroll the admin user and re-create it's creadentials.
-
-   In case error still persists, you probably configured another user to perform non-admin calls. To check that have a look at `./config.json`. E.g. you may see something like this:
-   ```
-   {
-      [...],
-      "userName":"user1",
-      "orgName":"Org1",
-      [...]
-   }
-   ```
-   In this case re-register that user as well using the following call:
-      ```
-      curl -s -X POST http://localhost:3000/users -H "content-type: application/x-www-form-urlencoded" -d 'username=michael&orgName=Org1'
-      ``` 
-      And then try again.
-

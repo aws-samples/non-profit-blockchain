@@ -88,7 +88,7 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, args
 						let message = 'REQUEST_TIMEOUT:' + eh.getPeerAddr();
 						logger.error(message);
 						eh.disconnect();
-					}, 3000);
+					}, 10000);
 					eh.registerTxEvent(txIdAsString, (tx, code, block_num) => {
 						logger.info('##### invokeChaincode - The invoke chaincode transaction has been committed on peer %s',eh.getPeerAddr());
 						logger.info('##### invokeChaincode - Transaction %s has status of %s in block %s', tx, code, block_num);
