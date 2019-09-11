@@ -71,7 +71,7 @@ Edit the file below and change the location of the REST API that the UI depends 
 vi src/environments/environment.ts 
 ```
 
-The values to be changed are as follows. The trailing backslash is important for the api_url.
+The values to be changed are as follows. The trailing slash is important for the api_url.
 
 ```
   api_url: 'http://tg-fabric-Blockcha-1NVE3TSKYVEQ3-247478291.us-east-1.elb.amazonaws.com/',
