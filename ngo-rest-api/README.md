@@ -85,8 +85,8 @@ ls -lR
 ```
 
 Check the config file used by app.js. Make sure the peer name in config.json (under 'peers:') is 
-the same as the peer name in the connection profile. Also check that the admin username and 
-password are correct and match the values you updated in the connection profile.
+the same as the peer name in the connection profile. **Make sure the admin username and 
+password are correct and match the values you updated in the connection profile.**
 
 ```
 cd ~/non-profit-blockchain/ngo-rest-api
@@ -107,8 +107,8 @@ config.json should look something like this:
     ],
     "admins":[
        {
-          "username":"admin",
-          "secret":"Adminpwd1!"
+          "username":"admin", <-- update for your env
+          "secret":"Adminpwd1!" <-- update for your env
        }
     ]
  }
@@ -117,15 +117,19 @@ config.json should look something like this:
 ## Step 4 - Run the REST API Node.js application
 On the Fabric client node.
 
-Run the app (in the background if you prefer):
+Run the app:
 
 ```
 cd ~/non-profit-blockchain/ngo-rest-api
 nvm use lts/carbon
-node app.js &
+node app.js 
 ```
 
 ## Step 5 - Test the REST API
+Open a new terminal pane within Cloud 9.  Click on Window -> New Terminal.
+
+From the new terminal, SSH into the Fabric cilent node.  Run the same SSH command you used earlier.
+
 On the Fabric client node.
 
 Once the app is running you can register an identity, and then start to execute chaincode. The command
@@ -143,6 +147,8 @@ response:
 ```
 {"success":true,"secret":"","message":"michael enrolled Successfully"}
 ```
+
+**If you encounter an error such as `{"code":20,"message":"Authorization failure"}`, it is likely because the admin credentials in `config.json` above are incorrect.  Update those and restart the REST API server that is running in the other terminal.**
 
 ### POST a Donor
 
