@@ -24,6 +24,8 @@ simulating two users sharing the same IDE session.
 ## Pre-requisites
 On Cloud9.
 
+Open a new terminal pane.  Click on Window -> New Terminal.  **You should not be SSH'ed into the Fabric Client for this.**
+
 Your REST API should be exposed via an AWS Elastic Load Balancer (ELB). The ELB was created for you
 by AWS CloudFormation in [Part 1](../ngo-fabric/README.md). You can find the DNS endpoint for the ELB in
 the Outputs of your CloudFormation stack in the AWS CloudFormation console.
@@ -69,7 +71,7 @@ Edit the file below and change the location of the REST API that the UI depends 
 vi src/environments/environment.ts 
 ```
 
-The values to be changed are as follows. The trailing backslash is important for the api_url.
+The values to be changed are as follows. The trailing slash is important for the api_url.
 
 ```
   api_url: 'http://tg-fabric-Blockcha-1NVE3TSKYVEQ3-247478291.us-east-1.elb.amazonaws.com/',
@@ -96,7 +98,9 @@ icon next to the URL in the preview pane.
 
 NOTE: You must remove the `https://` protocol from the Cloud9 URL. The application does not use TLS/SSL,
 and most modern browsers will not allow you to call an HTTPS endpoint when the underlying application
-makes HTTP calls. 
+makes HTTP calls.
+
+**If the application is not loading, check that you started the Angular app in a Cloud 9 terminal, and not on the Fabric Client Node.**
 
 ## Step 5 - Register a user in the application
 Registering a user is necessary before you carry out any tasks in the UI application. User registration

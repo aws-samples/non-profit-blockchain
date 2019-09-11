@@ -20,4 +20,5 @@ client:
   credentialStore:
     path: "./fabric-client-kv-org1-cred"
     cryptoStore:
-      path: "./fabric-client-kv-org1-keys"
+      path: "./fabric-client-certs-org1"
+
