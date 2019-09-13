@@ -63,20 +63,10 @@ npm i
 
 Your REST API is exposed via an AWS Elastic Load Balancer (ELB). The ELB was created for you
 by CloudFormation in [Part 1](../ngo-fabric/README.md). You can find the DNS endpoint for the ELB in
-the Outputs of your CloudFormation stack in the CloudFormation console.
+the Outputs of your CloudFormation stack in the CloudFormation console.  Replace in the commands below and then execute them.
 
-Edit the file below and change the location of the REST API that the UI depends on:
-
-```
-vi src/environments/environment.ts 
-```
-
-The values to be changed are as follows. The trailing slash is important for the api_url.
-
-```
-  api_url: 'http://tg-fabric-Blockcha-1NVE3TSKYVEQ3-247478291.us-east-1.elb.amazonaws.com/',
-  socket_url: 'ws://tg-fabric-Blockcha-1NVE3TSKYVEQ3-247478291.us-east-1.elb.amazonaws.com'
-```
+sed -i "s|__ELBURL__|<the DNS endpoint for the ELB>|g" src/environments/environment.ts 
+sed -i "s|__ELBURL__|<the DNS endpoint for the ELB>|g" config.json
 
 ## Step 4 - Start the application
 

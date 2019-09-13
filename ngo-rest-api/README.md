@@ -90,7 +90,8 @@ password are correct and match the values you updated in the connection profile.
 
 ```
 cd ~/non-profit-blockchain/ngo-rest-api
-vi config.json
+sed -i "s|__ADMINUSER__|<the admin user name you entered when creating your Fabric network>|g" config.json
+sed -i "s|__ADMINPWD__|<the admin password you entered when creating your Fabric network>|g" config.json
 ```
 
 config.json should look something like this:
@@ -182,37 +183,11 @@ response:
 ]
 ```
 ## Step 6 - Load the workshop test data
-In your Cloud9 terminal.
+On the Fabric client node.
 
-You can do this step from anywhere as it accesses the ELB DNS endpoint. Executing this from the SSH
-session is challenging as the SSH session will be outputting a range of INFO logs, which makes it
-challenging to edit files. So you can open another terminal window in Cloud9 and load the test data
-from Cloud9.
+Load the test data using cURL commands similar to those you used above to test the API.  This step outputs a lot of text as it is creating the test data, so if you prefer to run this from a new terminal, you can open a Cloud 9 terminal and SSH into the Fabric client EC2 and create a new session.
 
-Loading the test data uses cURL commands similar to those you used above to test the API. If you load
-the test data from Cloud9 you'll need to point to the AWS Elastic Load Balancer (ELB) that is used to 
-expose your REST API (if you load the test data from your Fabric client node you could use 'localhost'
-as the endpoint since the REST API server is running on the Fabric client node). To find the 
-DNS endpoint for the ELB, go to the CloudFormation stack created in [Part 1](../ngo-fabric/README.md)
-and look for ELBDNS in the Outputs. If you receive an error using the ELB it might be because the underlying EC2 
-instance has not moved to an 'InService' state. This will happen once the REST API server is running
-and the ELB is able to execute the desired number of health checks against it. You can check the 
-status in the EC2 console, under Load Balancers.
-
-```
-cd ~/non-profit-blockchain/ngo-rest-api
-vi ngo-load-workshop.sh
-```
-
-The line to be changed is this one. It should point to your ELB DNS. (it could point to `localhost` 
-if you run this on the Fabric client node. If you use `localhost` you also need to change the port to `3000`):
-
-```
-export ENDPOINT=ngo10-elb-2090058053.us-east-1.elb.amazonaws.com
-export PORT=80
-```
-
-After saving the changes, run the script:
+To run the script:
 
 ```
 cd ~/non-profit-blockchain/ngo-rest-api

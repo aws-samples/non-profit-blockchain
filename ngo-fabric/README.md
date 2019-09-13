@@ -97,7 +97,7 @@ You will find some useful information in the Outputs tab of the CloudFormation s
 is complete. We will use this information in later steps.
 
 ## Step 4 - Prepare the Fabric client node and enroll an identity
-On the Fabric client node.
+In your Cloud9 terminal window.
 
 Prior to executing any commands on the Fabric client node, you will need to export ENV variables
 that provide a context to Hyperledger Fabric. These variables will tell the client node which peer
@@ -126,7 +126,12 @@ Create the file that includes the ENV export values that define your Fabric netw
 ```
 cd ~/non-profit-blockchain/ngo-fabric
 cp templates/exports-template.sh fabric-exports.sh
-vi fabric-exports.sh
+sed -i "s|__NETWORKNAME__|<your network name>|g" fabric-exports.sh 
+sed -i "s|__MEMBERNAME__|<the member name you entered when creating your Fabric network>|g" fabric-exports.sh 
+sed -i "s|__ADMINUSER__|<the admin user name you entered when creating your Fabric network>|g" fabric-exports.sh 
+sed -i "s|__ADMINPWD__|<the admin password you entered when creating your Fabric network>|g" fabric-exports.sh 
+sed -i "s|__NETWORKID__|<your network ID, from the AWS Console>|g" fabric-exports.sh 
+sed -i "s|__MEMBERID__|<your member ID, from the AWS Console>|g" fabric-exports.sh 
 ```
 
 Update the export statements at the top of the file. The info you need either matches what you 
@@ -205,7 +210,7 @@ directory below, NOT the one in the repo:
 
 ```
 cp ~/non-profit-blockchain/ngo-fabric/configtx.yaml ~
-vi ~/configtx.yaml
+sed -i "s|__MEMBERID__|<your member ID, from the AWS Console>|g" ~/configtx.yaml
 ```
 
 Generate the configtx channel configuration by executing the following script. When the channel is created, this channel configuration will become the genesis block (i.e. block 0) on the channel:
