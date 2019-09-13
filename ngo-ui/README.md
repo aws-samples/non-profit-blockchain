@@ -66,7 +66,6 @@ by CloudFormation in [Part 1](../ngo-fabric/README.md). You can find the DNS end
 the Outputs of your CloudFormation stack in the CloudFormation console.  Replace in the commands below and then execute them.
 
 sed -i "s|__ELBURL__|<the DNS endpoint for the ELB>|g" src/environments/environment.ts 
-sed -i "s|__ELBURL__|<the DNS endpoint for the ELB>|g" config.json
 
 ## Step 4 - Start the application
 
