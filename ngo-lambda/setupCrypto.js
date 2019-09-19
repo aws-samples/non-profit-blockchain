@@ -26,7 +26,7 @@ async function setupCrypto() {
 	crypto_suite.setCryptoKeyStore(crypto_store);
 	fabric_client.setCryptoSuite(crypto_suite);
 
-	const fabricUser = await fabric_client.createUser({username, mspid: config.MSP_ID, cryptoContent: {privateKeyPEM: getPrivateKeyPEM(username), signedCertPEM: getCertPEM(username)}, skipPersistence: true});
+	const fabricUser = await fabric_client.createUser({username, mspid: config.mspID, cryptoContent: {privateKeyPEM: getPrivateKeyPEM(username), signedCertPEM: getCertPEM(username)}, skipPersistence: true});
 	fabric_client.setUserContext(fabricUser, true);
 
 	return { fabric_client };

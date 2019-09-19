@@ -38,9 +38,9 @@ async function downloadCredentials() {
     logger.info("Start of downloadCredentials");
 
     const username = config.fabricUsername;
-    const userCryptoFolder = cryptoFolder + username;
-    if (!fs.existsSync(path.join(cryptoFolder, username))){
-        fs.mkdirSync(path.join(cryptoFolder, username));
+    const userCryptoFolder = path.join(cryptoFolder, username);
+    if (!fs.existsSync(userCryptoFolder)) {
+        fs.mkdirSync(userCryptoFolder);
         fs.mkdirSync(path.join(userCryptoFolder, "cacerts"));
         fs.mkdirSync(path.join(userCryptoFolder, "keystore"));
         fs.mkdirSync(path.join(userCryptoFolder, "signcerts"));
