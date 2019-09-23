@@ -1,19 +1,20 @@
 /*
-    Query Fabric via a lambda function
+    A generic handler for executing Fabric chaincode functions
 */
 
 'use strict';
 
 const config = require("./config");
-const query = require("./query");
+const queryHandler = require("./query");
+const invokeHandler = require("./invoke");
 const syncCrypto = require("./syncCrypto");
 const logger = require("./logging").getLogger("lambdaFunction");
 
-function buildRequest(donorName) {
-    const argsString = JSON.stringify({donorUserName: donorName});
+function buildCommonRequestObject(chaincodeFunction, chaincodeFunctionArgs) {
+    const argsString = JSON.stringify(chaincodeFunctionArgs);
 	const request = {
         chaincodeId: config.chaincodeId,
-        fcn: 'queryDonor',
+        fcn: chaincodeFunction,
         args: [argsString],
         chainId: config.channelName,
     };
@@ -23,22 +24,37 @@ function buildRequest(donorName) {
 
 async function handler(event) {
     const promise = new Promise(async (resolve, reject) => {
-        let donorName = event.donorName;
-        if (!donorName) {
-            return resolve("Please provide a donor name")
+
+        let functionType = event.functionType;
+        let handlerFunction;
+
+        if (functionType == "query") {
+            handlerFunction = queryHandler;
+        } else if (functionType == "invoke") {
+            handlerFunction = invokeHandler;
+        } else {
+            return reject("functionType must be of type 'query' or 'invoke'");
         }
+
+        let chaincodeFunction = event.chaincodeFunction;
+        if (!chaincodeFunction) {
+            return reject("'chaincodeFunction' must be specified");
+        }
+
+        let chaincodeFunctionArgs = event.chaincodeFunctionArgs || {};
+
         try {
             logger.info("=== Handler Function Start ===");
         
             logger.info("Downloading credentials from S3...");
             await syncCrypto.downloadCredentials();
                 
-            logger.info("Querying donor");
-            const request = buildRequest(donorName);
-            let result = await query(request);
+            logger.info("Building request");
+            const request = buildCommonRequestObject(chaincodeFunction, chaincodeFunctionArgs);
+            let result = await handlerFunction(request);
         
             logger.info("=== Handler Function End ===");  
-            resolve("Donor is " + result);
+            return resolve(result);
         } catch (err) {
             logger.error("Error: " + err);
             reject(Error(err));

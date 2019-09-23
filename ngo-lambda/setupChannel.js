@@ -12,8 +12,11 @@ function setupChannel(client) {
     const pemfile = fs.readFileSync(path.resolve(__dirname, "./certs/managedblockchain-tls-chain.pem"), "utf8");
 
     if (!peer) {
-        peer = client.newPeer(config.peerEndpoint, {pem:pemfile});
-        channel.addPeer(peer);
+        let peerEndpoints = config.peerEndpoint.split(",");
+        for (let i in peerEndpoints) {
+            channel.addPeer(client.newPeer(peerEndpoint[i], {pem:pemfile}));
+            // Additional peer settings: https://fabric-sdk-node.github.io/Channel.html#addPeer__anchor
+        }
     }
 
     const order = client.newOrderer(config.ordererEndpoint, {pem:pemfile})

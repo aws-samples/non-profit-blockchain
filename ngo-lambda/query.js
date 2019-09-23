@@ -4,7 +4,7 @@ const setupCrypto = require("./setupCrypto");
 const setupChannel = require("./setupChannel");
 const logger = require("./logging").getLogger("query");
 
-async function query(request) {
+async function queryChaincode(request) {
     logger.info("=== Query Function Start ===");
     let { fabric_client } = await setupCrypto();  
 
@@ -31,4 +31,4 @@ async function query(request) {
     });
 }
 
-module.exports = query;
+module.exports = queryChaincode;
