@@ -32,7 +32,7 @@ async function invokeChaincode(request) {
         let channel = await setupChannel();
         let fabricClient = await setupFabricClient();
         
-        const transactionId = fabricClient.newTransactionID();
+        transactionId = fabricClient.newTransactionID();
         request['txId'] = transactionId;
         request['targets'] = channel.getPeers();
 
@@ -110,7 +110,7 @@ async function invokeChaincode(request) {
             });
 
             let orderer_request = {
-                txId: txId,
+                txId: transactionId,
                 proposalResponses: proposalResponses,
                 proposal: proposal
             };

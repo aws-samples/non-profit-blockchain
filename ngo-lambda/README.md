@@ -146,9 +146,10 @@ aws lambda create-function --function-name ngo-lambda-function --runtime nodejs8
 
 You can test the Lambda function from the [Lambda console](https://console.aws.amazon.com/lambda), or from the cli.
 
-To test from the cli:
+To test from the cli, we will first create a donor, and then query them:
 ```
-aws lambda invoke --function-name ngo-lambda-function --payload '{"functionType":"query","chaincodeFunction":"queryDonor","chaincodeFunctionArgs":{"donorUserName":"edge"}}' /tmp/lambda-output.txt --region us-east-1
+aws lambda invoke --function-name ngo-lambda-function --payload '{"functionType": "invoke","chaincodeFunction": "createDonor","chaincodeFunctionArgs": {"donorUserName":"melissa","email":"melissa@melissasngo.org"}}' /tmp/lambda-output-invoke.txt --region us-east-1
+aws lambda invoke --function-name ngo-lambda-function --payload '{"functionType":"query","chaincodeFunction":"queryDonor","chaincodeFunctionArgs":{"donorUserName":"melissa"}}' /tmp/lambda-output-query.txt --region us-east-1
 ```
 
 ## The workshop sections
