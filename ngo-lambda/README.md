@@ -1,6 +1,6 @@
-# Part 6: Lambda functions to query and invoke chaincode
+# Part 6: Read and write to the blockchain with AWS Lambda
 
-In this blog post we will learn how to publish a Lambda function to query a Hyperledger Fabric blockchain running on Amazon Managed Blockchain.  We will use the NodeJS Hyperledger Fabric SDK within the Lambda function to interface with the blockchain.
+In this blog post we will learn how to publish a Lambda function to invoke chaincode functions on a Hyperledger Fabric blockchain running on Amazon Managed Blockchain.  We will use the NodeJS Hyperledger Fabric SDK within the Lambda function to interface with the blockchain.
 
 ## Pre-requisites
 
@@ -38,7 +38,7 @@ source ~/peer-exports.sh
 The steps we will execute in this part are:
 
 1. Copy the Managed Blockchain certificate
-2. Create Fabric user credentials
+2. Create the Fabric user credentials
 3. Put user credentials on Secrets Manager
 4. Copy the Fabric client configuration files
 5. Install the npm dependencies
@@ -56,7 +56,7 @@ Copy the latest version of the Managed Blockchain PEM file into the working fold
 cp ~/managedblockchain-tls-chain.pem ~/non-profit-blockchain/ngo-lambda/certs/managedblockchain-tls-chain.pem
 ```
 
-## Step 2 - Create Fabric user credentials
+## Step 2 - Create the Fabric user credentials
 
 Register and enroll an identity with the Fabric CA (certificate authority). We will use this identity within the Lambda function.  In the example below we are creating a user named `lambdaUser` with a password of `Welcome123`.  The password is optional and one will be generated if not provided. 
 
@@ -178,4 +178,4 @@ The workshop instructions can be found in the README files in parts 1-4:
 * [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
 * [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
-* [Part 6:](../ngo-lambda/README.md) Query the blockchain with a Lambda function. 
+* [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with AWS Lambda. 
