@@ -148,7 +148,7 @@ You can test the Lambda function from the [Lambda console](https://console.aws.a
 
 To test from the cli:
 ```
-aws lambda invoke --function-name ngo-lambda-function --payload '{"functionType":"query","chaincodeFunction":"queryDonor","args":{"donorUserName":"michael"}}' /tmp/lambda-output.txt --region us-east-1
+aws lambda invoke --function-name ngo-lambda-function --payload '{"functionType":"query","chaincodeFunction":"queryDonor","chaincodeFunctionArgs":{"donorUserName":"edge"}}' /tmp/lambda-output.txt --region us-east-1
 ```
 
 ## The workshop sections

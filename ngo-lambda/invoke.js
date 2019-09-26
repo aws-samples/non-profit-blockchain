@@ -18,7 +18,8 @@
 
 const util = require('util');
 const setupChannel = require("./setupChannel");
-const logger = require("./logging").getLogger("query");
+const setupFabricClient = require("./setupFabricClient");
+const logger = require("./logging").getLogger("invoke");
 
 async function invokeChaincode(request) {
     logger.info("=== Invoke Function Start ===");
@@ -29,8 +30,9 @@ async function invokeChaincode(request) {
 	try {
 		// first setup the client for this org
         let channel = await setupChannel();
+        let fabricClient = await setupFabricClient();
         
-        const txId = client.newTransactionID();
+        const txId = fabricClient.newTransactionID();
 		txIdAsString = txId.getTransactionID();
         request['txId'] = txIdAsString;
         request['targets'] = peerNames;
