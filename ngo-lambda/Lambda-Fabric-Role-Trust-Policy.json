@@ -5,16 +5,6 @@
         "Effect": "Allow",
         "Principal": {"Service": "lambda.amazonaws.com"},
         "Action": "sts:AssumeRole"
-      },
-      {
-        "Effect": "Allow",
-        "Action": [
-          "secretsmanager:GetResourcePolicy",
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret",
-          "secretsmanager:ListSecretVersionIds"
-        ],
-        "Resource": [ "*" ]
       }
     ]
   }

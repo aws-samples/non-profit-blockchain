@@ -112,7 +112,7 @@ We need to grant Lambda execution and Secrets Manager policies to the role.
 
 ```
 aws iam attach-role-policy --role-name Lambda-Fabric-Role --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
-aws iam put-role-policy --role-name Lambda-Fabric-Role --policy-arn arn:aws:iam::aws:policy/secretsmanager:GetSecretValue
+aws iam put-role-policy --role-name Lambda-Fabric-Role --policy-name SecretsManagerPolicy --policy-document file://Secrets-Manager-Policy.json
 ```
 
 ## Step 7 - Create the Lambda function
@@ -139,7 +139,7 @@ Within `--vpc-config`, for SecurityGroupIds, replace `string` with the Cloudform
 Once you have updated those environment variables, execute the `create-function` call below.
 
 ```
-aws lambda create-function --function-name ngo-lambda-query --runtime nodejs8.10 --handler index.handler --role arn:aws:iam::XXXXXXXXXXXX:role/Lambda-Fabric-Role --vpc-config SubnetIds=string,SecurityGroupIds=string --environment Variables="{CA_ENDPOINT=$CASERVICEENDPOINT,PEER_ENDPOINT=grpcs://$PEERSERVICEENDPOINT,ORDERER_ENDPOINT=grpcs://$ORDERINGSERVICEENDPOINT,CHANNEL_NAME=$CHANNEL,CHAIN_CODE_ID=ngo,CRYPTO_FOLDER=/tmp,MSP=$MSP,FABRICUSER=$FABRICUSER},MEMBERNAME=$MEMBERNAME" --zip-file fileb:///tmp/ngo-lambda-query.zip --region us-east-1 --timeout 60
+aws lambda create-function --function-name ngo-lambda-query --runtime nodejs8.10 --handler index.handler --role arn:aws:iam::XXXXXXXXXXXX:role/Lambda-Fabric-Role --vpc-config SubnetIds=string,SecurityGroupIds=string --environment Variables="{CA_ENDPOINT=$CASERVICEENDPOINT,PEER_ENDPOINT=grpcs://$PEERSERVICEENDPOINT,ORDERER_ENDPOINT=grpcs://$ORDERINGSERVICEENDPOINT,CHANNEL_NAME=$CHANNEL,CHAIN_CODE_ID=ngo,CRYPTO_FOLDER=/tmp,MSP=$MSP,FABRICUSER=$FABRICUSER,MEMBERNAME=$MEMBERNAME"}" --zip-file fileb:///tmp/ngo-lambda-query.zip --region us-east-1 --timeout 60
 ```
 
 ## Step 8 - Test the Lambda function
@@ -148,7 +148,10 @@ You can test the Lambda function from the [Lambda console](https://console.aws.a
 
 To test from the cli:
 ```
-aws lambda invoke --function-name ngo-lambda-query --payload "{\"donorName\":\"michael\"}" /tmp/lambda-output.txt --region us-east-1
+aws lambda invoke --function-name ngo-lambda-query --payload "{\"functionType\":\"query\",\"chaincodeFunction\":\"queryDonor\",\"args\":\"queryDonor\"}" /tmp/lambda-output.txt --region us-east-1
+
+
+aws lambda invoke --function-name ngo-lambda-query --payload '{"functionType":"query","chaincodeFunction":"queryDonor","args":{"donorUserName":"michael"}}"' /tmp/lambda-output.txt --region us-east-1
 ```
 
 ## The workshop sections
