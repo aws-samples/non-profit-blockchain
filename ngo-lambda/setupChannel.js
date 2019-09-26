@@ -16,6 +16,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const AWS = require('aws-sdk');
 const Fabric_Client = require('fabric-client');
 const config = require("./config");
 
