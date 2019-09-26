@@ -29,10 +29,13 @@ async function invokeChaincode(request) {
 
     try {
         // first setup the client for this org
+        logger.info("=== Setting up channel ===");
         let channel = await setupChannel();
+        logger.info("=== Setting up client ===");
         let fabricClient = await setupFabricClient();
-        
+        logger.info("=== Creating transactionId ===");
         transactionId = fabricClient.newTransactionID();
+        logger.info("=== Created transactionId ===");
         request['txId'] = transactionId;
         request['targets'] = channel.getPeers();
 
