@@ -44,7 +44,8 @@ The steps we will execute in this part are:
 5. Install the npm dependencies
 6. Create the IAM role and policies
 7. Create the Lambda function
-8. Test the Lambda function
+8. Create a VPC Endpoint to Secrets Manager
+9. Test the Lambda function
 
 
 ## Step 1 - Copy the Managed Blockchain certificate
@@ -139,14 +140,31 @@ Within `--vpc-config`, for SecurityGroupIds, replace `string` with the Cloudform
 Once you have updated those environment variables, execute the `create-function` call below.
 
 ```
-aws lambda create-function --function-name ngo-lambda-function --runtime nodejs8.10 --handler index.handler --role arn:aws:iam::XXXXXXXXXXXX:role/Lambda-Fabric-Role --vpc-config SubnetIds=string,SecurityGroupIds=string --environment Variables="{CA_ENDPOINT=$CASERVICEENDPOINT,PEER_ENDPOINT=grpcs://$PEERSERVICEENDPOINT,ORDERER_ENDPOINT=grpcs://$ORDERINGSERVICEENDPOINT,CHANNEL_NAME=$CHANNEL,CHAIN_CODE_ID=ngo,CRYPTO_FOLDER=/tmp,MSP=$MSP,FABRICUSER=$FABRICUSER,MEMBERNAME=$MEMBERNAME"}" --zip-file fileb:///tmp/ngo-lambda-function.zip --region us-east-1 --timeout 30
+aws lambda create-function --function-name ngo-lambda-function --runtime nodejs8.10 --handler index.handler --memory-size 512 --role arn:aws:iam::XXXXXXXXXXXX:role/Lambda-Fabric-Role --vpc-config SubnetIds=string,SecurityGroupIds=string --environment Variables="{CA_ENDPOINT=$CASERVICEENDPOINT,PEER_ENDPOINT=grpcs://$PEERSERVICEENDPOINT,ORDERER_ENDPOINT=grpcs://$ORDERINGSERVICEENDPOINT,CHANNEL_NAME=$CHANNEL,CHAIN_CODE_ID=ngo,CRYPTO_FOLDER=/tmp,MSP=$MSP,FABRICUSER=$FABRICUSER,MEMBERNAME=$MEMBERNAME"}" --zip-file fileb:///tmp/ngo-lambda-function.zip --region us-east-1 --timeout 30
 ```
 
-## Step 8 - Test the Lambda function
+## Step 8 - Create a VPC Endpoint to Secrets Manager
+
+The Lambda function will run within a VPC, and therefore requires a VPC Endpoint to communicate with Secrets Manager.  We will do this with the `create-vpc-endpoint` command.
+
+Before executing this command, we'll need to configure a few parameters.
+
+From the AWS console, view the output of the [AWS Cloudformation](https://console.aws.amazon.com/cloudformation/home?region=us-east-1) stack you created in [Part 1](../ngo-fabric/README.md).
+
+Click the 'Outputs' tab.
+For `--vpc-id`, replace `string` with the value of `VPCID`.
+For `--subnet-ids`, replace `string` with the value of `PublicSubnetID`.
+For `--security-group-id`, replace `string` with the value of `sg-02c0f18a67125ca51`.
+
+```
+aws ec2 create-vpc-endpoint --vpc-id string --vpc-endpoint-type Interface --subnet-ids subnet-056aec874c560ff59 --service-name com.amazonaws.us-east-1.secretsmanager --security-group-id string --region us-east-1
+```
+
+## Step 9 - Test the Lambda function
 
 You can test the Lambda function from the [Lambda console](https://console.aws.amazon.com/lambda), or from the cli.
 
-To test from the cli, we will first create a donor, and then query them:
+To test from the cli, we will first create a donor, and then query the donor:
 ```
 aws lambda invoke --function-name ngo-lambda-function --payload '{"functionType": "invoke","chaincodeFunction": "createDonor","chaincodeFunctionArgs": {"donorUserName":"melissa","email":"melissa@melissasngo.org"}}' /tmp/lambda-output-invoke.txt --region us-east-1
 aws lambda invoke --function-name ngo-lambda-function --payload '{"functionType":"query","chaincodeFunction":"queryDonor","chaincodeFunctionArgs":{"donorUserName":"melissa"}}' /tmp/lambda-output-query.txt --region us-east-1

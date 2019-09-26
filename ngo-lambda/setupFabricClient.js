@@ -32,9 +32,7 @@ async function getSecret(keyName) {
     });
     
     return new Promise((resolve, reject) => {
-        logger.info("** about to call getsecretvalue for " + getSecretIDForKey(keyName));
         client.getSecretValue({SecretId: getSecretIDForKey(keyName)}, function(err, data) {
-            logger.info("returning with err of " + err);
             if (err) {
                 return reject(err);
             }
@@ -56,10 +54,7 @@ async function setupClient() {
     logger.info("=== setupClient start ===");
 
     if (!!_clientInstance) {
-        logger.info("=== returning existing instance ===");
         return _clientInstance;
-    } else {
-        logger.info("=== not returning existing client instance ===");
     }
 
 	let fabric_client = Fabric_Client.loadFromConfig(path.join(__dirname, "./ngo-connection-profile.yaml"));
@@ -72,14 +67,12 @@ async function setupClient() {
 	const crypto_store = Fabric_Client.newCryptoKeyStore({path: store_path});
 	crypto_suite.setCryptoKeyStore(crypto_store);
 	fabric_client.setCryptoSuite(crypto_suite);
-    logger.info("=== getting secrets ===");
+    
     const privatePEM = await getSecret("pk");
     const signedPEM = await getSecret("signcert");
-    logger.info("=== got secrets ===");
+    
 	fabricUser = await fabric_client.createUser({username, mspid: config.mspID, cryptoContent: {privateKeyPEM: privatePEM, signedCertPEM: signedPEM}, skipPersistence: true});
-    logger.info("=== created iser ===");
     fabric_client.setUserContext(fabricUser, true);
-
     _clientInstance = fabric_client;
 
     logger.info("=== setupClient end ===");

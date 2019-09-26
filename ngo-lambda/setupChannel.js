@@ -25,7 +25,7 @@ async function setupChannel() {
     logger.info("=== setupChannel start ===");
 
     let client = await setupClient();
-    logger.info("=== got client ===");
+
     let channel = client.getChannel(config.channelName, false);
     if (channel == null) {
         channel = client.newChannel(config.channelName);
@@ -42,8 +42,12 @@ async function setupChannel() {
         }
     }
 
-    const order = client.newOrderer(config.ordererEndpoint, {pem:pemfile})
-    channel.addOrderer(order);
+    let orderer = channel.getOrderers()[0];
+    if (!orderer) {
+        orderer = client.newOrderer(config.ordererEndpoint, {pem:pemfile})
+        channel.addOrderer(orderer);
+    }
+
     logger.info("=== setupChannel end ===");
     return channel;
 }
