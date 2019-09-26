@@ -47,7 +47,7 @@ async function getSecret(keyName) {
     });
 }
 
-async function setupCrypto() {
+async function setupClient() {
     
 	let fabric_client = Fabric_Client.loadFromConfig(path.join(__dirname, "./ngo-connection-profile.yaml"));
 	fabric_client.loadFromConfig(path.join(__dirname, "./client-org1.yaml"));
@@ -66,11 +66,13 @@ async function setupCrypto() {
 	fabricUser = await fabric_client.createUser({username, mspid: config.mspID, cryptoContent: {privateKeyPEM: privatePEM, signedCertPEM: signedPEM}, skipPersistence: true});
 	fabric_client.setUserContext(fabricUser, true);
 
-    return { fabric_client };
+    return fabric_client;
 
 }
 
-async function setupChannel(client) {
+async function setupChannel() {
+
+    let client = await setupClient();
     let channel = client.getChannel(config.channelName, false);
     if (channel == null) {
         channel = client.newChannel(config.channelName);
