@@ -7,7 +7,6 @@
 const config = require("./config");
 const queryHandler = require("./query");
 const invokeHandler = require("./invoke");
-const syncCrypto = require("./syncCrypto");
 const logger = require("./logging").getLogger("lambdaFunction");
 
 function buildCommonRequestObject(chaincodeFunction, chaincodeFunctionArgs) {
@@ -45,11 +44,7 @@ async function handler(event) {
 
         try {
             logger.info("=== Handler Function Start ===");
-        
-            logger.info("Downloading credentials from S3...");
-            await syncCrypto.downloadCredentials();
-                
-            logger.info("Building request");
+
             const request = buildCommonRequestObject(chaincodeFunction, chaincodeFunctionArgs);
             let result = await handlerFunction(request);
         

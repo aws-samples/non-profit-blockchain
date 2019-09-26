@@ -1,15 +1,13 @@
 'use strict';
 
-const setupCrypto = require("./setupCrypto");
 const setupChannel = require("./setupChannel");
 const logger = require("./logging").getLogger("query");
 
 async function queryChaincode(request) {
     logger.info("=== Query Function Start ===");
-    let { fabric_client } = await setupCrypto();  
 
     // send the query proposal to the peer
-    let channel = setupChannel(fabric_client);
+    let channel = await setupChannel();
 	return channel.queryByChaincode(request)
     .then((query_responses) => {
         logger.info("Query has completed, checking results");

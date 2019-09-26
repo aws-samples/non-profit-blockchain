@@ -1,7 +1,6 @@
 'use strict';
 
 const util = require('util');
-const setupCrypto = require("./setupCrypto");
 const setupChannel = require("./setupChannel");
 const logger = require("./logging").getLogger("query");
 
@@ -13,8 +12,7 @@ async function invokeChaincode(request) {
 
 	try {
 		// first setup the client for this org
-        let { fabric_client } = await setupCrypto();
-        let channel = setupChannel(fabric_client);
+        let channel = await setupChannel();
         
         const txId = client.newTransactionID();
 		txIdAsString = txId.getTransactionID();
