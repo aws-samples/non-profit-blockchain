@@ -32,7 +32,9 @@ async function getSecret(keyName) {
     });
     
     return new Promise((resolve, reject) => {
+        logger.info("** about to call getsecretvalue");
         client.getSecretValue({SecretId: getSecretIDForKey(keyName)}, function(err, data) {
+            logger.info("returning with err of " + err);
             if (err) {
                 return reject(err);
             }
