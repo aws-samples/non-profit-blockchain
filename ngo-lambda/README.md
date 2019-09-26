@@ -154,20 +154,20 @@ From the AWS console, view the output of the [AWS Cloudformation](https://consol
 Click the 'Outputs' tab.
 For `--vpc-id`, replace `string` with the value of `VPCID`.
 For `--subnet-ids`, replace `string` with the value of `PublicSubnetID`.
-For `--security-group-id`, replace `string` with the value of `sg-02c0f18a67125ca51`.
+For `--security-group-id`, replace `string` with the value of `SecurityGroupID`.
 
 ```
-aws ec2 create-vpc-endpoint --vpc-id string --vpc-endpoint-type Interface --subnet-ids subnet-056aec874c560ff59 --service-name com.amazonaws.us-east-1.secretsmanager --security-group-id string --region us-east-1
+aws ec2 create-vpc-endpoint --vpc-id string --vpc-endpoint-type Interface --subnet-ids string --service-name com.amazonaws.us-east-1.secretsmanager --security-group-id string --region us-east-1
 ```
 
 ## Step 9 - Test the Lambda function
 
 You can test the Lambda function from the [Lambda console](https://console.aws.amazon.com/lambda), or from the cli.
 
-To test from the cli, we will first create a donor, and then query the donor:
+To test from the cli, we will first create a donor, and then query the donor.  The output of each command is in the file specified in the last argument:
 ```
-aws lambda invoke --function-name ngo-lambda-function --payload '{"functionType": "invoke","chaincodeFunction": "createDonor","chaincodeFunctionArgs": {"donorUserName":"melissa","email":"melissa@melissasngo.org"}}' /tmp/lambda-output-invoke.txt --region us-east-1
-aws lambda invoke --function-name ngo-lambda-function --payload '{"functionType":"query","chaincodeFunction":"queryDonor","chaincodeFunctionArgs":{"donorUserName":"melissa"}}' /tmp/lambda-output-query.txt --region us-east-1
+aws lambda invoke --function-name ngo-lambda-function --payload '{"functionType": "invoke","chaincodeFunction": "createDonor","chaincodeFunctionArgs": {"donorUserName":"melissa","email":"melissa@melissasngo.org"}}' --region us-east-1 /tmp/lambda-output-invoke.txt
+aws lambda invoke --function-name ngo-lambda-function --payload '{"functionType":"query","chaincodeFunction":"queryDonor","chaincodeFunctionArgs":{"donorUserName":"melissa"}}' --region us-east-1 /tmp/lambda-output-query.txt
 ```
 
 ## The workshop sections
