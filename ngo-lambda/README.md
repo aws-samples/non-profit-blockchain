@@ -37,28 +37,36 @@ source ~/peer-exports.sh
 
 The steps we will execute in this part are:
 
-1. Copy the Managed Blockchain certificate
-2. Create the Fabric user credentials
-3. Put user credentials on Secrets Manager
-4. Copy the Fabric client configuration files
-5. Install the npm dependencies
-6. Create the IAM role and policies
-7. Create the Lambda function
-8. Create a VPC Endpoint to Secrets Manager
-9. Test the Lambda function
+1. Create a staging folder for the Lambda deployment bundle
+2. Copy the Managed Blockchain certificate
+3. Create the Fabric user credentials
+4. Put user credentials on Secrets Manager
+5. Copy the Fabric client configuration files
+6. Install the npm dependencies
+7. Create the IAM role and policies
+8. Create the Lambda function
+9. Create a VPC Endpoint to Secrets Manager
+10. Test the Lambda function
 
+## Step 1 - Create a staging folder for the Lambda deployment bundle
 
-## Step 1 - Copy the Managed Blockchain certificate
-
-Copy the latest version of the Managed Blockchain PEM file into the working folder. This will be used to secure communication with the Managed Blockchain service.
+Copy the source folder into a staging folder we can use for preparing the deployment bundle we will deploy to Lambda.
 
 ```
-cp ~/managedblockchain-tls-chain.pem ~/non-profit-blockchain/ngo-lambda/certs/managedblockchain-tls-chain.pem
+cp -R ~/non-profit-blockchain/ngo-lambda /tmp/lambdaWork
 ```
 
-## Step 2 - Create the Fabric user credentials
+## Step 2 - Copy the Managed Blockchain certificate
 
-Register and enroll an identity with the Fabric CA (certificate authority). We will use this identity within the Lambda function.  In the example below we are creating a user named `lambdaUser` with a password of `Welcome123`.  The password is optional and one will be generated if not provided. 
+Copy the latest version of the Managed Blockchain PEM file into the staging folder. This will be used to secure communication with the Managed Blockchain service.
+
+```
+cp ~/managedblockchain-tls-chain.pem /tmp/lambdaWork/certs/managedblockchain-tls-chain.pem
+```
+
+## Step 3 - Create the Fabric user credentials
+
+Register and enroll an identity with the Fabric CA (certificate authority). We will use this identity within the Lambda function.  In the example below we are creating a user named `lambdaUser` with a password of `Welcome123`.  The password is optional and one will be generated if not provided.  The credentials will be written into `/tmp/certs/lambdaUser/keystore` and `/tmp/certs/lambdaUser/signcerts`.
 
 ```
 export FABRICUSER=lambdaUser
@@ -69,37 +77,37 @@ fabric-ca-client register --id.name $FABRICUSER --id.affiliation $MEMBERNAME --t
 fabric-ca-client enroll -u https://$FABRICUSER:$FABRICUSERPASSWORD@$CASERVICEENDPOINT --tls.certfiles /home/ec2-user/managedblockchain-tls-chain.pem -M /tmp/certs/$FABRICUSER
 ```
 
-## Step 3 - Put user credentials on Secrets Manager ##
+## Step 4 - Put user credentials on Secrets Manager ##
 ```
 aws secretsmanager create-secret --name "dev/fabricOrgs/$MEMBERNAME/$FABRICUSER/pk" --secret-string "`cat /tmp/certs/$FABRICUSER/keystore/*`" --region us-east-1
 aws secretsmanager create-secret --name "dev/fabricOrgs/$MEMBERNAME/$FABRICUSER/signcert" --secret-string "`cat /tmp/certs/$FABRICUSER/signcerts/*`" --region us-east-1
 ```
 
-## Step 4 - Copy the Fabric client configuration files
+## Step 5 - Copy the Fabric client connection profiles
 
 You should have created the Fabric client configuration files in Part 3.  If not, follow the instructions in [Part 3 - Step 3](../ngo-rest-api/README.md) before continuing.  Make sure to source the files mentioned in the **Pre-requisites** section of Part 3 before generating the configuration files.
 
-Once the configuration files have been created, copy them to the local folder and update the path to the Managed Blockchain certificate.
+Once the configuration files have been created, copy them to the staging folder and update the path to the Managed Blockchain certificate.
 
 ```
-cp ~/non-profit-blockchain/tmp/connection-profile/ngo-connection-profile.yaml ~/non-profit-blockchain/ngo-lambda/.
-cp ~/non-profit-blockchain/tmp/connection-profile/org1/client-org1.yaml ~/non-profit-blockchain/ngo-lambda/.
-sed -i "s|/home/ec2-user/managedblockchain-tls-chain.pem|./certs/managedblockchain-tls-chain.pem|g" ~/non-profit-blockchain/ngo-lambda/ngo-connection-profile.yaml
+cp ~/non-profit-blockchain/tmp/connection-profile/ngo-connection-profile.yaml /tmp/lambdaWork/.
+cp ~/non-profit-blockchain/tmp/connection-profile/org1/client-org1.yaml /tmp/lambdaWork/.
+sed -i "s|/home/ec2-user/managedblockchain-tls-chain.pem|./certs/managedblockchain-tls-chain.pem|g" /tmp/lambdaWork/ngo-connection-profile.yaml
 ```
 
-## Step 5 - Install the npm dependencies
+## Step 6 - Install the npm dependencies
 
 You should have already installed `nvm` in a prior step.  If not, follow the instructions in [Part 3 - Step 1](../ngo-rest-api/README.md) before continuing.  Be sure to install the `gcc` compiler in that step.
 
 ```
-cd ~/non-profit-blockchain/ngo-lambda
+cd /tmp/lambdaWork
 nvm use lts/carbon
 npm install
 ```
 
-## Step 6 - Create the IAM role and policies for Lambda
+## Step 7 - Create the IAM role and policies for Lambda
 
-### Step 6a - Create the role
+### Step 7a - Create the role
 
 ```
 aws iam create-role --role-name Lambda-Fabric-Role --assume-role-policy-document file://Lambda-Fabric-Role-Trust-Policy.json
@@ -107,7 +115,7 @@ aws iam create-role --role-name Lambda-Fabric-Role --assume-role-policy-document
 
 This will output a JSON representation of the new role.  Copy the output to a local document so you can refer back to it later.
 
-### Step 6b - Add policies to the role
+### Step 7b - Add policies to the role
 
 We need to grant Lambda execution and Secrets Manager policies to the role.
 
@@ -116,18 +124,18 @@ aws iam attach-role-policy --role-name Lambda-Fabric-Role --policy-arn arn:aws:i
 aws iam put-role-policy --role-name Lambda-Fabric-Role --policy-name SecretsManagerPolicy --policy-document file://Secrets-Manager-Policy.json
 ```
 
-## Step 7 - Create the Lambda function
+## Step 8 - Create the Lambda function
 
-### Step 7a - Create the Lambda archive
+### Step 8a - Create the Lambda archive
 
 Archive the Lambda code into a zip file.
 
 ```
-cd ~/non-profit-blockchain/ngo-lambda
+cd /tmp/lambdaWork
 zip -r /tmp/ngo-lambda-function.zip  .
 ```
 
-### Step 7b - Prepare and create the function
+### Step 8b - Prepare and create the function
 
 Before running `create-function` you will need to replace a few parameters with those from your environment.
 
@@ -143,7 +151,7 @@ Once you have updated those environment variables, execute the `create-function`
 aws lambda create-function --function-name ngo-lambda-function --runtime nodejs8.10 --handler index.handler --memory-size 512 --role arn:aws:iam::XXXXXXXXXXXX:role/Lambda-Fabric-Role --vpc-config SubnetIds=string,SecurityGroupIds=string --environment Variables="{CA_ENDPOINT=$CASERVICEENDPOINT,PEER_ENDPOINT=grpcs://$PEERSERVICEENDPOINT,ORDERER_ENDPOINT=grpcs://$ORDERINGSERVICEENDPOINT,CHANNEL_NAME=$CHANNEL,CHAIN_CODE_ID=ngo,CRYPTO_FOLDER=/tmp,MSP=$MSP,FABRICUSER=$FABRICUSER,MEMBERNAME=$MEMBERNAME"}" --zip-file fileb:///tmp/ngo-lambda-function.zip --region us-east-1 --timeout 30
 ```
 
-## Step 8 - Create a VPC Endpoint to Secrets Manager
+## Step 9 - Create a VPC Endpoint to Secrets Manager
 
 The Lambda function will run within a VPC, and therefore requires a VPC Endpoint to communicate with Secrets Manager.  We will do this with the `create-vpc-endpoint` command.
 
@@ -160,7 +168,7 @@ For `--security-group-id`, replace `string` with the value of `SecurityGroupID`.
 aws ec2 create-vpc-endpoint --vpc-id string --vpc-endpoint-type Interface --subnet-ids string --service-name com.amazonaws.us-east-1.secretsmanager --security-group-id string --region us-east-1
 ```
 
-## Step 9 - Test the Lambda function
+## Step 10 - Test the Lambda function
 
 You can test the Lambda function from the [Lambda console](https://console.aws.amazon.com/lambda), or from the cli.
 
