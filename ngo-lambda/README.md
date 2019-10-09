@@ -72,10 +72,11 @@ fabric-ca-client enroll -u https://lambdaUser:Welcome123@$CASERVICEENDPOINT --tl
 
 If you already have an S3 bucket you would like to use, you can skip this step and move on to step 3.
 
-S3 buckets are globally unique, so you will need to use a different name than the one in this example.  In this example, we will create an S3 bucket named `mybucket` in the `us-east-1` region.
+S3 buckets are globally unique, so you will need to use a different name than the one in this example.  In this example, we will create an S3 bucket named `mybucket` in the `us-east-1` region.  We will then enable server side encryption for all objects in the bucket.
 
 ```
 aws s3 mb s3://mybucket --region us-east-1
+aws s3api put-bucket-encryption --bucket mybucket --server-side-encryption-configuration '{"Rules": [{"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}'
 ```
 
 ## Step 4 - Put the TLS certificate and user credentials on S3
