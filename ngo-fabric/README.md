@@ -121,6 +121,15 @@ cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
+Set environment variables to reference your Managed Blockchain network.  The info you need either matches what you entered when creating the Fabric network in [Part 1](../ngo-fabric/README.md), or can be found in the Amazon Managed Blockchain Console, under your network.
+
+```
+export MEMBERID=<your member ID, from the Amazon Managed Blockchain Console>
+export MEMBERNAME=<the member name you chose when creating your Fabric network>
+export ADMINUSER=<the admin user name you chose when creating your Fabric network>
+export ADMINPWD=<the admin password you chose when creating your Fabric network>
+```
+
 Create the file that includes the ENV export values that define your Fabric network configuration.
 
 ```
@@ -128,18 +137,13 @@ cd ~/non-profit-blockchain/ngo-fabric
 cp templates/exports-template.sh fabric-exports.sh
 sed -i "s|__NETWORKNAME__|$NETWORKNAME|g" fabric-exports.sh
 sed -i "s|__NETWORKID__|$NETWORKID|g" fabric-exports.sh
-sed -i "s|__MEMBERNAME__|<the member name you entered when creating your Fabric network>|g" fabric-exports.sh
-sed -i "s|__MEMBERID__|<your member ID, from the AWS Console>|g" fabric-exports.sh
-sed -i "s|__ADMINUSER__|<the admin user name you entered when creating your Fabric network>|g" fabric-exports.sh
-sed -i "s|__ADMINPWD__|<the admin password you entered when creating your Fabric network>|g" fabric-exports.sh
+sed -i "s|__MEMBERNAME__|$MEMBERNAME|g" fabric-exports.sh
+sed -i "s|__MEMBERID__|$MEMBERID|g" fabric-exports.sh
+sed -i "s|__ADMINUSER__|$ADMINUSER|g" fabric-exports.sh
+sed -i "s|__ADMINPWD__|$ADMINPWD|g" fabric-exports.sh
 ```
 
-Update the export statements at the top of the file. The info you need either matches what you 
-entered when creating the Fabric network in [Part 1](../ngo-fabric/README.md), or can be found 
-in the Amazon Managed Blockchain Console, under your network.
-
-Source the file, so the exports are applied to your current session. If you exit the SSH 
-session and re-connect, you'll need to source the file again.
+Source the file, so the exports are applied to your current session. If you exit the SSH session and re-connect, you'll need to source the file again.
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
@@ -198,8 +202,7 @@ cd ~/non-profit-blockchain/ngo-fabric
 On the Fabric client node.
 
 Update the configtx channel configuration. The Name and ID fields should be updated with the member ID. 
-You can obtain the member ID from the Amazon Managed Blockchain Console, or from the ENV variables 
-exported to your current session.
+You can obtain the member ID from the Amazon Managed Blockchain Console, or from the ENV variables exported to your current session.
 
 ```
 echo $MEMBERID
