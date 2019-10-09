@@ -64,7 +64,7 @@ Register and enroll an identity with the Fabric CA (certificate authority). We w
 ```
 export PATH=$PATH:/home/ec2-user/go/src/github.com/hyperledger/fabric-ca/bin
 cd ~
-fabric-ca-client register --id.name lambdaUser --id.affiliation NGOEmile --tls.certfiles ~/managedblockchain-tls-chain.pem --id.type user --id.secret Welcome123
+fabric-ca-client register --id.name lambdaUser --id.affiliation Org1 --tls.certfiles ~/managedblockchain-tls-chain.pem --id.type user --id.secret Welcome123
 fabric-ca-client enroll -u https://lambdaUser:Welcome123@$CASERVICEENDPOINT --tls.certfiles /home/ec2-user/managedblockchain-tls-chain.pem -M /tmp/certs/lambdaUser
 ```
 
@@ -170,7 +170,7 @@ Once you have updated those environment variables, execute the `create-function`
 aws lambda create-function --function-name ngo-lambda-query --runtime nodejs8.10 --handler index.handler --role arn:aws:iam::XXXXXXXXXXXX:role/Lambda-Fabric-Role --vpc-config SubnetIds=string,SecurityGroupIds=string --environment Variables="{CA_ENDPOINT=$CASERVICEENDPOINT,PEER_ENDPOINT=grpcs://$PEERSERVICEENDPOINT,ORDERER_ENDPOINT=grpcs://$ORDERINGSERVICEENDPOINT,CHANNEL_NAME=$CHANNEL,CHAIN_CODE_ID=ngo,S3_CRYPTO_BUCKET=mybucket,CRYPTO_FOLDER=/tmp,MSP_ID=$MSP,FABRIC_USERNAME=lambdaUser}" --zip-file fileb:///tmp/ngo-lambda-query.zip --region us-east-1 --timeout 60
 ```
 
-## Step 9c - Create the VPC Endpoint to S3
+### Step 9c - Create the VPC Endpoint to S3
 
 The Lambda function will run within a VPC, and therefore requires a VPC Endpoint to communicate with S3.  We will do this with the `create-vpc-endpoint` command.
 
@@ -197,12 +197,5 @@ To test from the cli:
 aws lambda invoke --function-name ngo-lambda-query --payload "{\"donorName\":\"michael\"}" /tmp/lambda-output.txt --region us-east-1
 ```
 
-## The workshop sections
-The workshop instructions can be found in the README files in parts 1-4:
 
-* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
-* [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
-* [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
-* [Part 4:](../ngo-ui/README.md) Run the application. 
-* [Part 5:](../new-member/README.md) Add a new member to the network. 
-* [Part 6:](../ngo-lambda/README.md) Query the blockchain with a Lambda function. 
+You now have a Lambda function that is querying the blockchain.  You can use this Lambda function to service API Gateway requests as part of a serverless architecture.
