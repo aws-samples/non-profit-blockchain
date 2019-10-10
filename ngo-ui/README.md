@@ -65,7 +65,12 @@ Your REST API is exposed via an AWS Elastic Load Balancer (ELB). The ELB was cre
 by CloudFormation in [Part 1](../ngo-fabric/README.md). You can find the DNS endpoint for the ELB in
 the Outputs of your CloudFormation stack in the CloudFormation console.  Replace in the commands below and then execute them.
 
-sed -i "s|__ELBURL__|<the DNS endpoint for the ELB>|g" src/environments/environment.ts 
+export REGION=us-east-1
+export FABRICSTACK=ngo-fabric-network
+export ELBURL=$(aws cloudformation --region $REGION describe-stacks --stack-name $FABRICSTACK --query "Stacks[0].Outputs[?OutputKey=='ELBURL'].OutputValue" --output text)
+
+
+sed -i "s|__ELBURL__|$ELBURL|g" src/environments/environment.ts 
 
 ## Step 4 - Start the application
 
