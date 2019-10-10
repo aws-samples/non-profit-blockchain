@@ -1,9 +1,16 @@
+# To be used with Amazon Event Engine
+
+Use this README if you are hosting an event with attendees, and you are using Amazon Event Engine to handle the creation of 
+AWS accounts and the pre-provisioning of Managed Blockchain networks in the accounts. 
+
+TBC
+
 # Part1: Build a Hyperledger Fabric blockchain network using Amazon Managed Blockchain
 
-This section will build a Hyperledger Fabric blockchain network using Amazon Managed Blockchain. A combination of AWS CloudFormation, the AWS Console and the AWS CLI will be used. The process to create the network is as follows:
+This section will build a Hyperledger Fabric blockchain network using Amazon Managed Blockchain. A combination of the AWS Console and the AWS CLI will be used. The process to create the network is as follows:
 
 * Provision an AWS Cloud9 instance. We will use the Linux terminal that Cloud9 provides
-* From Cloud9, run an AWS CloudFormation template to create a Fabric network and provision a peer node in Amazon Managed Blockchain 
+* Use the Amazon Managed Blockchain console to create a Fabric network and provision a peer node
 * From Cloud9, run an AWS CloudFormation template to provision a VPC and a Fabric client node. You 
 will use the Fabric client node to administer the Fabric network
 * From the Fabric client node, create a Fabric channel, install and instantiate chaincode, and 
@@ -31,36 +38,29 @@ sudo pip install awscli --upgrade
 ```
 
 ## Step 1 - Create the Hyperledger Fabric blockchain network
-Use Cloud9 to create a Fabric network using the provided CloudFormation template.
+In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 
-In Cloud9:
+Make sure you are in the correct AWS region (i.e. us-east-1, also known as N. Virginia) and follow the steps below:
 
-```
-export REGION=us-east-1
-cd ~/non-profit-blockchain/ngo-fabric
-./amb.sh
-```
-
-The CloudFormation template, `amb.yaml`, expects a number of parameters. All of these have default values for the purpose
-of this workshop, but can be overridden in the script `amb.sh`. The template defaults to creating a 'Starter' Fabric network
-with a single small peer node. This would not be suitable for a production network, which would need a 'Standard' Fabric
-network with multiple peer nodes spread across AZs.
+1. Click `Create a Network`
+2. Make sure `Hyperleger Fabric 1.2` is selected
+3. Enter a network name and an optional description, and click `Next`. DO NOT use spaces OR special characters in the network name, as this name is used as a prefix when creating resources in step 3. 
+4. Enter a member name (e.g. this could be the name of the organisation you belong to) and an optional description
+5. Enter an admin username and password, and note this down. You will need it later. Click `Next`
+6. Check your configuration and click `Create network and member`
+7. Wait until the status of your network and your network member become Available.
 
 Before continuing, check to see that your Fabric network has been created and is Available. If not,
 wait for it to complete. Otherwise the steps below may fail.
 
-## Step 2 - Check the network is AVAILABLE
-Before continuing, check to see that your Fabric network has been created and is Available. It does take quite a while
-to create the network, so grab a coffee in meantime. You will need an Available network before continuining with the 
-next steps.
+## Step 2 - Create the Fabric Peer
+In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 
-You can check the status of your network in two places:
+1. In the new network you have created, click on the member in the Members section.
+2. Click `Create peer node`
+3. Leave the defaults, and click `Create peer node`
 
-In the AWS CloudFormation Console: https://console.aws.amazon.com/cloudformation. Check the resources for your stack. You
-are waiting for the member and the peer node to be CREATE_COMPLETE
-
-In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain. For you network, you are waiting
-for the network, the member and the member's peer node to be Available.
+We'll continue with the next steps while we wait for the peer node to become Available.
 
 ## Step 3 - Create the Fabric client node
 In your Cloud9 terminal window.

@@ -18,10 +18,10 @@ Metadata:
         Label:
           default: First member configuration
         Parameters:
-          - FirstMemberName
-          - FirstMemberDescription
-          - FirstMemberAdminUsername
-          - FirstMemberAdminPassword
+          - MemberName
+          - MemberDescription
+          - MemberAdminUsername
+          - MemberAdminPassword
           - PeerNodeAvailabilityZone
           - PeerNodeInstanceType
     ParameterLabels:
@@ -37,13 +37,13 @@ Metadata:
         default: Threshold comparator
       ProposalDurationInHours:
         default: Proposal duration
-      FirstMemberName:
+      MemberName:
         default: First member name
-      FirstMemberDescription:
+      MemberDescription:
         default: First member description
-      FirstMemberAdminUsername:
+      MemberAdminUsername:
         default: First member admin username
-      FirstMemberAdminPassword:
+      MemberAdminPassword:
         default: First member admin password
       PeerNodeAvailabilityZone:
         default: Peer node Availability Zone
@@ -68,23 +68,23 @@ Parameters:
       - STARTER
       - STANDARD
     Type: String
-  FirstMemberName:
+  MemberName:
     Description: The name of the first member in your Amazon Managed Blockchain network.
     AllowedPattern: "^[0-9a-zA-Z]+$"
-    ConstraintDescription: FirstMemberName must be alphanumeric.
+    ConstraintDescription: MemberName must be alphanumeric.
     Type: String
     Default: member
-  FirstMemberDescription:
+  MemberDescription:
     Description: An optional description of your first member.
     Type: String
     Default: First member 
-  FirstMemberAdminUsername:
+  MemberAdminUsername:
     Description: The user name of your first member's admin user.
     AllowedPattern: '^[0-9a-zA-Z/]+$'
     ConstraintDescription: AdminUsername must contain only uppercase and lowercase letters and numbers.
     Type: String
     Default: Admin
-  FirstMemberAdminPassword:
+  MemberAdminPassword:
     Description: The password of your first member's admin user.
     MinLength: 8
     MaxLength: 32
@@ -151,8 +151,8 @@ Resources:
     Type: "AWS::ManagedBlockchain::Member"
     Properties:
       NetworkConfiguration:
-        Name: !Sub "network-${AWS::AccountId}"
-        Description: !Sub "network-${AWS::AccountId}"
+        Name: !Ref NetworkName
+        Description: !Sub "network-${NetworkName}-${AWS::AccountId}"
         Framework: "HYPERLEDGER_FABRIC"
         FrameworkVersion: "1.2"
         NetworkFrameworkConfiguration:
@@ -164,13 +164,13 @@ Resources:
             ProposalDurationInHours: !Ref ProposalDurationInHours
             ThresholdComparator: !Ref ThresholdComparator
       MemberConfiguration:
-        Name: !Sub "member-${AWS::AccountId}"
-        Description: !Sub "member-${AWS::AccountId}"
+        Name: !Sub "member-${NetworkName}"
+        Description: !Sub "member-${NetworkName}-${AWS::AccountId}"
         MemberFrameworkConfiguration:
           MemberFabricConfiguration:
-            AdminUsername: !Ref FirstMemberAdminUsername
-            AdminPassword: !Ref FirstMemberAdminPassword
-  InitialNode:
+            AdminUsername: !Ref MemberAdminUsername
+            AdminPassword: !Ref MemberAdminPassword
+  MemberPeerNode:
     Type: "AWS::ManagedBlockchain::Node"
     Properties:
       NetworkId: !GetAtt Member.NetworkId
@@ -187,7 +187,7 @@ Outputs:
       Name: !Sub "${AWS::StackName}-MemberId"
   MemberName:
     Description: member name 
-    Value: !Sub "member-${AWS::AccountId}"
+    Value: !Sub "member-${NetworkName}"
     Export:
       Name: !Sub "${AWS::StackName}-MemberName"
   NetworkId:
@@ -197,19 +197,19 @@ Outputs:
       Name: !Sub "${AWS::StackName}-NetworkId"
   NetworkName:
     Description: network name 
-    Value: !Sub "network-${AWS::AccountId}"
+    Value: !Ref NetworkName
     Export:
       Name: !Sub "${AWS::StackName}-NetworkName"
   MemberPeerNodeId:
     Description: member peer node Id
-    Value: !GetAtt InitialNode.NodeId
+    Value: !GetAtt MemberPeerNode.NodeId
     Export:
       Name: !Sub "${AWS::StackName}-MemberPeerNodeId"
-  MemberAdminUserName:
+  MemberAdminUsername:
     Description: fabric admin user name
     Value: !Ref MemberAdminUsername
     Export:
-      Name: !Sub "${AWS::StackName}-MemberAdminUserName"
+      Name: !Sub "${AWS::StackName}-MemberAdminUsername"
   MemberAdminPassword:
     Description: fabric admin password
     Value: !Ref MemberAdminPassword
