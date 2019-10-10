@@ -84,37 +84,6 @@ cat ngo-connection-profile.yaml
 ls -lR
 ```
 
-Check the config file used by app.js. Make sure the peer name in config.json (under 'peers:') is 
-the same as the peer name in the connection profile. **Make sure the admin username and 
-password are correct and match the values you updated in the connection profile.**
-
-```
-cd ~/non-profit-blockchain/ngo-rest-api
-sed -i "s|__ADMINUSER__|<the admin user name you entered when creating your Fabric network>|g" config.json
-sed -i "s|__ADMINPWD__|<the admin password you entered when creating your Fabric network>|g" config.json
-```
-
-config.json should look something like this:
-
-```
-{
-    "host":"localhost",
-    "port":"3000",
-    "channelName":"mychannel",
-    "chaincodeName":"ngo",
-    "eventWaitTime":"30000",
-    "peers":[
-        "peer1"
-    ],
-    "admins":[
-       {
-          "username":"admin", <-- update for your env
-          "secret":"Adminpwd1!" <-- update for your env
-       }
-    ]
- }
-```
-
 ## Step 4 - Run the REST API Node.js application
 On the Fabric client node.
 
