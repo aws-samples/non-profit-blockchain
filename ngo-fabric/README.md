@@ -70,8 +70,9 @@ In Cloud9:
 
 ```
 export REGION=us-east-1
-export NETWORKID=<the network ID you created in Step1, from the Amazon Managed Blockchain Console>
-export NETWORKNAME=<the name you gave the network>
+export FABRICSTACK=ngo-fabric-network
+export NETWORKID=$(aws cloudformation --region $REGION describe-stacks --stack-name $FABRICSTACK --query "Stacks[0].Outputs[?OutputKey=='NetworkID'].OutputValue" --output text)
+export NETWORKNAME=$(aws cloudformation --region $REGION describe-stacks --stack-name $FABRICSTACK --query "Stacks[0].Outputs[?OutputKey=='NETWORKNAME'].OutputValue" --output text)
 ```
 
 Set the VPC endpoint. Make sure it has been populated and exported. If the `echo` statement below shows
@@ -124,10 +125,14 @@ git clone https://github.com/aws-samples/non-profit-blockchain.git
 Set environment variables to reference your Managed Blockchain network.  The info you need either matches what you entered when creating the Fabric network in [Part 1](../ngo-fabric/README.md), or can be found in the Amazon Managed Blockchain Console, under your network.
 
 ```
-export MEMBERID=<your member ID, from the Amazon Managed Blockchain Console>
-export MEMBERNAME=<the member name you chose when creating your Fabric network>
-export ADMINUSER=<the admin user name you chose when creating your Fabric network>
-export ADMINPWD=<the admin password you chose when creating your Fabric network>
+export REGION=us-east-1
+export FABRICSTACK=ngo-fabric-network
+export NETWORKID=$(aws cloudformation --region $REGION describe-stacks --stack-name $FABRICSTACK --query "Stacks[0].Outputs[?OutputKey=='NetworkID'].OutputValue" --output text)
+export NETWORKNAME=$(aws cloudformation --region $REGION describe-stacks --stack-name $FABRICSTACK --query "Stacks[0].Outputs[?OutputKey=='NETWORKNAME'].OutputValue" --output text)
+export MEMBERID=$(aws cloudformation --region $REGION describe-stacks --stack-name $FABRICSTACK --query "Stacks[0].Outputs[?OutputKey=='MemberID'].OutputValue" --output text)
+export MEMBERNAME=$(aws cloudformation --region $REGION describe-stacks --stack-name $FABRICSTACK --query "Stacks[0].Outputs[?OutputKey=='MemberName'].OutputValue" --output text)
+export ADMINUSER=admin
+export ADMINPWD=AdminPwd!
 ```
 
 Create the file that includes the ENV export values that define your Fabric network configuration.
