@@ -213,8 +213,7 @@ aws lambda invoke --function-name ngo-lambda-function --payload '{"functionType"
 cat /tmp/lambda-output-queryAllDonors.txt
 ```
 
-## The workshop sections
-The workshop instructions can be found in the README files in parts 1-4:
+You now have a Lambda function that is querying the blockchain.  You can use this Lambda function to service API Gateway requests as part of a serverless architecture.
 
 * [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
 * [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
