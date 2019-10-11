@@ -16,8 +16,9 @@
 echo Creating VPC - TODO. Create the VPC, subnets, security group, EC2 client node, VPC endpoint
 echo Create a keypair
 
-NETWORKNAME=$(aws cloudformation describe-stacks --stack-name non-profit-amb --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkId`].OutputValue' --output text)
-VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKNAME --query 'Network.VpcEndpointServiceName' --output text)
+NETWORKNAME=$(aws cloudformation describe-stacks --stack-name non-profit-amb --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkName`].OutputValue' --output text)
+NETWORKID=$(aws cloudformation describe-stacks --stack-name non-profit-amb --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkId`].OutputValue' --output text)
+VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
 
 echo Searching for existing keypair named $NETWORKNAME-keypair
 keyname=$(aws ec2 describe-key-pairs --key-names $NETWORKNAME-keypair --region $REGION --query 'KeyPairs[0].KeyName' --output text)

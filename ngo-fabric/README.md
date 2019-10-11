@@ -46,9 +46,6 @@ of this workshop, but can be overridden in the script `amb.sh`. The template def
 with a single small peer node. This would not be suitable for a production network, which would need a 'Standard' Fabric
 network with multiple peer nodes spread across AZs.
 
-Before continuing, check to see that your Fabric network has been created and is Available. If not,
-wait for it to complete. Otherwise the steps below may fail.
-
 ## Step 2 - Check the network is AVAILABLE
 Before continuing, check to see that your Fabric network has been created and is Available. It does take quite a while
 to create the network, so grab a coffee in meantime. You will need an Available network before continuining with the 
@@ -110,39 +107,38 @@ cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-Source the file that includes the ENV export values that define your Fabric network configuration
-so that the exports are applied to your current session. If you exit the SSH session and re-connect, 
-you'll need to source the file again.
+In future steps you will need to refer to different configuration values in your Fabric network. In this step
+we export these values so you don't need to copy them from the console, or look them up elsewhere. Source the file 
+that includes the ENV export values that define your Fabric network configuration so that the exports are applied 
+to your current session. If you exit the SSH session and re-connect, you'll need to source the file again.
 
 ```
 export REGION=us-east-1
 cd ~/non-profit-blockchain/ngo-fabric
 cp templates/exports-template.sh fabric-exports.sh
 source fabric-exports.sh
+source ~/peer-exports.sh 
 ```
 
 Sourcing the file will do two things:
 * export the necessary ENV variables
 * create another file which contains the export values you need to use when working with a Fabric peer node.
-This can be found in the file: `~/peer-exports.sh`. You will see how to use this in a later step.
+This can be found in the file: `~/peer-exports.sh`, which we also source here.
 
-Check the `source` worked:
+Check the `source` worked. You should see values for both of the ENV variables below:
 
 ```
 $ echo $PEERSERVICEENDPOINT
 nd-4MHB4EKFCRF7VBHXZE2ZU4F6GY.m-B7YYBFY4GREBZLPCO2SUS4GP3I.n-WDG36TTUD5HEJORZUPF4REKMBI.managedblockchain.us-east-1.amazonaws.com:30003
+
+$ echo $MSP
+m-MKPVAFNPQ5BV7ADVZ4MP2QWA3M
 ```
 
-Check the peer export file exists and that it contains a number of export keys with values:
+For interest, you can check that the peer export file exists and that it contains a number of export keys with values:
 
 ```
 cat ~/peer-exports.sh 
-```
-
-If the file has values for all keys, source it:
-
-```
-source ~/peer-exports.sh 
 ```
 
 Get the latest version of the Managed Blockchain PEM file. This will overwrite the existing file in the home directory with the latest version of this file:
