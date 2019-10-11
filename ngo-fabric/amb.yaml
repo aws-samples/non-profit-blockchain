@@ -29,6 +29,10 @@ Metadata:
         default: Network name
       NetworkDescription:
         default: Network description
+      Framework:
+        default: Framework
+      FrameworkVersion:
+        default: Framework version
       Edition:
         default: Edition
       ThresholdPercentage:
@@ -38,13 +42,13 @@ Metadata:
       ProposalDurationInHours:
         default: Proposal duration
       MemberName:
-        default: First member name
+        default: Member name
       MemberDescription:
-        default: First member description
+        default: Member description
       MemberAdminUsername:
-        default: First member admin username
+        default: Member admin username
       MemberAdminPassword:
-        default: First member admin password
+        default: Member admin password
       PeerNodeAvailabilityZone:
         default: Peer node Availability Zone
       PeerNodeInstanceType:
@@ -60,6 +64,14 @@ Parameters:
     Description: An optional description of your network.
     Type: String
     Default: Network for tracking donations made to non-profit organisations
+  Framework:
+    Description: The blockchain protocol to use, such as Hyperledger Fabric
+    Type: String
+    Default: HYPERLEDGER_FABRIC
+  FrameworkVersion:
+    Description: The version of the blockchain protocol to use
+    Type: String
+    Default: 1.2
   Edition:
     Description: Setting that determines the number of peer nodes per member and the selection of instance types that can be used for them.
     ConstraintDescription: Must be STARTER or STANDARD
@@ -153,8 +165,8 @@ Resources:
       NetworkConfiguration:
         Name: !Ref NetworkName
         Description: !Sub "network-${NetworkName}-${AWS::AccountId}"
-        Framework: "HYPERLEDGER_FABRIC"
-        FrameworkVersion: "1.2"
+        Framework: !Ref Framework
+        FrameworkVersion: !Ref FrameworkVersion
         NetworkFrameworkConfiguration:
           NetworkFabricConfiguration:
             Edition: !Ref Edition
@@ -200,6 +212,16 @@ Outputs:
     Value: !Ref NetworkName
     Export:
       Name: !Sub "${AWS::StackName}-NetworkName"
+  Framework:
+    Description: blockchain protocol, such as Hyperledger Fabric
+    Value: !Ref Framework
+    Export:
+      Name: !Sub "${AWS::StackName}-Framework"
+  FrameworkVersion:
+    Description: version of the blockchain protocol
+    Value: !Ref FrameworkVersion
+    Export:
+      Name: !Sub "${AWS::StackName}-FrameworkVersion"
   MemberPeerNodeId:
     Description: member peer node Id
     Value: !GetAtt MemberPeerNode.NodeId

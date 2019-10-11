@@ -77,24 +77,6 @@ In Cloud9:
 
 ```
 export REGION=us-east-1
-export NETWORKID=<the network ID you created in Step1, from the Amazon Managed Blockchain Console>
-export NETWORKNAME=<the name you gave the network>
-```
-
-Set the VPC endpoint. Make sure it has been populated and exported. If the `echo` statement below shows
-that it's blank, check the details under your network in the Amazon Managed Blockchain Console: 
-
-```
-export VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
-echo $VPCENDPOINTSERVICENAME
-```
-
-If the VPC endpoint is populated with a value, go ahead and run this script. This will create the
-CloudFormation stack. You will see an error saying `key pair does not exist`. This is expected as the script
-will check whether the keypair exists before creating it. I don't want to overwrite any existing
-keypairs you have, so just ignore this error and let the script continue:
-
-```
 cd ~/non-profit-blockchain/ngo-fabric
 ./vpc-client-node.sh
 ```
@@ -128,23 +110,14 @@ cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-Create the file that includes the ENV export values that define your Fabric network configuration.
+Source the file that includes the ENV export values that define your Fabric network configuration
+so that the exports are applied to your current session. If you exit the SSH session and re-connect, 
+you'll need to source the file again.
 
 ```
+export REGION=us-east-1
 cd ~/non-profit-blockchain/ngo-fabric
 cp templates/exports-template.sh fabric-exports.sh
-vi fabric-exports.sh
-```
-
-Update the export statements at the top of the file. The info you need either matches what you 
-entered when creating the Fabric network in [Part 1](../ngo-fabric/README.md), or can be found 
-in the Amazon Managed Blockchain Console, under your network.
-
-Source the file, so the exports are applied to your current session. If you exit the SSH 
-session and re-connect, you'll need to source the file again.
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
 source fabric-exports.sh
 ```
 
