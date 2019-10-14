@@ -21,10 +21,10 @@
 ################################################################################
 Organizations:
     - &Org1
-        Name: <REPLACE WITH MEMBER_ID> 
+        Name: __MEMBERID__
 
         # ID to load the MSP definition as
-        ID: <REPLACE WITH MEMBER_ID>
+        ID: __MEMBERID__
 
         MSPDir: /opt/home/admin-msp
 

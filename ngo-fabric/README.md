@@ -33,7 +33,7 @@ sudo pip install awscli --upgrade
 ## Step 1 - Create the Hyperledger Fabric blockchain network
 Use Cloud9 to create a Fabric network using the provided CloudFormation template.
 
-In Cloud9:
+In your Cloud9 terminal window:
 
 ```
 export REGION=us-east-1
@@ -53,11 +53,12 @@ next steps.
 
 You can check the status of your network in two places:
 
-In the AWS CloudFormation Console: https://console.aws.amazon.com/cloudformation. Check the resources for your stack. You
+* In the AWS CloudFormation Console: https://console.aws.amazon.com/cloudformation. Check the resources for your stack. You
 are waiting for the member and the peer node to be CREATE_COMPLETE
-
-In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain. For you network, you are waiting
+* In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain. For you network, you are waiting
 for the network, the member and the member's peer node to be Available.
+
+Once your Managed Blockchain network is available, move on to the next step.
 
 ## Step 3 - Create the Fabric client node
 In your Cloud9 terminal window.

@@ -95,7 +95,7 @@ Parameters:
     AllowedPattern: '^[0-9a-zA-Z/]+$'
     ConstraintDescription: AdminUsername must contain only uppercase and lowercase letters and numbers.
     Type: String
-    Default: Admin
+    Default: admin
   MemberAdminPassword:
     Description: The password of your first member's admin user.
     MinLength: 8
