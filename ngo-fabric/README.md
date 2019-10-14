@@ -87,8 +87,8 @@ is complete. We will use this information in later steps.
 On the Fabric client node.
 
 Prior to executing any commands on the Fabric client node, you will need to export ENV variables
-that provide a context to Hyperledger Fabric. These variables will tell the client node which peer
-node to interact with, which TLS certs to use, etc. 
+that provide a context to Hyperledger Fabric. These variables will tell the client node which Fabric
+network to use, which peer node to interact with, which TLS certs to use, etc. 
 
 From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
 The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
@@ -169,20 +169,11 @@ cd ~/non-profit-blockchain/ngo-fabric
 ## Step 5 - Update the configtx channel configuration
 On the Fabric client node.
 
-Update the configtx channel configuration. The Name and ID fields should be updated with the member ID. 
-You can obtain the member ID from the Amazon Managed Blockchain Console, or from the ENV variables 
-exported to your current session.
-
-```
-echo $MEMBERID
-```
-
-Update the configtx.yaml file. Make sure you edit the configtx.yaml file you copy to your home
-directory below, NOT the one in the repo:
+Update the configtx channel configuration. The Name and ID fields should be updated with the member ID from Managed Blockchain.
 
 ```
 cp ~/non-profit-blockchain/ngo-fabric/configtx.yaml ~
-vi ~/configtx.yaml
+sed -i "s|__MEMBERID__|$MEMBERID|g" ~/configtx.yaml
 ```
 
 Generate the configtx channel configuration by executing the following script. When the channel is created, this channel configuration will become the genesis block (i.e. block 0) on the channel:
