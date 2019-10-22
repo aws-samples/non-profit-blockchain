@@ -150,7 +150,7 @@ You now have everything you need to create the Lambda function, including the IA
 You can set these environment variables by issuing these commands. 
 
 ```
-export ROLE_ARN=grep -o '"Arn": *"[^"]*"' /tmp/lambdaFabricRole-output.json | grep -o '"[^"]*"$'
+export ROLE_ARN=$(grep -o '"Arn": *"[^"]*"' /tmp/lambdaFabricRole-output.json | grep -o '"[^"]*"$' | tr -d '"')
 export SUBNETID=$(aws cloudformation --region $REGION describe-stacks --stack-name $NETWORKNAME-fabric-client-node --query "Stacks[0].Outputs[?OutputKey=='PublicSubnetID'].OutputValue" --output text)
 export SECURITYGROUPID=$(aws cloudformation --region $REGION describe-stacks --stack-name $NETWORKNAME-fabric-client-node --query "Stacks[0].Outputs[?OutputKey=='SecurityGroupID'].OutputValue" --output text)
 ```
@@ -186,7 +186,7 @@ export VPCID=$(aws cloudformation --region $REGION describe-stacks --stack-name 
 You also need the subnet ID and security group ID, which you already set in step 8b.  Once you have set the environment variables, you can create the VPC endpoint with this command.
 
 ```
-aws ec2 create-vpc-endpoint --vpc-id string --vpc-endpoint-type Interface --subnet-ids $SUBNETID --service-name com.amazonaws.us-east-1.secretsmanager --security-group-id $SECURITYGROUPID --region $REGION
+aws ec2 create-vpc-endpoint --vpc-id $VPCID --vpc-endpoint-type Interface --subnet-ids $SUBNETID --service-name com.amazonaws.us-east-1.secretsmanager --security-group-id $SECURITYGROUPID --region $REGION
 ```
 
 ## Step 10 - Test the Lambda function
