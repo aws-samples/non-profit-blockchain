@@ -3,15 +3,15 @@
 Part 6 will show you how to publish a Lambda function that invokes chaincode on a Hyperledger Fabric blockchain network running on Amazon Managed Blockchain.  You will use the NodeJS Hyperledger Fabric SDK within the Lambda function to interface with the blockchain.
 
 ## Pre-requisites
- There are multiple parts to the workshop.  Before starting on Part 6, you should have completed (Part 1)[../ngo-fabric/README.md], (Part 2)[../ngo-chaincode/README.md], and (Step 1 and Step 3 of Part 3)[../ngo-rest-api/README.md#step-3---generate-a-connection-profile].
+ There are multiple parts to the workshop.  Before starting on Part 6, you should have completed [Part 1](../ngo-fabric/README.md), [Part 2](../ngo-chaincode/README.md), and Step 1 and Step 3 of [Part 3](../ngo-rest-api/README.md#step-3---generate-a-connection-profile).
 
- In the AWS account where you create the [Part 1](../ngo-fabric/README.md) Fabric network, use Cloud9 to SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you created in [Part 1](../ngo-fabric/README.md)
+ In the AWS account where you [created the Fabric network](../ngo-fabric/README.md), use Cloud9 to SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you created in [Part 1](../ngo-fabric/README.md).
 
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
 ```
 
-You should have already cloned this repo in [Part 1](../ngo-fabric/README.md)
+You should have already cloned this repo in [Part 1](../ngo-fabric/README.md).
 
 ```
 cd ~
@@ -19,7 +19,7 @@ git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
 You will need to set the context before carrying out any Fabric CLI commands. You do this 
-using the export files that were generated for us in [Part 1](../ngo-fabric/README.md)
+using the export files that were generated for us in [Part 1](../ngo-fabric/README.md).
 
 Source the file, so the exports are applied to your current session. If you exit the SSH 
 session and re-connect, you'll need to source the file again. The `source` command below
