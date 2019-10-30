@@ -48,7 +48,7 @@ network with multiple peer nodes spread across AZs.
 
 ## Step 2 - Check the network is AVAILABLE
 Before continuing, check to see that your Fabric network has been created and is Available. It does take quite a while
-to create the network, so grab a coffee in meantime. You will need an Available network before continuining with the 
+to create the network, so grab a coffee in the meantime. You will need an Available network before continuining with the 
 next steps.
 
 You can check the status of your network in two places:
@@ -65,11 +65,11 @@ In your Cloud9 terminal window.
 
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
 the Fabric network. The Fabric client node will be created in its own VPC in your AWS account, with VPC endpoints 
-pointing to the Fabric network you created in [Part 1](../ngo-fabric/README.md). AWS CloudFormation 
+pointing to the Fabric network you created in Step 1 above. AWS CloudFormation 
 will be used to create the Fabric client node, the VPC and the VPC endpoints.
 
-The AWS CloudFormation template requires a number of parameter values. We'll make sure these 
-are available as export variables before running the script below.
+The AWS CloudFormation template requires a number of parameter values. The script you run below will make sure these 
+are available as export variables before calling CloudFormation.
 
 In Cloud9:
 
