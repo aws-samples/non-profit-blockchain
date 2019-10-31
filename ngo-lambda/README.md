@@ -47,6 +47,10 @@ The steps you will execute in this part are:
 9. Create a VPC Endpoint to Secrets Manager
 10. Test the Lambda function
 
+This architecture diagram illustrates how the Lambda function you will build and deploy fits within the overall architecture.
+
+![Architecture Diagram](./Lambda%20Architecture%20Diagram.png)
+
 ## Step 1 - Create a staging folder for the Lambda deployment bundle
 
 Copy the source folder into a staging folder you can use for preparing the deployment bundle you will deploy to Lambda.
