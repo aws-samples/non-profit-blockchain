@@ -57,8 +57,7 @@ async function setupClient() {
         return _clientInstance;
     }
 
-	let fabric_client = Fabric_Client.loadFromConfig(path.join(__dirname, "./ngo-connection-profile.yaml"));
-	fabric_client.loadFromConfig(path.join(__dirname, "./client-org1.yaml"));
+	let fabric_client = Fabric_Client.loadFromConfig(path.join(__dirname, "./connection-profile.yaml"));
 
 	const username = config.fabricUsername;
 	const store_path = path.join(config.cryptoFolder);
