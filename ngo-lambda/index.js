@@ -66,6 +66,7 @@ async function handler(event) {
             return reject("functionType must be of type 'queryString', 'queryArray', 'queryObject' or 'invoke'");
         }
 
+        config["fabricUsername"] = event.fabricUsername;
         let chaincodeFunction = event.chaincodeFunction;
         if (!chaincodeFunction) {
             return reject("'chaincodeFunction' must be specified");
