@@ -48,4 +48,27 @@ async function queryChaincode(request) {
     });
 }
 
-module.exports = queryChaincode;
+async function queryStringHandler(request) {
+    let result = await queryChaincode(request);
+    return result;
+}
+
+async function queryArrayHandler(request) {
+    let result = await queryChaincode(request);
+    if (!result) return [];
+    let resultArray = result.split(",");
+    return resultArray;
+}
+
+async function queryObjectHandler(request) {
+    let result = await queryChaincode(request);
+    if (!result) return {};
+    let resultObject = JSON.parse(result);
+    return resultObject;
+}
+
+module.exports = {
+    queryStringHandler,
+    queryArrayHandler,
+    queryObjectHandler
+}

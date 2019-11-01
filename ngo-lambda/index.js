@@ -21,7 +21,7 @@
 'use strict';
 
 const config = require("./config");
-const queryHandler = require("./query");
+const {queryStringHandler, queryArrayHandler, queryObjectHandler} = require("./query");
 const invokeHandler = require("./invoke");
 const logger = require("./logging").getLogger("lambdaFunction");
 
@@ -37,18 +37,33 @@ function buildCommonRequestObject(chaincodeFunction, chaincodeFunctionArgs) {
     return request;
 };
 
+/**
+ * 
+ * @param {*} event (Object)
+ * {
+ *      functionType: String, one of ['invoke','queryString','queryArray','queryObject']
+ *      chaincodeFunction: String, name of the chaincode function to execute
+ *      chaincodeFunctionArgs: Object, arguments to pass into the chaincode
+ *      fabricUsername: String, username of the context in which to execute the chaincode function
+ * }
+ *      
+ */
 async function handler(event) {
     const promise = new Promise(async (resolve, reject) => {
 
         let functionType = event.functionType;
         let handlerFunction;
 
-        if (functionType == "query") {
-            handlerFunction = queryHandler;
+        if (functionType == "queryString") {
+            handlerFunction = queryStringHandler;
+        } else if (functionType == "queryArray") {
+            handlerFunction = queryArrayHandler;
+        } else if (functionType == "queryObject") {
+            handlerFunction = queryObjectHandler;
         } else if (functionType == "invoke") {
             handlerFunction = invokeHandler;
         } else {
-            return reject("functionType must be of type 'query' or 'invoke'");
+            return reject("functionType must be of type 'queryString', 'queryArray', 'queryObject' or 'invoke'");
         }
 
         let chaincodeFunction = event.chaincodeFunction;
