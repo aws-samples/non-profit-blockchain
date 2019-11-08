@@ -35,6 +35,8 @@ Parameters:
     Type:                                         String
   SUBNETID:
     Type:                                         String
+  VPCID:
+    Type:                                         String
 
 Resources:
   SecretsManagerReadPolicy:
@@ -70,8 +72,8 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs8.10
-      CodeUri: 's3://fabric-lambda/fabric_farming_lambda_01.zip'
-      FunctionName: 'FabricLambda1'
+      CodeUri: ./
+      FunctionName: 'NGO-Lambda-Fabric-1'
       MemorySize: 512
       Role: !GetAtt LambdaRole.Arn
       Environment:
@@ -87,5 +89,15 @@ Resources:
       VpcConfig:
         SecurityGroupIds: 
           - !Ref SECURITYGROUPID
-        SubnetIds: 
+        SubnetIds:
           - !Ref SUBNETID
+  SecretsManagerVPCE:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      SecurityGroupIds:
+        - !Ref SECURITYGROUPID
+      SubnetIds:
+        - !Ref SUBNETID
+      VpcEndpointType: Interface
+      VpcId: !Ref VPCID
+      ServiceName: com.amazonaws.us-east-1.secretsmanager

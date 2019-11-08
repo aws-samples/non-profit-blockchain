@@ -38,8 +38,7 @@ The steps you will execute in this part are:
 
 1. Create the Fabric user
 2. Create the Lambda function
-3. Create a VPC endpoint to Secrets Manager
-4. Test the Lambda function
+3. Test the Lambda function
 
 This architecture diagram illustrates how the Lambda function you will build and deploy fits within the overall architecture.
 
@@ -69,21 +68,13 @@ Execute this script to create the Lambda function.
 ~/non-profit-blockchain/ngo-lambda/createLambda.sh
 ```
 
-If you get an error indicating `Function already exist: ngo-lambda-function`, you can update the existing Lambda by executing this script:
+If you get an error indicating `Function already exist: ngo-lambda-function`, you can update the deployment bundle of the existing Lambda by executing this script:
 
 ```
 ~/non-profit-blockchain/ngo-lambda/updateLambda.sh
 ```
 
-## Step 3 - Create a VPC Endpoint to Secrets Manager
-
-The Lambda function will run within a VPC, and therefore requires a VPC Endpoint to communicate with Secrets Manager.  Execute this script to create the VPC endpoint.
-
-```
-~/non-profit-blockchain/ngo-lambda/createSecretsManagerVPCE.sh
-```
-
-## Step 4 - Test the Lambda function
+## Step 3 - Test the Lambda function
 
 You can test the Lambda function from the [Lambda console](https://console.aws.amazon.com/lambda), or from the cli.
 
