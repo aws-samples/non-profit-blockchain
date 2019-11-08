@@ -1,5 +1,5 @@
 PROFILEDIR=./
-LOCALCA=./certs/managedblockchain-tls-chain.pem
+LOCALCA=~/managedblockchain-tls-chain.pem
 
 #copy the connection profiles
 cp $PROFILEDIR/connection-profile-template.yaml $PROFILEDIR/connection-profile.yaml

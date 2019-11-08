@@ -56,7 +56,7 @@ async function queryStringHandler(request) {
 async function queryArrayHandler(request) {
     let result = await queryChaincode(request);
     if (!result) return [];
-    let resultArray = result.split(",");
+    let resultArray = JSON.parse(result.split(","));
     return resultArray;
 }
 
