@@ -3,14 +3,15 @@
 Use this README if you are hosting an event with attendees, and you are using Amazon Event Engine to handle the creation of 
 AWS accounts and the pre-provisioning of Managed Blockchain networks in the accounts. 
 
-TBC
-
 # Part1: Build a Hyperledger Fabric blockchain network using Amazon Managed Blockchain
 
-This section will build a Hyperledger Fabric blockchain network using Amazon Managed Blockchain. A combination of the AWS Console and the AWS CLI will be used. The process to create the network is as follows:
+The difference when using Event Engine is that the Fabric network will be pre-provisioned in the account and does
+not need to be created. Attendees will start the workshop by provisioning a Fabric client node to administer
+the Fabric network.
+
+This section will build a Hyperledger Fabric blockchain network using Amazon Managed Blockchain. A combination of AWS CloudFormation, the AWS Console and the AWS CLI will be used. The process to create the network is as follows:
 
 * Provision an AWS Cloud9 instance. We will use the Linux terminal that Cloud9 provides
-* Use the Amazon Managed Blockchain console to create a Fabric network and provision a peer node
 * From Cloud9, run an AWS CloudFormation template to provision a VPC and a Fabric client node. You 
 will use the Fabric client node to administer the Fabric network
 * From the Fabric client node, create a Fabric channel, install and instantiate chaincode, and 
@@ -38,63 +39,44 @@ sudo pip install awscli --upgrade
 ```
 
 ## Step 1 - Create the Hyperledger Fabric blockchain network
-In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
+This step is not required if you are using Event Engine to pre-provision the Managed Blockchain network.
 
-Make sure you are in the correct AWS region (i.e. us-east-1, also known as N. Virginia) and follow the steps below:
+## Step 2 - Check the network is AVAILABLE
+Before continuing, check to see that your Fabric network has been created and is Available. It does take quite a while
+to create the network, so grab a coffee in the meantime. You will need an Available network before continuining with the 
+next steps.
 
-1. Click `Create a Network`
-2. Make sure `Hyperleger Fabric 1.2` is selected
-3. Enter a network name and an optional description, and click `Next`. DO NOT use spaces OR special characters in the network name, as this name is used as a prefix when creating resources in step 3. 
-4. Enter a member name (e.g. this could be the name of the organisation you belong to) and an optional description
-5. Enter an admin username and password, and note this down. You will need it later. Click `Next`
-6. Check your configuration and click `Create network and member`
-7. Wait until the status of your network and your network member become Available.
+You can check the status of your network in two places:
 
-Before continuing, check to see that your Fabric network has been created and is Available. If not,
-wait for it to complete. Otherwise the steps below may fail.
+* In the AWS CloudFormation Console: https://console.aws.amazon.com/cloudformation. Check the resources for your stack. You
+are waiting for the member and the peer node to be CREATE_COMPLETE
+* In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain. For you network, you are waiting
+for the network, the member and the member's peer node to be Available.
 
-## Step 2 - Create the Fabric Peer
-In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
-
-1. In the new network you have created, click on the member in the Members section.
-2. Click `Create peer node`
-3. Leave the defaults, and click `Create peer node`
-
-We'll continue with the next steps while we wait for the peer node to become Available.
+Once your Managed Blockchain network is available, move on to the next step.
 
 ## Step 3 - Create the Fabric client node
 In your Cloud9 terminal window.
 
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
 the Fabric network. The Fabric client node will be created in its own VPC in your AWS account, with VPC endpoints 
-pointing to the Fabric network you created in [Part 1](../ngo-fabric/README.md). AWS CloudFormation 
+pointing to the Fabric network you created in Step 1 above. AWS CloudFormation 
 will be used to create the Fabric client node, the VPC and the VPC endpoints.
 
-The AWS CloudFormation template requires a number of parameter values. We'll make sure these 
-are available as export variables before running the script below.
+The AWS CloudFormation template requires a number of parameter values. The script you run below will make sure these 
+are available as export variables before calling CloudFormation.
+
+Event engine provisions the Managed Blockchain network using the CloudFormation template in this folder. However, it 
+isn't possible to control the stack name, which makes it difficult to query the stack outputs. To make this easier,
+we export the stack name by searching the stack list for the stack that created the Managed Blockchain network.
+
 
 In Cloud9:
 
 ```
 export REGION=us-east-1
-export NETWORKID=<the network ID you created in Step1, from the Amazon Managed Blockchain Console>
-export NETWORKNAME=<the name you gave the network>
-```
-
-Set the VPC endpoint. Make sure it has been populated and exported. If the `echo` statement below shows
-that it's blank, check the details under your network in the Amazon Managed Blockchain Console: 
-
-```
-export VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
-echo $VPCENDPOINTSERVICENAME
-```
-
-If the VPC endpoint is populated with a value, go ahead and run this script. This will create the
-CloudFormation stack. You will see an error saying `key pair does not exist`. This is expected as the script
-will check whether the keypair exists before creating it. I don't want to overwrite any existing
-keypairs you have, so just ignore this error and let the script continue:
-
-```
+export STACKNAME=$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[?Description==`Amazon Managed Blockchain. Creates network with a single member and peer node`] | [0].StackName' --output text)
+echo $STACKNAME
 cd ~/non-profit-blockchain/ngo-fabric
 ./vpc-client-node.sh
 ```
@@ -107,8 +89,8 @@ is complete. We will use this information in later steps.
 On the Fabric client node.
 
 Prior to executing any commands on the Fabric client node, you will need to export ENV variables
-that provide a context to Hyperledger Fabric. These variables will tell the client node which peer
-node to interact with, which TLS certs to use, etc. 
+that provide a context to Hyperledger Fabric. These variables will tell the client node which Fabric
+network to use, which peer node to interact with, which TLS certs to use, etc. 
 
 From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
 The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you 
@@ -128,48 +110,40 @@ cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-Create the file that includes the ENV export values that define your Fabric network configuration.
+In future steps you will need to refer to different configuration values in your Fabric network. In this step
+we export these values so you don't need to copy them from the console, or look them up elsewhere. Source the file 
+that includes the ENV export values that define your Fabric network configuration so that the exports are applied 
+to your current session. If you exit the SSH session and re-connect, you'll need to source the file again.
 
 ```
+export REGION=us-east-1
+export STACKNAME=$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[?Description==`Amazon Managed Blockchain. Creates network with a single member and peer node`] | [0].StackName' --output text)
+echo $STACKNAME
 cd ~/non-profit-blockchain/ngo-fabric
 cp templates/exports-template.sh fabric-exports.sh
-vi fabric-exports.sh
-```
-
-Update the export statements at the top of the file. The info you need either matches what you 
-entered when creating the Fabric network in [Part 1](../ngo-fabric/README.md), or can be found 
-in the Amazon Managed Blockchain Console, under your network.
-
-Source the file, so the exports are applied to your current session. If you exit the SSH 
-session and re-connect, you'll need to source the file again.
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
 source fabric-exports.sh
+source ~/peer-exports.sh 
 ```
 
 Sourcing the file will do two things:
 * export the necessary ENV variables
 * create another file which contains the export values you need to use when working with a Fabric peer node.
-This can be found in the file: `~/peer-exports.sh`. You will see how to use this in a later step.
+This can be found in the file: `~/peer-exports.sh`, which we also source here.
 
-Check the `source` worked:
+Check the `source` worked. You should see values for both of the ENV variables below:
 
 ```
 $ echo $PEERSERVICEENDPOINT
 nd-4MHB4EKFCRF7VBHXZE2ZU4F6GY.m-B7YYBFY4GREBZLPCO2SUS4GP3I.n-WDG36TTUD5HEJORZUPF4REKMBI.managedblockchain.us-east-1.amazonaws.com:30003
+
+$ echo $MSP
+m-MKPVAFNPQ5BV7ADVZ4MP2QWA3M
 ```
 
-Check the peer export file exists and that it contains a number of export keys with values:
+For interest, you can check that the peer export file exists and that it contains a number of export keys with values:
 
 ```
 cat ~/peer-exports.sh 
-```
-
-If the file has values for all keys, source it:
-
-```
-source ~/peer-exports.sh 
 ```
 
 Get the latest version of the Managed Blockchain PEM file. This will overwrite the existing file in the home directory with the latest version of this file:
@@ -199,20 +173,11 @@ cd ~/non-profit-blockchain/ngo-fabric
 ## Step 5 - Update the configtx channel configuration
 On the Fabric client node.
 
-Update the configtx channel configuration. The Name and ID fields should be updated with the member ID. 
-You can obtain the member ID from the Amazon Managed Blockchain Console, or from the ENV variables 
-exported to your current session.
-
-```
-echo $MEMBERID
-```
-
-Update the configtx.yaml file. Make sure you edit the configtx.yaml file you copy to your home
-directory below, NOT the one in the repo:
+Update the configtx channel configuration. The Name and ID fields should be updated with the member ID from Managed Blockchain.
 
 ```
 cp ~/non-profit-blockchain/ngo-fabric/configtx.yaml ~
-vi ~/configtx.yaml
+sed -i "s|__MEMBERID__|$MEMBERID|g" ~/configtx.yaml
 ```
 
 Generate the configtx channel configuration by executing the following script. When the channel is created, this channel configuration will become the genesis block (i.e. block 0) on the channel:
@@ -429,3 +394,4 @@ The workshop instructions can be found in the README files in parts 1-4:
 * [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
 * [Part 6:](../ngo-lambda/README.md) Query the blockchain with a Lambda function. 
+* 

@@ -14,6 +14,6 @@
 # permissions and limitations under the License.
 
 echo Creating Amazon Managed Blockchain network, member and peer node
-aws cloudformation deploy --stack-name non-profit-amb --template-file amb.yaml \
+aws cloudformation deploy --stack-name $STACKNAME --template-file amb.yaml \
 --capabilities CAPABILITY_NAMED_IAM \
 --region $REGION

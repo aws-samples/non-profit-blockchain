@@ -14,13 +14,13 @@
 # permissions and limitations under the License.
 
 export REGION=us-east-1
-export NETWORKNAME=$(aws cloudformation describe-stacks --stack-name non-profit-amb --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkName`].OutputValue' --output text)
-export MEMBERNAME=$(aws cloudformation describe-stacks --stack-name non-profit-amb --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`MemberName`].OutputValue' --output text)
-export NETWORKVERSION=$(aws cloudformation describe-stacks --stack-name non-profit-amb --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`FrameworkVersion`].OutputValue' --output text)
-export ADMINUSER=$(aws cloudformation describe-stacks --stack-name non-profit-amb --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`MemberAdminUsername`].OutputValue' --output text)
-export ADMINPWD=$(aws cloudformation describe-stacks --stack-name non-profit-amb --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`MemberAdminPassword`].OutputValue' --output text)
-export NETWORKID=$(aws cloudformation describe-stacks --stack-name non-profit-amb --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkId`].OutputValue' --output text)
-export MEMBERID=$(aws cloudformation describe-stacks --stack-name non-profit-amb --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`MemberId`].OutputValue' --output text)
+export NETWORKNAME=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkName`].OutputValue' --output text)
+export MEMBERNAME=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`MemberName`].OutputValue' --output text)
+export NETWORKVERSION=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`FrameworkVersion`].OutputValue' --output text)
+export ADMINUSER=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`MemberAdminUsername`].OutputValue' --output text)
+export ADMINPWD=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`MemberAdminPassword`].OutputValue' --output text)
+export NETWORKID=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkId`].OutputValue' --output text)
+export MEMBERID=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`MemberId`].OutputValue' --output text)
 
 # No need to change anything below here
 echo Updating AWS CLI to the latest version

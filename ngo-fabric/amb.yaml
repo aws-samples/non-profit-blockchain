@@ -196,45 +196,45 @@ Outputs:
     Description: member id 
     Value: !GetAtt Member.MemberId
     Export:
-      Name: !Sub "${AWS::StackName}-MemberId"
+      Name: !Sub "${NetworkName}-MemberId"
   MemberName:
     Description: member name 
     Value: !Sub "member-${NetworkName}"
     Export:
-      Name: !Sub "${AWS::StackName}-MemberName"
+      Name: !Sub "${NetworkName}-MemberName"
   NetworkId:
     Description: network id 
     Value: !GetAtt Member.NetworkId
     Export:
-      Name: !Sub "${AWS::StackName}-NetworkId"
+      Name: !Sub "${NetworkName}-NetworkId"
   NetworkName:
     Description: network name 
     Value: !Ref NetworkName
     Export:
-      Name: !Sub "${AWS::StackName}-NetworkName"
+      Name: !Sub "${NetworkName}-NetworkName"
   Framework:
     Description: blockchain protocol, such as Hyperledger Fabric
     Value: !Ref Framework
     Export:
-      Name: !Sub "${AWS::StackName}-Framework"
+      Name: !Sub "${NetworkName}-Framework"
   FrameworkVersion:
     Description: version of the blockchain protocol
     Value: !Ref FrameworkVersion
     Export:
-      Name: !Sub "${AWS::StackName}-FrameworkVersion"
+      Name: !Sub "${NetworkName}-FrameworkVersion"
   MemberPeerNodeId:
     Description: member peer node Id
     Value: !GetAtt MemberPeerNode.NodeId
     Export:
-      Name: !Sub "${AWS::StackName}-MemberPeerNodeId"
+      Name: !Sub "${NetworkName}-MemberPeerNodeId"
   MemberAdminUsername:
     Description: fabric admin user name
     Value: !Ref MemberAdminUsername
     Export:
-      Name: !Sub "${AWS::StackName}-MemberAdminUsername"
+      Name: !Sub "${NetworkName}-MemberAdminUsername"
   MemberAdminPassword:
     Description: fabric admin password
     Value: !Ref MemberAdminPassword
     Export:
-      Name: !Sub "${AWS::StackName}-MemberAdminPassword"
+      Name: !Sub "${NetworkName}-MemberAdminPassword"
   
