@@ -32,6 +32,7 @@ nvm install lts/carbon
 nvm use lts/carbon
 cd src
 npm install
+cd ..
 
 echo Package the Cloudformation template
 export BUCKETNAME=`echo "$NETWORKNAME-fabric-lambda" | tr '[:upper:]' '[:lower:]'`
@@ -44,13 +45,13 @@ aws cloudformation package --template-file cloudformation-lambda.yaml \
 echo Deploy the Lambda Cloudformation stack
 export LAMBDA_STACK_NAME=fabric-lambda-stack
 export VPC_STACK_NAME=$NETWORKNAME-fabric-client-node
-export VPCID=$(aws cloudformation --region $REGION describe-stacks --stack-name $NETWORKNAME-fabric-client-node --query "Stacks[0].Outputs[?OutputKey=='VPCID'].OutputValue" --output text)
+export VPCID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='VPCID'].OutputValue" --output text --region $REGION)
 
 aws cloudformation deploy --stack-name $LAMBDA_STACK_NAME --template-file packaged-cloudformation-lambda.yaml \
 --region $REGION --capabilities CAPABILITY_NAMED_IAM \
 --parameter-overrides CAENDPOINT=$CASERVICEENDPOINT PEERENDPOINT=grpcs://$PEERSERVICEENDPOINT \
 ORDERERENDPOINT=grpcs://$ORDERINGSERVICEENDPOINT CHANNELNAME=$CHANNEL \
-CHAINCODEID=$CHAINCODEID MSP=$MSP MEMBERNAME=$MEMBERNAME VPC=$VPCID \
+CHAINCODEID=$CHAINCODEID MSP=$MSP MEMBERNAME=$MEMBERNAME VPCID=$VPCID \
 SECURITYGROUPID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='SecurityGroupID'].OutputValue" --output text --region $REGION ) \
 SUBNETID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='PublicSubnetID'].OutputValue" --output text --region $REGION )
 

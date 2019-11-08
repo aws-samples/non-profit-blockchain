@@ -68,7 +68,7 @@ Execute this script to create the Lambda function.
 ~/non-profit-blockchain/ngo-lambda/createLambda.sh
 ```
 
-If you get an error indicating `Function already exist: ngo-lambda-function`, you can update the deployment bundle of the existing Lambda by executing this script:
+If you get an error indicating `Function already exists: ngo-lambda-function`, you can update the deployment bundle of the existing Lambda by executing this script:
 
 ```
 ~/non-profit-blockchain/ngo-lambda/updateLambda.sh
