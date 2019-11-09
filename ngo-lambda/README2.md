@@ -82,7 +82,7 @@ To test from the cli, you will execute the commands below.  The output of each c
 
 First, call the `createDonor` chaincode function to create the donor "melissa".
 ```
-aws lambda invoke --function-name ngo-lambda-function --payload '{"fabricUsername":$FABRICUSER,"functionType": "invoke","chaincodeFunction": "createDonor","chaincodeFunctionArgs": {"donorUserName":"melissa","email":"melissa@melissasngo.org"}}' --region $REGION /tmp/lambda-output-createDonor.txt
+aws lambda invoke --function-name ngo-lambda-function --payload '{"fabricUsername":"$FABRICUSER","functionType": "invoke","chaincodeFunction": "createDonor","chaincodeFunctionArgs": {"donorUserName":"melissa","email":"melissa@melissasngo.org"}}' --region $REGION /tmp/lambda-output-createDonor.txt
 cat /tmp/lambda-output-createDonor.txt
 ```
 
@@ -94,7 +94,7 @@ cat /tmp/lambda-output-queryDonor.txt
 
 Finally, call the `queryAllDonors` function to view all the donors.
 ```
-aws lambda query --function-name ngo-lambda-function --payload '{"fabricUsername":"lambdaUser","functionType":"queryObject","chaincodeFunction":"queryAllDonors","chaincodeFunctionArgs":{}}' --region $REGION /tmp/lambda-output-queryAllDonors.txt
+aws lambda query --function-name ngo-lambda-function --payload '{"fabricUsername":"$FABRICUSER","functionType":"queryObject","chaincodeFunction":"queryAllDonors","chaincodeFunctionArgs":{}}' --region $REGION /tmp/lambda-output-queryAllDonors.txt
 cat /tmp/lambda-output-queryAllDonors.txt
 ```
 
