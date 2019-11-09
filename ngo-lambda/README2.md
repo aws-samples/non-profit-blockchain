@@ -88,7 +88,7 @@ cat /tmp/lambda-output-createDonor.txt
 
 Next, call the `queryDonor` function to view the details of the donor we just created.
 ```
-aws lambda invoke --function-name ngo-lambda-function --payload '{"fabricUsername":$FABRICUSER,"functionType":"query","chaincodeFunction":"queryDonor","chaincodeFunctionArgs":{"donorUserName":"melissa"}}' --region $REGION /tmp/lambda-output-queryDonor.txt
+aws lambda invoke --function-name ngo-lambda-function --payload '{"fabricUsername":"$FABRICUSER","functionType":"queryObject","chaincodeFunction":"queryDonor","chaincodeFunctionArgs":{"donorUserName":"melissa"}}' --region $REGION /tmp/lambda-output-queryDonor.txt
 cat /tmp/lambda-output-queryDonor.txt
 ```
 

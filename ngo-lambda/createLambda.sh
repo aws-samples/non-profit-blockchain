@@ -43,6 +43,7 @@ aws cloudformation package --template-file cloudformation-lambda.yaml \
     --s3-bucket $BUCKETNAME
 
 echo Deploy the Lambda Cloudformation stack
+export CHAINCODEID=ngo
 export LAMBDA_STACK_NAME=fabric-lambda-stack
 export VPC_STACK_NAME=$NETWORKNAME-fabric-client-node
 export VPCID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='VPCID'].OutputValue" --output text --region $REGION)
