@@ -76,6 +76,7 @@ Resources:
       FunctionName: 'NGO-Lambda-Fabric-1'
       MemorySize: 512
       Role: !GetAtt LambdaRole.Arn
+      Timeout: 15
       Environment:
         Variables:
           CA_ENDPOINT: !Ref CAENDPOINT
