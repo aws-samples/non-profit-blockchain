@@ -59,7 +59,4 @@ certificateAuthorities:
       verify: false
     tlsCACerts:
       path: %CAFILE%
-    registrar:
-      - enrollId: %ADMINUSER%
-        enrollSecret: %ADMINPWD%
     caName: %MEMBERID%
