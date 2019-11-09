@@ -14,6 +14,7 @@
 # permissions and limitations under the License.
 
 # This script is used to update an existing Lambda function.
-zip -r /tmp/ngo-lambda-function.zip ~/non-profit-blockchain/ngo-lambda/src/
+cd ~/non-profit-blockchain/ngo-lambda/src/
+zip -r /tmp/ngo-lambda-function.zip .
 
 aws lambda update-function-code --function-name ngo-lambda-function --zip-file fileb:///tmp/ngo-lambda-function.zip --region $REGION
