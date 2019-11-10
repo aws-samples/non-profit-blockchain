@@ -102,3 +102,4 @@ Resources:
       VpcEndpointType: Interface
       VpcId: !Ref VPCID
       ServiceName: com.amazonaws.us-east-1.secretsmanager
+      PrivateDnsEnabled: true
