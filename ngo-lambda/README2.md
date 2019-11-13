@@ -1,6 +1,6 @@
-# Part 6: Read and write to the blockchain with AWS Lambda
+# Part 6: Read and write to the blockchain with Amazon API Gateway and AWS Lambda
 
-Part 6 will show you how to publish a Lambda function that invokes chaincode on a Hyperledger Fabric blockchain network running on Amazon Managed Blockchain.  You will use the NodeJS Hyperledger Fabric SDK within the Lambda function to interface with the blockchain.
+Part 6 will show you how to publish a REST API with API Gateway and Lambda that invokes chaincode on a Hyperledger Fabric blockchain network running on Amazon Managed Blockchain.  You will use the NodeJS Hyperledger Fabric SDK within the Lambda function to interface with the blockchain.
 
 ## Pre-requisites
  There are multiple parts to the workshop.  Before starting on Part 6, you should have completed [Part 1](../ngo-fabric/README.md) and [Part 2](../ngo-chaincode/README.md).
@@ -37,8 +37,10 @@ source ~/peer-exports.sh
 The steps you will execute in this part are:
 
 1. Create the Fabric user
-2. Create the Lambda function
+2. Create and deploy the Lambda function
 3. Test the Lambda function
+4. Create and deploy the API Gateway
+5. Test the API Gateway
 
 This architecture diagram illustrates how the Lambda function you will build and deploy fits within the overall architecture.
 
@@ -60,7 +62,7 @@ Execute this script to register and enroll the Fabric user, and upload the crede
 ~/non-profit-blockchain/ngo-lambda/createFabricUser.sh
 ```
 
-## Step 2 - Create the Lambda function
+## Step 2 - Create and deploy the Lambda function
 
 Execute this script to create the Lambda function.
 
@@ -98,11 +100,58 @@ aws lambda query --function-name ngo-lambda-function --payload '{"fabricUsername
 cat /tmp/lambda-output-queryAllDonors.txt
 ```
 
-You now have a Lambda function that is querying the blockchain.  You can use this Lambda function to service API Gateway requests as part of a serverless architecture.
+You now have a Lambda function that is querying the blockchain.  Next we'll create an API Gateway that calls this Lambda for each of its routes.
+
+## Step 4 - Create and deploy the API Gateway
+
+Execute this script to create the API Gateway.  If you used a non-default name for the Lambda function, edit the name of the Lambda function within `createAPIGateway.sh` before exexuting it.
+
+```
+~/non-profit-blockchain/ngo-lambda/createAPIGateway.sh
+```
+
+## Step 5 - Test the API Gateway
+
+You can test the API Gateway from the [API Gateway console](https://console.aws.amazon.com/apigateway), or from the cli.
+
+To test from the cli, you will execute the commands below.  The output of each command is in the file specified in the last argument, and is displayed via `cat`.
+
+In the requests below, replace `<YOUR_API_GATEWAY_URL>` with the url that was output from running step 4.  You can also find this within `Stages` of the API in the [API Gateway console](https://console.aws.amazon.com/apigateway).
+
+First, call the `POST /users` endpoint which will execute the `createDonor` chaincode function to create the donor "thomas".
+```
+curl -s -X POST "<YOUR_API_GATEWAY_URL>/users" -H "content-type: application/x-www-form-urlencoded" -d 'username=thomas&orgName=Org1' > /tmp/apigateway-output-createDonor.txt
+cat /tmp/apigateway-output-createDonor.txt
+```
+
+Second, call the `GET /users/{donorName}` endpoint which will execute the `queryDonor` chaincode function to query the donor "thomas".
+```
+curl -s -X GET "<YOUR_API_GATEWAY_URL>/users/thomas" > /tmp/apigateway-output-queryDonor.txt
+cat /tmp/apigateway-output-queryDonor.txt
+```
+
+Finally, call the `GET /users` endpoint which will execute the `queryAllDonors` chaincode function to view all the donors.
+```
+curl -s -X GET "<YOUR_API_GATEWAY_URL>/users" > /tmp/apigateway-output-queryAllDonors.txt
+cat /tmp/apigateway-output-queryAllDonors.txt
+```
+
+You now have a REST API running on API Gateway that is invoking a Lambda function to execute transactions on the blockchain.
+
+
+// TO DO
+1. Create the API Gateway with the three routes POST /users, GET /users/name, GET /users
+2. Map them to lambda with mapping templates for all content-types
+3. Test it
+4. Export the swagger as yaml
+5. Create a CFN for API G and include the exported swagger
+    Also include creating a stage on APIG
+
+xxx. figure out the permissioning around stages
 
 * [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
 * [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
 * [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
 * [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
-* [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with AWS Lambda.
+* [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with Amazon API Gateway and AWS Lambda.
