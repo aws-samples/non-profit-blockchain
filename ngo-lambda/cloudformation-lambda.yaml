@@ -109,8 +109,7 @@ Resources:
       VpcId: !Ref VPCID
       ServiceName: com.amazonaws.us-east-1.secretsmanager
       PrivateDnsEnabled: true
-  Outputs:
-    APIGatewayURL:
-      Description:                                  API Gateway URL
-      Value:
-        !GetAtt                                     NGOAPIGateway.Stage
+Outputs:
+  APIGatewayURL:
+    Description: API Gateway URL
+    Value: !Ref NGOAPIGateway.Stage

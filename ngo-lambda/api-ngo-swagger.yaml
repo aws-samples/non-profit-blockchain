@@ -3,10 +3,6 @@ swagger: "2.0"
 info:
   version: "2019-11-13T11:12:00Z"
   title: "Non Profit Blockchain"
-host: "l9icb7av8k.execute-api.us-east-1.amazonaws.com"
-basePath: "/dev"
-schemes:
-- "https"
 paths:
   /donors:
     get:
@@ -27,7 +23,7 @@ paths:
         requestTemplates:
           application/json: "{\n  \"functionType\": \"queryObject\",\n  \"chaincodeFunction\"\
             : \"queryAllDonors\",\n  \"chaincodeFunctionArgs\": {},\n  \"fabricUsername\"\
-            : \"lambdaUser5\"\n}"
+            : \"lambdaUser\"\n}"
         passthroughBehavior: "when_no_templates"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
