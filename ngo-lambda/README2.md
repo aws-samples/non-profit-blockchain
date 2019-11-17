@@ -37,14 +37,13 @@ source ~/peer-exports.sh
 The steps you will execute in this part are:
 
 1. Create the Fabric user
-2. Create and deploy the Lambda function
+2. Deploy the Lambda function and API Gateway
 3. Test the Lambda function
-4. Create and deploy the API Gateway
-5. Test the API Gateway
+4. Test the API Gateway
 
-This architecture diagram illustrates how the Lambda function you will build and deploy fits within the overall architecture.
+This architecture diagram illustrates how the Lambda function and API Gateway you will build and deploy fits within the overall architecture.
 
-![Architecture Diagram](./Lambda%20Architecture%20Diagram.png)
+![Architecture Diagram](./Lambda%20API%20AMB%20Workshop%20Diagram.png)
 
 ## Step 1 - Create the Fabric user
 
@@ -62,9 +61,11 @@ Execute this script to register and enroll the Fabric user, and upload the crede
 ~/non-profit-blockchain/ngo-lambda/createFabricUser.sh
 ```
 
-## Step 2 - Create and deploy the Lambda function
+## Step 2 - Deploy the Lambda function and API Gateway
 
-Execute this script to create the Lambda function.
+The Lambda function will run within your VPC so it can access the VPC Endpoint to the Managed Blockchain service.  The VPC will also need a new VPC Endpoint so it can communicate with Secrets Manager.  The API Gateway will translate REST requests into Lambda function executions.
+
+Execute this script to create the Lambda function, VPC Endpoint and the API Gateway.
 
 ```
 ~/non-profit-blockchain/ngo-lambda/createLambda.sh
@@ -100,7 +101,7 @@ aws lambda query --function-name ngo-lambda-function --payload '{"fabricUsername
 cat /tmp/lambda-output-queryAllDonors.txt
 ```
 
-You now have a Lambda function that is querying the blockchain.  Next we'll create an API Gateway that calls this Lambda for each of its routes.
+You have just a Lambda function that is querying the blockchain.  Next we'll create an API Gateway that calls this Lambda for each of its routes.
 
 ## Step 4 - Create and deploy the API Gateway
 

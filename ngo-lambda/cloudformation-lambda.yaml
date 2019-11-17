@@ -92,12 +92,22 @@ Resources:
           - !Ref SECURITYGROUPID
         SubnetIds:
           - !Ref SUBNETID
-  NGOAPIGateway:
-    Type: 'AWS::Serverless::Api'
-    Properties:
-      Name: NGO API
-      StageName: dev
-      DefinitionUri: ./api-ngo-swagger.yaml
+      Events:
+        Type: Api
+        Properties:
+          Path: /donors
+          Method: get
+          RestApiId: !Ref NGOAPIGateway
+        Type: Api
+        Properties:
+          Path: /donors
+          Method: post
+          RestApiId: !Ref NGOAPIGateway
+        Type: Api
+        Properties:
+          Path: /{donorUserName}
+          Method: get
+          RestApiId: !Ref NGOAPIGateway
   SecretsManagerVPCE:
     Type: 'AWS::EC2::VPCEndpoint'
     Properties:
@@ -109,7 +119,101 @@ Resources:
       VpcId: !Ref VPCID
       ServiceName: com.amazonaws.us-east-1.secretsmanager
       PrivateDnsEnabled: true
+  NGOAPIGateway:
+    Type: 'AWS::Serverless::Api'
+    Properties:
+      Name: NGO API
+      StageName: dev
+      DefinitionBody: # Can't use uri: https://github.com/awslabs/serverless-application-model/issues/305
+        swagger: "2.0"
+        info:
+          version: "2019-11-13T11:12:00Z"
+          title: "Non Profit Blockchain"
+        paths:
+          /donors:
+            get:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              x-amazon-apigateway-integration:
+                uri: Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NGOLambdaFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: "{\n  \"functionType\": \"queryObject\",\n  \"chaincodeFunction\"\
+                    : \"queryAllDonors\",\n  \"chaincodeFunctionArgs\": {},\n  \"fabricUsername\"\
+                    : \"lambdaUser\"\n}"
+                passthroughBehavior: "when_no_templates"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            post:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              x-amazon-apigateway-integration:
+                uri: Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NGOLambdaFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: "{\n  \"functionType\": \"invoke\",\n  \"chaincodeFunction\"\
+                    : \"createDonor\",\n  \"chaincodeFunctionArgs\": {\n      #set( $body\
+                    \ = $util.parseJson($input.body) )\n      \"donorUserName\": \"$body.donorUserName\"\
+                    ,\n      \"email\": \"$body.email\",\n      \"registeredDate\":\"$context.requestTime\"\
+                    \n  },\n  \"fabricUsername\": \"lambdaUser\"\n}"
+                passthroughBehavior: "when_no_templates"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+          /donors/{donorUserName}:
+            get:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "donorUserName"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              x-amazon-apigateway-integration:
+                uri: Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NGOLambdaFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: "{\n  \"functionType\": \"queryObject\",\n  \"chaincodeFunction\"\
+                    : \"queryDonor\",\n  \"chaincodeFunctionArgs\": {\n      \"donorUserName\"\
+                    : \"$input.params('donorUserName')\"\n  },\n  \"fabricUsername\": \"lambdaUser\"\
+                    \n}"
+                passthroughBehavior: "when_no_templates"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+        definitions:
+          Empty:
+            type: "object"
+            title: "Empty Schema"
 Outputs:
   APIGatewayURL:
-    Description: API Gateway URL
-    Value: !Ref NGOAPIGateway.Stage
+    Description: "API Gateway endpoint URL for Dev stage"
+    Value: !Sub "https://${NGOAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev/"
