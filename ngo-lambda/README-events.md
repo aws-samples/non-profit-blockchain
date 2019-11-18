@@ -1,3 +1,8 @@
+# To be used with Amazon Event Engine
+
+Use this README if you are hosting an event with attendees, and you are using Amazon Event Engine to handle the creation of 
+AWS accounts and the pre-provisioning of Managed Blockchain networks in the accounts. 
+
 # Part 6: Read and write to the blockchain with Amazon API Gateway and AWS Lambda
 
 Part 6 will show you how to publish a REST API with API Gateway and Lambda that invokes chaincode on a Hyperledger Fabric blockchain network running on Amazon Managed Blockchain.  You will use the NodeJS Hyperledger Fabric SDK within the Lambda function to interface with the blockchain.
@@ -63,7 +68,19 @@ Execute this script to register and enroll the Fabric user, and upload the crede
 
 ## Step 2 - Deploy the Lambda function and API Gateway
 
-The Lambda function will run within your VPC so it can access the VPC Endpoint to the Managed Blockchain service.  The VPC will also need a new VPC Endpoint so it can communicate with Secrets Manager.  The API Gateway will translate REST requests into Lambda function executions.
+The Lambda function will run within your VPC so it can access the VPC Endpoint to the Managed Blockchain service.  The Lambda function is designed to support calling any function that is exported from the blockchain.  In our examples below we will call several functions on the blockchain, and they will all be invoking this single Lambda.  This simplifies adding higher level interfaces like API Gateway to execute blockchain transactions.
+
+The VPC will also need a new VPC Endpoint so it can communicate with Secrets Manager.  The API Gateway will translate REST requests into Lambda function executions.
+
+The AWS CloudFormation template we will deploy requires a number of parameter values. The script you run below will make sure these are available as export variables before calling CloudFormation.
+
+Event engine provisions the Managed Blockchain network using the CloudFormation template in this repository. However, it isn't possible to control the stack name, which makes it difficult to query the stack outputs. To make this easier, we export the stack name by searching the stack list for the stack that created the Managed Blockchain network.
+
+```
+export REGION=us-east-1
+export VPC_STACK_NAME=$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[?Description==`Amazon Managed Blockchain. Creates network with a single member and peer node`] | [0].StackName' --output text)
+echo $VPC_STACK_NAME
+```
 
 Execute this script to create the Lambda function, VPC Endpoint and the API Gateway.
 
@@ -71,7 +88,15 @@ Execute this script to create the Lambda function, VPC Endpoint and the API Gate
 ~/non-profit-blockchain/ngo-lambda/createLambda.sh
 ```
 
-If you get an error indicating `Function already exists: ngo-lambda-function`, you can update the deployment bundle of the existing Lambda by executing this script:
+If this is successful you should see a message indicating:
+```
+Lambda creation completed. API Gateway is active at:
+https://abcd12345.execute-api.us-east-1.amazonaws.com/dev
+```
+
+The url is to the API Gateway which we will test with in step 4.  Copy the url and paste it in a local text editor to reference it later.
+
+If the deploy was not successful, and you get an error indicating `Function already exists: ngo-lambda-function`, you can update the deployment bundle of the existing Lambda by executing this script:
 
 ```
 ~/non-profit-blockchain/ngo-lambda/updateLambda.sh
@@ -103,52 +128,33 @@ cat /tmp/lambda-output-queryAllDonors.txt
 
 You have just a Lambda function that is querying the blockchain.  Next we'll create an API Gateway that calls this Lambda for each of its routes.
 
-## Step 4 - Create and deploy the API Gateway
+## Step 4 - Test the API Gateway
 
-Execute this script to create the API Gateway.  If you used a non-default name for the Lambda function, edit the name of the Lambda function within `createAPIGateway.sh` before exexuting it.
-
-```
-~/non-profit-blockchain/ngo-lambda/createAPIGateway.sh
-```
-
-## Step 5 - Test the API Gateway
-
-You can test the API Gateway from the [API Gateway console](https://console.aws.amazon.com/apigateway), or from the cli.
+You can test the API Gateway from the [API Gateway console](https://console.aws.amazon.com/apigateway), or from the cli.  We will walk through testing it from the cli.
 
 To test from the cli, you will execute the commands below.  The output of each command is in the file specified in the last argument, and is displayed via `cat`.
 
-In the requests below, replace `<YOUR_API_GATEWAY_URL>` with the url that was output from running step 4.  You can also find this within `Stages` of the API in the [API Gateway console](https://console.aws.amazon.com/apigateway).
+In the requests below, replace `<YOUR_API_GATEWAY_URL>` with the url that was output from running step 2.  You can also find this within the `dev` stage in the `Stages` of the API in the [API Gateway console](https://console.aws.amazon.com/apigateway).
 
-First, call the `POST /users` endpoint which will execute the `createDonor` chaincode function to create the donor "thomas".
+First, call the `POST /donors` endpoint which will execute the `createDonor` chaincode function to create the donor "thomas".
 ```
-curl -s -X POST "<YOUR_API_GATEWAY_URL>/users" -H "content-type: application/x-www-form-urlencoded" -d 'username=thomas&orgName=Org1' > /tmp/apigateway-output-createDonor.txt
+curl -s -X POST "<YOUR_API_GATEWAY_URL>/donors" -H "content-type: application/json" -d '{"donorUserName":"rachel","email":"rachel@donor.org"}' > /tmp/apigateway-output-createDonor.txt
 cat /tmp/apigateway-output-createDonor.txt
 ```
 
-Second, call the `GET /users/{donorName}` endpoint which will execute the `queryDonor` chaincode function to query the donor "thomas".
+Second, call the `GET /donors/{donorName}` endpoint which will execute the `queryDonor` chaincode function to query the donor "thomas".
 ```
-curl -s -X GET "<YOUR_API_GATEWAY_URL>/users/thomas" > /tmp/apigateway-output-queryDonor.txt
+curl -s -X GET "<YOUR_API_GATEWAY_URL>/donors/thomas" > /tmp/apigateway-output-queryDonor.txt
 cat /tmp/apigateway-output-queryDonor.txt
 ```
 
-Finally, call the `GET /users` endpoint which will execute the `queryAllDonors` chaincode function to view all the donors.
+Finally, call the `GET /donors` endpoint which will execute the `queryAllDonors` chaincode function to view all the donors.
 ```
-curl -s -X GET "<YOUR_API_GATEWAY_URL>/users" > /tmp/apigateway-output-queryAllDonors.txt
+curl -s -X GET "<YOUR_API_GATEWAY_URL>/donors" > /tmp/apigateway-output-queryAllDonors.txt
 cat /tmp/apigateway-output-queryAllDonors.txt
 ```
 
-You now have a REST API running on API Gateway that is invoking a Lambda function to execute transactions on the blockchain.
-
-
-// TO DO
-1. Create the API Gateway with the three routes POST /users, GET /users/name, GET /users
-2. Map them to lambda with mapping templates for all content-types
-3. Test it
-4. Export the swagger as yaml
-5. Create a CFN for API G and include the exported swagger
-    Also include creating a stage on APIG
-
-xxx. figure out the permissioning around stages
+You now have a REST API running on API Gateway that is invoking a Lambda function to execute transactions on the blockchain.  To make more functions from the blockchain available within API Gateway, you would add API Gateway routes to support them, and continue using the same Lambda function.   
 
 * [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
 * [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 

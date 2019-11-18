@@ -93,21 +93,24 @@ Resources:
         SubnetIds:
           - !Ref SUBNETID
       Events:
-        Type: Api
-        Properties:
-          Path: /donors
-          Method: get
-          RestApiId: !Ref NGOAPIGateway
-        Type: Api
-        Properties:
-          Path: /donors
-          Method: post
-          RestApiId: !Ref NGOAPIGateway
-        Type: Api
-        Properties:
-          Path: /donors/{donorUserName}
-          Method: get
-          RestApiId: !Ref NGOAPIGateway
+        GetDonors:
+          Type: Api
+          Properties:
+            Path: /donors
+            Method: get
+            RestApiId: !Ref NGOAPIGateway
+        CreateDonor:
+          Type: Api
+          Properties:
+            Path: /donors
+            Method: post
+            RestApiId: !Ref NGOAPIGateway
+        GetDonor:
+          Type: Api
+          Properties:
+            Path: /donors/{donorUserName}
+            Method: get
+            RestApiId: !Ref NGOAPIGateway
   SecretsManagerVPCE:
     Type: 'AWS::EC2::VPCEndpoint'
     Properties:

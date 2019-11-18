@@ -13,6 +13,11 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 
+if [ -z "$VPC_STACK_NAME" ]
+then
+      echo "Environment variable \$VPC_STACK_NAME is empty. Please populate this with the name of the CloudFormation stack that created your Managed Blockchain network"
+fi
+
 cd ~/non-profit-blockchain/ngo-lambda
 
 echo Copy the Managed Blockchain TLS Certificate
@@ -45,7 +50,6 @@ aws cloudformation package --template-file cloudformation-lambda.yaml \
 echo Deploy the Lambda Cloudformation stack
 export CHAINCODEID=ngo
 export LAMBDA_STACK_NAME=fabric-lambda-stack
-export VPC_STACK_NAME=$NETWORKNAME-fabric-client-node
 export VPCID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='VPCID'].OutputValue" --output text --region $REGION)
 
 aws cloudformation deploy --stack-name $LAMBDA_STACK_NAME --template-file packaged-cloudformation-lambda.yaml \
