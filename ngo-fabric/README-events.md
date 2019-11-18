@@ -60,16 +60,18 @@ In your Cloud9 terminal window.
 
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
 the Fabric network. The Fabric client node will be created in its own VPC in your AWS account, with VPC endpoints 
-pointing to the Fabric network you created in Step 1 above. AWS CloudFormation 
-will be used to create the Fabric client node, the VPC and the VPC endpoints.
+pointing to the Fabric network you created in Step 1 above. AWS CloudFormation will be used to create the Fabric 
+client node, the VPC and the VPC endpoints.
 
 The AWS CloudFormation template requires a number of parameter values. The script you run below will make sure these 
 are available as export variables before calling CloudFormation.
 
+If you see the following error when running the script below: `An error occurred (InvalidKeyPair.NotFound)`, ignore it.
+This is caused by the script creating a keypair, and ensuring it does not overwrite it if it does exist.
+
 Event engine provisions the Managed Blockchain network using the CloudFormation template in this folder. However, it 
 isn't possible to control the stack name, which makes it difficult to query the stack outputs. To make this easier,
 we export the stack name by searching the stack list for the stack that created the Managed Blockchain network.
-
 
 In Cloud9:
 

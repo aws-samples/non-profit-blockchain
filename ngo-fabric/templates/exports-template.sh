@@ -13,6 +13,10 @@
 # express or implied. See the License for the specific language governing 
 # permissions and limitations under the License.
 
+echo Updating AWS CLI to the latest version
+sudo pip install awscli --upgrade
+cd ~
+
 export REGION=us-east-1
 export NETWORKNAME=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkName`].OutputValue' --output text)
 export MEMBERNAME=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`MemberName`].OutputValue' --output text)
@@ -21,11 +25,6 @@ export ADMINUSER=$(aws cloudformation describe-stacks --stack-name $STACKNAME --
 export ADMINPWD=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`MemberAdminPassword`].OutputValue' --output text)
 export NETWORKID=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkId`].OutputValue' --output text)
 export MEMBERID=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`MemberId`].OutputValue' --output text)
-
-# No need to change anything below here
-echo Updating AWS CLI to the latest version
-sudo pip install awscli --upgrade
-cd ~
 
 VpcEndpointServiceName=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
 OrderingServiceEndpoint=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.FrameworkAttributes.Fabric.OrderingServiceEndpoint' --output text)
@@ -42,7 +41,7 @@ export PEERSERVICEENDPOINT=$peerEndpoint
 export PEERSERVICEENDPOINTNOPORT=${PEERSERVICEENDPOINT::-6}
 export PEEREVENTENDPOINT=$peerEventEndpoint
 
-echo Useful information used in Cloud9
+echo Useful information stored in EXPORT variables
 echo REGION: $REGION
 echo NETWORKNAME: $NETWORKNAME
 echo NETWORKVERSION: $NETWORKVERSION
