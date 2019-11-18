@@ -1,0 +1,240 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Amazon Managed Blockchain. Creates network with a single member and peer node
+Metadata:
+  LICENSE: Apache License Version 2.0
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: Network configuration
+        Parameters:
+          - NetworkName
+          - NetworkDescription
+          - Edition
+          - ThresholdPercentage
+          - ThresholdComparator
+          - ProposalDurationInHours
+      -
+        Label:
+          default: First member configuration
+        Parameters:
+          - MemberName
+          - MemberDescription
+          - MemberAdminUsername
+          - MemberAdminPassword
+          - PeerNodeAvailabilityZone
+          - PeerNodeInstanceType
+    ParameterLabels:
+      NetworkName:
+        default: Network name
+      NetworkDescription:
+        default: Network description
+      Framework:
+        default: Framework
+      FrameworkVersion:
+        default: Framework version
+      Edition:
+        default: Edition
+      ThresholdPercentage:
+        default: Threshold percentage
+      ThresholdComparator:
+        default: Threshold comparator
+      ProposalDurationInHours:
+        default: Proposal duration
+      MemberName:
+        default: Member name
+      MemberDescription:
+        default: Member description
+      MemberAdminUsername:
+        default: Member admin username
+      MemberAdminPassword:
+        default: Member admin password
+      PeerNodeAvailabilityZone:
+        default: Peer node Availability Zone
+      PeerNodeInstanceType:
+        default: Instance type
+Parameters:
+  NetworkName:
+    Description: The name of your Amazon Managed Blockchain network.
+    AllowedPattern: "^[0-9a-zA-Z]+$"
+    ConstraintDescription: Network name must be alphanumeric and cannot contain spaces.
+    Type: String
+    Default: ngo
+  NetworkDescription:
+    Description: An optional description of your network.
+    Type: String
+    Default: Network for tracking donations made to non-profit organisations
+  Framework:
+    Description: The blockchain protocol to use, such as Hyperledger Fabric
+    Type: String
+    Default: HYPERLEDGER_FABRIC
+  FrameworkVersion:
+    Description: The version of the blockchain protocol to use
+    Type: String
+    Default: 1.2
+  Edition:
+    Description: Setting that determines the number of peer nodes per member and the selection of instance types that can be used for them.
+    ConstraintDescription: Must be STARTER or STANDARD
+    Default: STARTER
+    AllowedValues:
+      - STARTER
+      - STANDARD
+    Type: String
+  MemberName:
+    Description: The name of the first member in your Amazon Managed Blockchain network.
+    AllowedPattern: "^[0-9a-zA-Z]+$"
+    ConstraintDescription: MemberName must be alphanumeric.
+    Type: String
+    Default: member
+  MemberDescription:
+    Description: An optional description of your first member.
+    Type: String
+    Default: First member 
+  MemberAdminUsername:
+    Description: The user name of your first member's admin user.
+    AllowedPattern: '^[0-9a-zA-Z/]+$'
+    ConstraintDescription: AdminUsername must contain only uppercase and lowercase letters and numbers.
+    Type: String
+    Default: admin
+  MemberAdminPassword:
+    Description: The password of your first member's admin user.
+    MinLength: 8
+    MaxLength: 32
+    AllowedPattern: "^(?!.*?['\"\\/ @])(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).*{8,32}$"
+    ConstraintDescription: >-
+      AdminPassword must be at least 8 characters long and must contain at least one
+      uppercase character, one lowercase character, and one digit. It must not
+      contain ', ", \, /, @ or spaces. It must not exceed 32 characters in length.
+    Type: String
+    NoEcho: true
+    Default: Adminpwd1!
+  ThresholdPercentage:
+    Description: The percentage of favorable votes needed to approve a blockchain proposal.
+    MinValue: 1
+    MaxValue: 100
+    Type: Number
+    Default: 50
+  ThresholdComparator:
+    Description: >-
+          This comparator is used to determine how the vote percentages are compared
+          with the threshold. If it is GREATER_THAN, then the percentage of favorable
+          votes must exceed the ThresholdPercentage for a proposal to pass. If it is
+          GREATER_THAN_OR_EQUAL_TO, then the percentage of favorable votes must at
+          least be equal to the threshold for a proposal to pass.
+    ConstraintDescription: Must be GREATER_THAN or GREATER_THAN_OR_EQUAL_TO
+    Default: GREATER_THAN
+    AllowedValues:
+      - GREATER_THAN
+      - GREATER_THAN_OR_EQUAL_TO
+    Type: String
+  ProposalDurationInHours:
+    Description: The number of hours a proposal can be voted on.
+    MinValue: 1
+    MaxValue: 168
+    Default: 24
+    Type: Number
+  PeerNodeAvailabilityZone:
+    Description: The Availability Zone for your first peer node.
+    Default: us-east-1a
+    Type: String
+  PeerNodeInstanceType:
+    Description: The type of compute instance to use for your peer nodes.
+    Default: bc.t3.small
+    Type: String
+    AllowedValues:
+      - bc.t3.small
+      - bc.t3.medium
+      - bc.t3.large
+      - bc.t3.xlarge
+      - bc.m5.large
+      - bc.m5.xlarge
+      - bc.m5.2xlarge
+      - bc.m5.4xlarge
+      - bc.c5.large
+      - bc.c5.xlarge
+      - bc.c5.2xlarge
+      - bc.c5.4xlarge
+    ConstraintDescription: >-
+      If Edition is STARTER, then this value must be bc.t3.small
+      or bc.t3.medium.
+
+Resources:
+  Member:
+    Type: "AWS::ManagedBlockchain::Member"
+    Properties:
+      NetworkConfiguration:
+        Name: !Ref NetworkName
+        Description: !Sub "network-${NetworkName}-${AWS::AccountId}"
+        Framework: !Ref Framework
+        FrameworkVersion: !Ref FrameworkVersion
+        NetworkFrameworkConfiguration:
+          NetworkFabricConfiguration:
+            Edition: !Ref Edition
+        VotingPolicy:
+          ApprovalThresholdPolicy:
+            ThresholdPercentage: !Ref ThresholdPercentage
+            ProposalDurationInHours: !Ref ProposalDurationInHours
+            ThresholdComparator: !Ref ThresholdComparator
+      MemberConfiguration:
+        Name: !Sub "member-${NetworkName}"
+        Description: !Sub "member-${NetworkName}-${AWS::AccountId}"
+        MemberFrameworkConfiguration:
+          MemberFabricConfiguration:
+            AdminUsername: !Ref MemberAdminUsername
+            AdminPassword: !Ref MemberAdminPassword
+  MemberPeerNode:
+    Type: "AWS::ManagedBlockchain::Node"
+    Properties:
+      NetworkId: !GetAtt Member.NetworkId
+      MemberId: !GetAtt Member.MemberId
+      NodeConfiguration:
+        InstanceType: !Ref PeerNodeInstanceType
+        AvailabilityZone: !Ref PeerNodeAvailabilityZone
+    DependsOn: Member
+Outputs:
+  MemberId:
+    Description: member id 
+    Value: !GetAtt Member.MemberId
+    Export:
+      Name: !Sub "${NetworkName}-MemberId"
+  MemberName:
+    Description: member name 
+    Value: !Sub "member-${NetworkName}"
+    Export:
+      Name: !Sub "${NetworkName}-MemberName"
+  NetworkId:
+    Description: network id 
+    Value: !GetAtt Member.NetworkId
+    Export:
+      Name: !Sub "${NetworkName}-NetworkId"
+  NetworkName:
+    Description: network name 
+    Value: !Ref NetworkName
+    Export:
+      Name: !Sub "${NetworkName}-NetworkName"
+  Framework:
+    Description: blockchain protocol, such as Hyperledger Fabric
+    Value: !Ref Framework
+    Export:
+      Name: !Sub "${NetworkName}-Framework"
+  FrameworkVersion:
+    Description: version of the blockchain protocol
+    Value: !Ref FrameworkVersion
+    Export:
+      Name: !Sub "${NetworkName}-FrameworkVersion"
+  MemberPeerNodeId:
+    Description: member peer node Id
+    Value: !GetAtt MemberPeerNode.NodeId
+    Export:
+      Name: !Sub "${NetworkName}-MemberPeerNodeId"
+  MemberAdminUsername:
+    Description: fabric admin user name
+    Value: !Ref MemberAdminUsername
+    Export:
+      Name: !Sub "${NetworkName}-MemberAdminUsername"
+  MemberAdminPassword:
+    Description: fabric admin password
+    Value: !Ref MemberAdminPassword
+    Export:
+      Name: !Sub "${NetworkName}-MemberAdminPassword"
+  

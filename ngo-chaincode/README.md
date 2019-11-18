@@ -33,16 +33,6 @@ they are not, follow Step 4 in [Part 1](../ngo-fabric/README.md) to repopulate t
 ```
 cd ~/non-profit-blockchain/ngo-fabric
 source fabric-exports.sh
-```
-
-Check the peer export file exists and that it contains a number of export keys with values:
-
-```
-cat ~/peer-exports.sh 
-```
-If the file has values for all keys, source it:
-
-```
 source ~/peer-exports.sh 
 ```
 

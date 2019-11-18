@@ -158,7 +158,7 @@ keypairs you have, so just ignore this error and let the script continue:
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
-./3-vpc-client-node.sh
+./vpc-client-node.sh
 ```
 
 Check the progress in the AWS CloudFormation console and wait until the stack is CREATE COMPLETE.

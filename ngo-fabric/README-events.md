@@ -1,9 +1,17 @@
+# To be used with Amazon Event Engine
+
+Use this README if you are hosting an event with attendees, and you are using Amazon Event Engine to handle the creation of 
+AWS accounts and the pre-provisioning of Managed Blockchain networks in the accounts. 
+
 # Part1: Build a Hyperledger Fabric blockchain network using Amazon Managed Blockchain
+
+The difference when using Event Engine is that the Fabric network will be pre-provisioned in the account and does
+not need to be created. Attendees will start the workshop by provisioning a Fabric client node to administer
+the Fabric network.
 
 This section will build a Hyperledger Fabric blockchain network using Amazon Managed Blockchain. A combination of AWS CloudFormation, the AWS Console and the AWS CLI will be used. The process to create the network is as follows:
 
 * Provision an AWS Cloud9 instance. We will use the Linux terminal that Cloud9 provides
-* From Cloud9, run an AWS CloudFormation template to create a Fabric network and provision a peer node in Amazon Managed Blockchain 
 * From Cloud9, run an AWS CloudFormation template to provision a VPC and a Fabric client node. You 
 will use the Fabric client node to administer the Fabric network
 * From the Fabric client node, create a Fabric channel, install and instantiate chaincode, and 
@@ -31,21 +39,7 @@ sudo pip install awscli --upgrade
 ```
 
 ## Step 1 - Create the Hyperledger Fabric blockchain network
-Use Cloud9 to create a Fabric network using the provided CloudFormation template.
-
-In your Cloud9 terminal window:
-
-```
-export REGION=us-east-1
-export STACKNAME=non-profit-amb
-cd ~/non-profit-blockchain/ngo-fabric
-./amb.sh
-```
-
-The CloudFormation template, `amb.yaml`, expects a number of parameters. All of these have default values for the purpose
-of this workshop, but can be overridden in the script `amb.sh`. The template defaults to creating a 'Starter' Fabric network
-with a single small peer node. This would not be suitable for a production network, which would need a 'Standard' Fabric
-network with multiple peer nodes spread across AZs.
+This step is not required if you are using Event Engine to pre-provision the Managed Blockchain network.
 
 ## Step 2 - Check the network is AVAILABLE
 Before continuing, check to see that your Fabric network has been created and is Available. It does take quite a while
@@ -75,10 +69,16 @@ are available as export variables before calling CloudFormation.
 If you see the following error when running the script below: `An error occurred (InvalidKeyPair.NotFound)`, ignore it.
 This is caused by the script creating a keypair, and ensuring it does not overwrite it if it does exist.
 
+Event engine provisions the Managed Blockchain network using the CloudFormation template in this folder. However, it 
+isn't possible to control the stack name, which makes it difficult to query the stack outputs. To make this easier,
+we export the stack name by searching the stack list for the stack that created the Managed Blockchain network.
+
 In Cloud9:
 
 ```
 export REGION=us-east-1
+export STACKNAME=$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[?Description==`Amazon Managed Blockchain. Creates network with a single member and peer node`] | [0].StackName' --output text)
+echo $STACKNAME
 cd ~/non-profit-blockchain/ngo-fabric
 ./vpc-client-node.sh
 ```
@@ -119,7 +119,8 @@ to your current session. If you exit the SSH session and re-connect, you'll need
 
 ```
 export REGION=us-east-1
-export STACKNAME=non-profit-amb
+export STACKNAME=$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[?Description==`Amazon Managed Blockchain. Creates network with a single member and peer node`] | [0].StackName' --output text)
+echo $STACKNAME
 cd ~/non-profit-blockchain/ngo-fabric
 cp templates/exports-template.sh fabric-exports.sh
 source fabric-exports.sh
@@ -395,3 +396,4 @@ The workshop instructions can be found in the README files in parts 1-4:
 * [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
 * [Part 6:](../ngo-lambda/README.md) Query the blockchain with a Lambda function. 
+* 

@@ -20,10 +20,10 @@
 
 # The export statements below can be used to point to either localhost or to an ELB endpoint, 
 # depending on where the REST API server is running 
-export ENDPOINT=Fabric-ELB-205962472.us-west-2.elb.amazonaws.com
-export PORT=80
-#export ENDPOINT=localhost
-#export PORT=3000
+#export ENDPOINT=Fabric-ELB-205962472.us-west-2.elb.amazonaws.com
+#export PORT=80
+export ENDPOINT=localhost
+export PORT=3000
 set +e
 echo installing jq
 sudo yum install jq
