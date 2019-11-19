@@ -4,7 +4,7 @@
     "description": "A Lambda function to execute transactions against Amazon Managed Blockchain",
     "main": "index.js",
     "engines": {
-        "node" : ">=10.0.0 <11.0.0",
+        "node" : ">=12.0.0",
         "npm": ">=6.0.0 <7.0"
     },
     "license": "Apache-2.0",
