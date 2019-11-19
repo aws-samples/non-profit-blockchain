@@ -53,7 +53,7 @@ aws cloudformation deploy --stack-name $LAMBDA_STACK_NAME --template-file packag
 ORDERERENDPOINT=grpcs://$ORDERINGSERVICEENDPOINT CHANNELNAME=$CHANNEL \
 CHAINCODEID=$CHAINCODEID MSP=$MSP MEMBERNAME=$MEMBERNAME VPCID=$VPCID \
 SECURITYGROUPID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='SecurityGroupID'].OutputValue" --output text --region $REGION ) \
-SUBNETID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='PublicSubnetID'].OutputValue" --output text --region $REGION )
+SUBNETID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='PublicSubnetID'].OutputValue" --output text --region $REGION ) LAMBDANAME=$LAMBDANAME
 
 echo Lambda creation completed. API Gateway is active at:
 echo $(aws cloudformation describe-stacks --stack-name $LAMBDA_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='APIGatewayURL'].OutputValue" --output text --region $REGION )

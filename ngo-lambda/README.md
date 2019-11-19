@@ -84,12 +84,6 @@ https://abcd12345.execute-api.us-east-1.amazonaws.com/dev
 
 The url is to the API Gateway which we will test with in step 4.  Copy the url and paste it in a local text editor to reference it later.
 
-If the deploy was not successful, and you get an error indicating `Function already exists: ngo-lambda-function`, you can update the deployment bundle of the existing Lambda by executing this script:
-
-```
-~/non-profit-blockchain/ngo-lambda/updateLambda.sh
-```
-
 ## Step 3 - Test the Lambda function
 
 You can test the Lambda function from the [Lambda console](https://console.aws.amazon.com/lambda), or from the cli.
@@ -132,7 +126,7 @@ cat /tmp/apigateway-output-createDonor.txt
 
 Second, call the `GET /donors/{donorName}` endpoint which will execute the `queryDonor` chaincode function to query the donor "thomas".
 ```
-curl -s -X GET "<YOUR_API_GATEWAY_URL>/donors/thomas" > /tmp/apigateway-output-queryDonor.txt
+curl -s -X GET "<YOUR_API_GATEWAY_URL>/donors/rachel" > /tmp/apigateway-output-queryDonor.txt
 cat /tmp/apigateway-output-queryDonor.txt
 ```
 
