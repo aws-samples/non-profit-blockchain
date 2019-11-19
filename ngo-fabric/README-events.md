@@ -77,8 +77,6 @@ In Cloud9:
 
 ```
 export REGION=us-east-1
-export STACKNAME=$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[?Description==`Amazon Managed Blockchain. Creates network with a single member and peer node`] | [0].StackName' --output text)
-echo $STACKNAME
 cd ~/non-profit-blockchain/ngo-fabric
 ./vpc-client-node.sh
 ```
@@ -119,8 +117,6 @@ to your current session. If you exit the SSH session and re-connect, you'll need
 
 ```
 export REGION=us-east-1
-export STACKNAME=$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[?Description==`Amazon Managed Blockchain. Creates network with a single member and peer node`] | [0].StackName' --output text)
-echo $STACKNAME
 cd ~/non-profit-blockchain/ngo-fabric
 cp templates/exports-template.sh fabric-exports.sh
 source fabric-exports.sh
