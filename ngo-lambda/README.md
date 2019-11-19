@@ -71,8 +71,7 @@ We will also need to create a new VPC Endpoint to allow our VPC to communicate w
 Execute the following commands to create the Lambda function, VPC Endpoint and the API Gateway.  This script will create an S3 bucket to store the Lambda artifacts, and this bucket must be globally unique.  Modify the value of `BUCKETNAME` if you need to make it globally unique.
 
 ```
-export REGION=us-east-1
-export BUCKETNAME=`echo "$MEMBER-fabric-lambda" | tr '[:upper:]' '[:lower:]'`
+export BUCKETNAME=`echo "$MEMBERNAME-fabric-lambda" | tr '[:upper:]' '[:lower:]'`
 export LAMBDANAME=`echo "$NETWORKNAME-fabric-lambda" | tr '[:upper:]' '[:lower:]'`
 ~/non-profit-blockchain/ngo-lambda/createLambda.sh
 ```
