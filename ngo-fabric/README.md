@@ -119,7 +119,6 @@ to your current session. If you exit the SSH session and re-connect, you'll need
 
 ```
 export REGION=us-east-1
-export STACKNAME=non-profit-amb
 cd ~/non-profit-blockchain/ngo-fabric
 cp templates/exports-template.sh fabric-exports.sh
 source fabric-exports.sh
