@@ -13,14 +13,10 @@
 # express or implied. See the License for the specific language governing 
 # permissions and limitations under the License.
 
-if [ -z "$STACKNAME" ]
-then
-      echo "Environment variable \$STACKNAME is empty. Please populate this with the name of the CloudFormation stack that created your Managed Blockchain network"
-fi
-
 echo Creating VPC - TODO. Create the VPC, subnets, security group, EC2 client node, VPC endpoint
 echo Create a keypair
 
+STACKNAME=$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[?Description==`Amazon Managed Blockchain. Creates network with a single member and peer node`] | [0].StackName' --output text)
 NETWORKNAME=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkName`].OutputValue' --output text)
 NETWORKID=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkId`].OutputValue' --output text)
 VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
