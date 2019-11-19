@@ -13,11 +13,6 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 
-if [ -z "$VPC_STACK_NAME" ]
-then
-      echo "Environment variable \$VPC_STACK_NAME is empty. Please populate this with the name of the CloudFormation stack that created your Managed Blockchain network"
-fi
-
 cd ~/non-profit-blockchain/ngo-lambda
 
 echo Copy the Managed Blockchain TLS Certificate
@@ -40,19 +35,19 @@ npm install
 cd ..
 
 echo Package the Cloudformation template
-export BUCKETNAME=`echo "$NETWORKNAME-fabric-lambda" | tr '[:upper:]' '[:lower:]'`
 aws s3 mb s3://$BUCKETNAME --region $REGION
 
-aws cloudformation package --template-file cloudformation-lambda.yaml \
-    --output-template-file packaged-cloudformation-lambda.yaml \
+aws cloudformation package --template-file lambda-api-template.yaml \
+    --output-template-file packaged-lambda-api-template.yaml \
     --s3-bucket $BUCKETNAME
 
 echo Deploy the Lambda Cloudformation stack
 export CHAINCODEID=ngo
 export LAMBDA_STACK_NAME=fabric-lambda-stack
+export VPC_STACK_NAME=$NETWORKNAME-fabric-client-node
 export VPCID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='VPCID'].OutputValue" --output text --region $REGION)
 
-aws cloudformation deploy --stack-name $LAMBDA_STACK_NAME --template-file packaged-cloudformation-lambda.yaml \
+aws cloudformation deploy --stack-name $LAMBDA_STACK_NAME --template-file packaged-lambda-api-template.yaml \
 --region $REGION --capabilities CAPABILITY_NAMED_IAM \
 --parameter-overrides CAENDPOINT=$CASERVICEENDPOINT PEERENDPOINT=grpcs://$PEERSERVICEENDPOINT \
 ORDERERENDPOINT=grpcs://$ORDERINGSERVICEENDPOINT CHANNELNAME=$CHANNEL \

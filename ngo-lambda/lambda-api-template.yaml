@@ -37,7 +37,8 @@ Parameters:
     Type:                                         String
   VPCID:
     Type:                                         String
-
+  LAMBDANAME:
+    Type:                                         String
 Resources:
   SecretsManagerReadPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -73,7 +74,7 @@ Resources:
       Handler: index.handler
       Runtime: nodejs8.10
       CodeUri: ./src
-      FunctionName: 'NGO-Lambda-Fabric'
+      FunctionName: !Ref LAMBDANAME
       MemorySize: 512
       Role: !GetAtt LambdaRole.Arn
       Timeout: 15
