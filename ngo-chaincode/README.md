@@ -160,4 +160,4 @@ The workshop instructions can be found in the README files in parts 1-4:
 * [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
 * [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
-* [Part 6:](../ngo-lambda/README.md) Query the blockchain with a Lambda function. 
+* [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with Amazon API Gateway and AWS Lambda.
