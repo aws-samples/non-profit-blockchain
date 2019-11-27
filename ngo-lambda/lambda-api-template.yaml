@@ -1,0 +1,226 @@
+# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License.
+# A copy of the License is located at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# or in the "license" file accompanying this file. This file is distributed
+# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+# express or implied. See the License for the specific language governing
+# permissions and limitations under the License.
+ 
+AWSTemplateFormatVersion:                         '2010-09-09'
+Transform:                                        'AWS::Serverless-2016-10-31'
+Description:                                      >
+  This template creates a Lambda function and its associated IAM role and policies.  
+  It also creates the VPC endpoint needed to interface with Secrets Manager.
+Parameters:
+  PEERENDPOINT:
+    Type:                                         String
+  CAENDPOINT:
+    Type:                                         String
+  ORDERERENDPOINT:
+    Type:                                         String
+  CHANNELNAME:
+    Type:                                         String
+  CHAINCODEID:
+    Type:                                         String
+  MSP:
+    Type:                                         String
+  MEMBERNAME:
+    Type:                                         String
+  SECURITYGROUPID:
+    Type:                                         String
+  SUBNETID:
+    Type:                                         String
+  VPCID:
+    Type:                                         String
+  LAMBDANAME:
+    Type:                                         String
+Resources:
+  SecretsManagerReadPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetResourcePolicy"
+          - "secretsmanager:GetSecretValue"
+          - "secretsmanager:DescribeSecret"
+          - "secretsmanager:ListSecretVersionIds"
+          "Resource": "*"
+  LambdaRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref SecretsManagerReadPolicy
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+  NGOLambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src
+      FunctionName: !Ref LAMBDANAME
+      MemorySize: 512
+      Role: !GetAtt LambdaRole.Arn
+      Timeout: 15
+      Environment:
+        Variables:
+          CA_ENDPOINT: !Ref CAENDPOINT
+          PEER_ENDPOINT: !Ref PEERENDPOINT
+          ORDERER_ENDPOINT: !Ref ORDERERENDPOINT
+          CHANNEL_NAME: !Ref CHANNELNAME
+          CHAIN_CODE_ID: !Ref CHAINCODEID
+          CRYPTO_FOLDER: /tmp
+          MSP: !Ref MSP
+          MEMBERNAME: !Ref MEMBERNAME
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SECURITYGROUPID
+        SubnetIds:
+          - !Ref SUBNETID
+      Events:
+        GetDonors:
+          Type: Api
+          Properties:
+            Path: /donors
+            Method: get
+            RestApiId: !Ref NGOAPIGateway
+        CreateDonor:
+          Type: Api
+          Properties:
+            Path: /donors
+            Method: post
+            RestApiId: !Ref NGOAPIGateway
+        GetDonor:
+          Type: Api
+          Properties:
+            Path: /donors/{donorUserName}
+            Method: get
+            RestApiId: !Ref NGOAPIGateway
+  SecretsManagerVPCE:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      SecurityGroupIds:
+        - !Ref SECURITYGROUPID
+      SubnetIds:
+        - !Ref SUBNETID
+      VpcEndpointType: Interface
+      VpcId: !Ref VPCID
+      ServiceName: com.amazonaws.us-east-1.secretsmanager
+      PrivateDnsEnabled: true
+  NGOAPIGateway:
+    Type: 'AWS::Serverless::Api'
+    Properties:
+      Name: NGO API
+      StageName: dev
+      DefinitionBody: # Can't use uri: https://github.com/awslabs/serverless-application-model/issues/305
+        swagger: "2.0"
+        info:
+          version: "2019-11-13T11:12:00Z"
+          title: "Non Profit Blockchain"
+        paths:
+          /donors:
+            get:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NGOLambdaFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: "{\n  \"functionType\": \"queryObject\",\n  \"chaincodeFunction\"\
+                    : \"queryAllDonors\",\n  \"chaincodeFunctionArgs\": {},\n  \"fabricUsername\"\
+                    : \"lambdaUser\"\n}"
+                passthroughBehavior: "when_no_templates"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            post:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NGOLambdaFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: "{\n  \"functionType\": \"invoke\",\n  \"chaincodeFunction\"\
+                    : \"createDonor\",\n  \"chaincodeFunctionArgs\": {\n      #set( $body\
+                    \ = $util.parseJson($input.body) )\n      \"donorUserName\": \"$body.donorUserName\"\
+                    ,\n      \"email\": \"$body.email\",\n      \"registeredDate\":\"$context.requestTime\"\
+                    \n  },\n  \"fabricUsername\": \"lambdaUser\"\n}"
+                passthroughBehavior: "when_no_templates"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+          /donors/{donorUserName}:
+            get:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "donorUserName"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NGOLambdaFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: "{\n  \"functionType\": \"queryObject\",\n  \"chaincodeFunction\"\
+                    : \"queryDonor\",\n  \"chaincodeFunctionArgs\": {\n      \"donorUserName\"\
+                    : \"$input.params('donorUserName')\"\n  },\n  \"fabricUsername\": \"lambdaUser\"\
+                    \n}"
+                passthroughBehavior: "when_no_templates"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+        definitions:
+          Empty:
+            type: "object"
+            title: "Empty Schema"
+Outputs:
+  APIGatewayURL:
+    Description: "API Gateway endpoint URL for Dev stage"
+    Value: !Sub "https://${NGOAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev"

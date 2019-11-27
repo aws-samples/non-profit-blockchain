@@ -1,26 +1,25 @@
-# Part 6: Lambda functions to query and invoke chaincode
+# Part 6: Read and write to the blockchain with Amazon API Gateway and AWS Lambda
 
-In this blog post we will learn how to publish a Lambda function to query a Hyperledger Fabric blockchain running on Amazon Managed Blockchain.  We will use the NodeJS Hyperledger Fabric SDK within the Lambda function to interface with the blockchain.
+Part 6 will show you how to publish a REST API with API Gateway and Lambda that invokes chaincode on a Hyperledger Fabric blockchain network running on Amazon Managed Blockchain.  You will use the NodeJS Hyperledger Fabric SDK within the Lambda function to interface with the blockchain.
 
 ## Pre-requisites
+ There are multiple parts to the workshop.  Before starting on Part 6, you should have completed [Part 1](../ngo-fabric/README.md) and [Part 2](../ngo-chaincode/README.md).
 
-From Cloud9, SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. 
-The DNS of the Fabric client node EC2 instance can be found in the output of the AWS CloudFormation stack you 
-created in [Part 1](../ngo-fabric/README.md)
+ In the AWS account where you [created the Fabric network](../ngo-fabric/README.md), use Cloud9 to SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you created in [Part 1](../ngo-fabric/README.md).
 
 ```
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
 ```
 
-You should have already cloned this repo in [Part 1](../ngo-fabric/README.md)
+You should have already cloned this repo in [Part 1](../ngo-fabric/README.md).
 
 ```
 cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-You will need to set the context before carrying out any Fabric CLI commands. We do this 
-using the export files that were generated for us in [Part 1](../ngo-fabric/README.md)
+You will need to set the context before carrying out any Fabric CLI commands. You do this 
+using the export files that were generated for us in [Part 1](../ngo-fabric/README.md).
 
 Source the file, so the exports are applied to your current session. If you exit the SSH 
 session and re-connect, you'll need to source the file again. The `source` command below
@@ -35,167 +34,113 @@ source ~/peer-exports.sh
 
 ## Overview
 
-The steps we will execute in this part are:
+The steps you will execute in this part are:
 
-1. Download the Managed Blockchain certificate
-2. Create user credentials
-3. Create an S3 bucket to store the credentials
-4. Put the certificates and credentials on S3
-5. Copy the Fabric client configuration files
-6. Install the npm dependencies
-7. Create the IAM role and policies
-8. Apply a policy to S3
-9. Create the Lambda function
-10. Test the Lambda function
+1. Create the Fabric user
+2. Deploy the Lambda function and API Gateway
+3. Test the Lambda function
+4. Test the API Gateway
 
+This architecture diagram illustrates how the Lambda function and API Gateway you will build and deploy fits within the overall architecture.
 
-## Step 1 - Download the Managed Blockchain certificate
+![Architecture Diagram](./Lambda%20API%20AMB%20Workshop%20Diagram.png)
 
-Get the latest version of the Managed Blockchain PEM file. This will be use for securing communication with the Managed Blockchain service.
+## Step 1 - Create the Fabric user
+On the Fabric client node.
 
-```
-aws s3 cp s3://us-east-1.managedblockchain/etc/managedblockchain-tls-chain.pem  ~/non-profit-blockchain/ngo-lambda/certs/managedblockchain-tls-chain.pem
-```
+Register and enroll an identity with the Fabric Certificate Authority (CA). You will use this identity within the Lambda function.  In the example below you are creating a user named `lambdaUser` with a password of `Welcome123`.  The password is optional and one will be generated if not provided.  Enrolling the new user will download the credentials from Fabric CA and store them in the temporary folders `/tmp/certs/lambdaUser/keystore` and `/tmp/certs/lambdaUser/signcerts`. From there they will be written as secrets to AWS Secrets Manager.
 
-## Step 2 - Create user credentials
-
-Register and enroll an identity with the Fabric CA (certificate authority). We will use this identity within the Lambda function.  In the example below we are creating a user named `lambdaUser` with a password of `Welcome123`.  The password is optional and one will be generated if not provided.
+Set environment variables for the username and password of the Fabric user you will be creating.
 
 ```
-export PATH=$PATH:/home/ec2-user/go/src/github.com/hyperledger/fabric-ca/bin
-cd ~
-fabric-ca-client register --id.name lambdaUser --id.affiliation Org1 --tls.certfiles ~/managedblockchain-tls-chain.pem --id.type user --id.secret Welcome123
-fabric-ca-client enroll -u https://lambdaUser:Welcome123@$CASERVICEENDPOINT --tls.certfiles /home/ec2-user/managedblockchain-tls-chain.pem -M /tmp/certs/lambdaUser
+export FABRICUSER=lambdaUser
+export FABRICUSERPASSWORD=Welcome123
 ```
 
-## Step 3 - Create an S3 bucket
-
-If you already have an S3 bucket you would like to use, you can skip this step and move on to step 3.
-
-S3 buckets are globally unique, so you will need to use a different name than the one in this example.  In this example, we will create an S3 bucket named `mybucket` in the `us-east-1` region.  We will then enable server side encryption for all objects in the bucket.
-
+Execute this script to register and enroll the Fabric user, and upload the credentials to AWS Secrets Manager.
 ```
-aws s3 mb s3://mybucket --region us-east-1
-aws s3api put-bucket-encryption --bucket mybucket --server-side-encryption-configuration '{"Rules": [{"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}'
+~/non-profit-blockchain/ngo-lambda/createFabricUser.sh
 ```
 
-## Step 4 - Put the TLS certificate and user credentials on S3
+## Step 2 - Deploy the Lambda function and API Gateway
 
-Replace `mybucket` with your bucket name in each of the commands below, and then run them.
+The Lambda function will run within your VPC so it can access the VPC Endpoint to the Managed Blockchain service.  The Lambda function is designed to support calling any function that is exported from the blockchain.  In our examples below we will call several functions on the blockchain, and they will all be invoking this single Lambda.  This simplifies adding higher level interfaces like API Gateway to execute blockchain transactions.  The API Gateway will translate REST requests into Lambda function executions.
 
-```
-aws s3 cp ~/non-profit-blockchain/ngo-lambda/certs/managedblockchain-tls-chain.pem s3://mybucket  --region us-east-1
-aws s3 cp /tmp/certs/lambdaUser s3://mybucket/lambdaUser --recursive --region us-east-1
-```
+We will also need to create a new VPC Endpoint to allow our VPC to communicate with Secrets Manager.  
 
-## Step 5 - Copy the Fabric client configuration files
-
-You should have created the Fabric client configuration files in Part 3.  If not, follow the instructions in [Part 3 - Step 3](../ngo-rest-api/README.md) before continuing.  Make sure to source the files mentioned in the **Pre-requisites** section of Part 3 before generating the configuration files.
-
-Once the configuration files have been created, copy them to the local folder and update the path to the Managed Blockchain certificate.
+Execute the following commands to create the Lambda function, VPC Endpoint and the API Gateway.  This script will create an S3 bucket to store the Lambda artifacts, and this bucket must be globally unique.  Modify the value of `BUCKETNAME` if you need to make it globally unique.
 
 ```
-cp ~/non-profit-blockchain/tmp/connection-profile/ngo-connection-profile.yaml ~/non-profit-blockchain/ngo-lambda/.
-cp ~/non-profit-blockchain/tmp/connection-profile/org1/client-org1.yaml ~/non-profit-blockchain/ngo-lambda/.
-sed -i "s|/home/ec2-user/managedblockchain-tls-chain.pem|./certs/managedblockchain-tls-chain.pem|g" ~/non-profit-blockchain/ngo-lambda/ngo-connection-profile.yaml
+export BUCKETNAME=`echo "$MEMBERNAME-fabric-lambda" | tr '[:upper:]' '[:lower:]'`
+export LAMBDANAME=`echo "$NETWORKNAME-fabric-lambda" | tr '[:upper:]' '[:lower:]'`
+~/non-profit-blockchain/ngo-lambda/createLambda.sh
 ```
 
-## Step 6 - Install the npm dependencies
-
-You should have already installed `nvm` in a prior step.  If not, follow the instructions in [Part 3 - Step 1](../ngo-rest-api/README.md) before continuing.  Be sure to install the `gcc` compiler in that step.
-
+If this is successful you should see a message indicating:
 ```
-cd ~/non-profit-blockchain/ngo-lambda
-nvm use lts/carbon
-npm install
+Lambda creation completed. API Gateway is active at:
+https://abcd12345.execute-api.us-east-1.amazonaws.com/dev
 ```
 
-## Step 7 - Create the IAM role and policies for Lambda
+The url is to the API Gateway which we will test with in step 4.  Copy the url and paste it in a local text editor to reference it later.
 
-### Step 7a - Create the role
-```
-aws iam create-role --role-name Lambda-Fabric-Role --assume-role-policy-document file://Lambda-Fabric-Role-Trust-Policy.json
-```
-
-This will output a JSON representation of the new role.  Copy the output to a local document so you can refer back to it later.
-
-### Step 7b - Add policies to the role
-
-We need to grant an S3 and an execution policy to the role.
-
-```
-aws iam attach-role-policy --role-name Lambda-Fabric-Role --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
-aws iam attach-role-policy --role-name Lambda-Fabric-Role --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
-```
-
-## Step 8 - Add a policy to S3 bucket
-
-Edit `s3policy.json` and replace:
-* `Statement.Principal.AWS` with the value of the `Role.Arn` attribute from the `create-role` output above.
-* The instances of `mybucket` within `Statement.Resource` with your bucket name.
-
-Save the file and exit the editor.
-
-Replace `mybucket` with your bucket name in the command below, and then execute it.
-
-```
-aws s3api put-bucket-policy --bucket mybucket --policy file://s3policy.json
-```
-
-## Step 9 - Create the Lambda function
-
-### Step 9a - Create the Lambda archive
-
-Archive the Lambda code into a zip file.
-
-```
-cd ~/non-profit-blockchain/ngo-lambda
-zip -r /tmp/ngo-lambda-query.zip  .
-```
-
-### Step 9b - Prepare and create the function
-
-Before running `create-function` you will need to replace a few parameters with those from your environment.
-
-From the AWS console, view the output of the [AWS Cloudformation](https://console.aws.amazon.com/cloudformation/home?region=us-east-1) stack you created in [Part 1](../ngo-fabric/README.md).  Click the 'Outputs' tab.
-
-For `--role`, replace `arn:aws...XXX` from the output of step 8.
-Within `--vpc-config`, for SubnetIds, replace `string` with the Cloudformation value for the key `PublicSubnetID`.
-Within `--vpc-config`, for SecurityGroupIds, replace `string` with the Cloudformation value for the key `SecurityGroupID`.
-Within `Variables`, for S3_CRYPTO_BUCKET, replace `mybucket` with the name of the bucket you created.
-
-Once you have updated those environment variables, execute the `create-function` call below.
-
-```
-aws lambda create-function --function-name ngo-lambda-query --runtime nodejs8.10 --handler index.handler --role arn:aws:iam::XXXXXXXXXXXX:role/Lambda-Fabric-Role --vpc-config SubnetIds=string,SecurityGroupIds=string --environment Variables="{CA_ENDPOINT=$CASERVICEENDPOINT,PEER_ENDPOINT=grpcs://$PEERSERVICEENDPOINT,ORDERER_ENDPOINT=grpcs://$ORDERINGSERVICEENDPOINT,CHANNEL_NAME=$CHANNEL,CHAIN_CODE_ID=ngo,S3_CRYPTO_BUCKET=mybucket,CRYPTO_FOLDER=/tmp,MSP_ID=$MSP,FABRIC_USERNAME=lambdaUser}" --zip-file fileb:///tmp/ngo-lambda-query.zip --region us-east-1 --timeout 60
-```
-
-### Step 9c - Create the VPC Endpoint to S3
-
-The Lambda function will run within a VPC, and therefore requires a VPC Endpoint to communicate with S3.  We will do this with the `create-vpc-endpoint` command.
-
-Before executing this command, we'll need to set some parameters.
-
-From the AWS console, view the output of the [AWS Cloudformation](https://console.aws.amazon.com/cloudformation/home?region=us-east-1) stack you created in [Part 1](../ngo-fabric/README.md).
-
-Click the 'Outputs' tab.
-For `--vpc-id`, replace `string` with the value of `VPCID`.
-
-Click the 'Resources' tab.
-For `--route-table-ids`, replace `string` with the value of `BlockchainWorkshopRouteTable`.
-
-```
-aws ec2 create-vpc-endpoint --vpc-id string --service-name com.amazonaws.us-east-1.s3 --route-table-ids string --region us-east-1
-```
-
-## Step 10 - Test the Lambda function
+## Step 3 - Test the Lambda function
 
 You can test the Lambda function from the [Lambda console](https://console.aws.amazon.com/lambda), or from the cli.
 
-To test from the cli:
+To test from the cli, you will execute the commands below.  The output of each command is in the file specified in the last argument, and is displayed via `cat`.
+
+First, call the `createDonor` chaincode function to create the donor "melissa".
 ```
-aws lambda invoke --function-name ngo-lambda-query --payload "{\"donorName\":\"michael\"}" /tmp/lambda-output.txt --region us-east-1
+aws lambda invoke --function-name $LAMBDANAME --payload "{\"fabricUsername\":\"$FABRICUSER\",\"functionType\":\"invoke\",\"chaincodeFunction\":\"createDonor\",\"chaincodeFunctionArgs\":{\"donorUserName\":\"melissa\",\"email\":\"melissa@melissasngo.org\"}}" --region $REGION /tmp/lambda-output-createDonor.txt
+cat /tmp/lambda-output-createDonor.txt
 ```
 
+Next, call the `queryDonor` function to view the details of the donor we just created.
+```
+aws lambda invoke --function-name $LAMBDANAME --payload "{\"fabricUsername\":\"$FABRICUSER\",\"functionType\":\"queryObject\",\"chaincodeFunction\":\"queryDonor\",\"chaincodeFunctionArgs\":{\"donorUserName\":\"melissa\"}}" --region $REGION /tmp/lambda-output-queryDonor.txt
+cat /tmp/lambda-output-queryDonor.txt
+```
 
-You now have a Lambda function that is querying the blockchain.  You can use this Lambda function to service API Gateway requests as part of a serverless architecture.
+Finally, call the `queryAllDonors` function to view all the donors.
+```
+aws lambda invoke --function-name $LAMBDANAME --payload "{\"fabricUsername\":\"$FABRICUSER\",\"functionType\":\"queryObject\",\"chaincodeFunction\":\"queryAllDonors\",\"chaincodeFunctionArgs\":{}}" --region $REGION /tmp/lambda-output-queryAllDonors.txt
+cat /tmp/lambda-output-queryAllDonors.txt
+```
+
+You have deployed a Lambda function that is invoking transactions on the blockchain.  Next we'll create an API Gateway that calls this Lambda for each of its routes.
+
+## Step 4 - Test the API Gateway
+
+You can test the API Gateway from the [API Gateway console](https://console.aws.amazon.com/apigateway), or from the cli.  We will walk through testing it from the cli.
+
+To test from the cli, you will execute the commands below.  The output of each command is in the file specified in the last argument, and is displayed via `cat`.
+
+In the requests below, replace `<YOUR_API_GATEWAY_URL>` with the url that was output from running step 2.  You can also find this within the `dev` stage in the `Stages` of the API in the [API Gateway console](https://console.aws.amazon.com/apigateway).
+
+First, call the `POST /donors` endpoint which will execute the `createDonor` chaincode function to create the donor "thomas".
+```
+curl -s -X POST "<YOUR_API_GATEWAY_URL>/donors" -H "content-type: application/json" -d '{"donorUserName":"rachel","email":"rachel@donor.org"}' > /tmp/apigateway-output-createDonor.txt
+cat /tmp/apigateway-output-createDonor.txt
+```
+
+Second, call the `GET /donors/{donorName}` endpoint which will execute the `queryDonor` chaincode function to query the donor "thomas".
+```
+curl -s -X GET "<YOUR_API_GATEWAY_URL>/donors/rachel" > /tmp/apigateway-output-queryDonor.txt
+cat /tmp/apigateway-output-queryDonor.txt
+```
+
+Finally, call the `GET /donors` endpoint which will execute the `queryAllDonors` chaincode function to view all the donors.
+```
+curl -s -X GET "<YOUR_API_GATEWAY_URL>/donors" > /tmp/apigateway-output-queryAllDonors.txt
+cat /tmp/apigateway-output-queryAllDonors.txt
+```
+
+You now have a REST API running on API Gateway that is invoking a Lambda function to execute transactions on the blockchain.  To make more functions from the blockchain available within API Gateway, you would add API Gateway routes to support them, and continue using the same Lambda function.   
+
+* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
+* [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
+* [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
+* [Part 4:](../ngo-ui/README.md) Run the application. 
+* [Part 5:](../new-member/README.md) Add a new member to the network. 
+* [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with Amazon API Gateway and AWS Lambda.

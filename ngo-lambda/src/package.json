@@ -1,7 +1,7 @@
 {
     "name": "ngo-lambda",
     "version": "1.0.0",
-    "description": "A Lambda function to query the blockchain",
+    "description": "A Lambda function to execute transactions against Amazon Managed Blockchain",
     "main": "index.js",
     "engines": {
         "node": ">=8.9.4 <9.0",
@@ -14,5 +14,8 @@
         "fabric-client": "1.3.0",
         "log4js": "^3.0.6"
     },
-    "author": "Emile Baizel"
+    "author": "Emile Baizel",
+    "scripts": {
+        "install": "find ./node_modules/* -mtime +10950 -exec touch {} \\;"
+    }
 }
