@@ -21,10 +21,10 @@
 # The export statements below can be used to point to either localhost or to an ELB endpoint, 
 # depending on where the REST API server is running 
 set +e
-export ENDPOINT=ngo10-elb-2090058053.us-east-1.elb.amazonaws.com
-export PORT=80
-#export ENDPOINT=localhost
-#export PORT=3000
+#export ENDPOINT=ngo10-elb-2090058053.us-east-1.elb.amazonaws.com
+#export PORT=80
+export ENDPOINT=localhost
+export PORT=3000
 
 echo '---------------------------------------'
 echo connecting to server: $ENDPOINT:$PORT

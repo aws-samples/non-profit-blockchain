@@ -28,21 +28,11 @@ using the export files that were generated for us in [Part 1](../ngo-fabric/READ
 Source the file, so the exports are applied to your current session. If you exit the SSH 
 session and re-connect, you'll need to source the file again. The `source` command below
 will print out the values of the key ENV variables. Make sure they are all populated. If
-they are not, follow Step 4 in [Part 1](../ngo-fabric/README.md) to repopulate them:
+they are not, follow Step 4 in [Part 1](../ngo-fabric/README.md) to repopulate them.
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
 source fabric-exports.sh
-```
-
-Check the peer export file exists and that it contains a number of export keys with values:
-
-```
-cat ~/peer-exports.sh 
-```
-If the file has values for all keys, source it:
-
-```
 source ~/peer-exports.sh 
 ```
 
@@ -170,4 +160,4 @@ The workshop instructions can be found in the README files in parts 1-4:
 * [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
 * [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
-* [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with AWS Lambda.
+* [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with Amazon API Gateway and AWS Lambda.

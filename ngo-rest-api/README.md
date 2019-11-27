@@ -81,37 +81,6 @@ cd ~/non-profit-blockchain/ngo-rest-api/connection-profile
 ./gen-connection-profile.sh
 cd ~/non-profit-blockchain/tmp/connection-profile/
 cat ngo-connection-profile.yaml
-ls -lR
-```
-
-Check the config file used by app.js. Make sure the peer name in config.json (under 'peers:') is 
-the same as the peer name in the connection profile. **Make sure the admin username and 
-password are correct and match the values you updated in the connection profile.**
-
-```
-cd ~/non-profit-blockchain/ngo-rest-api
-vi config.json
-```
-
-config.json should look something like this:
-
-```
-{
-    "host":"localhost",
-    "port":"3000",
-    "channelName":"mychannel",
-    "chaincodeName":"ngo",
-    "eventWaitTime":"30000",
-    "peers":[
-        "peer1"
-    ],
-    "admins":[
-       {
-          "username":"admin", <-- update for your env
-          "secret":"Adminpwd1!" <-- update for your env
-       }
-    ]
- }
 ```
 
 ## Step 4 - Run the REST API Node.js application
@@ -128,7 +97,8 @@ node app.js
 ## Step 5 - Test the REST API
 Open a new terminal pane within Cloud 9.  Click on Window -> New Terminal.
 
-From the new terminal, SSH into the Fabric cilent node.  Run the same SSH command you used earlier.
+From the new terminal, SSH into the Fabric cilent node.  Run the same SSH command you used earlier, using the 
+keypair in your home directory, and obtaining the DNS for the Fabric client node from the CloudFormation stack outputs.
 
 On the Fabric client node.
 
@@ -182,37 +152,14 @@ response:
 ]
 ```
 ## Step 6 - Load the workshop test data
-In your Cloud9 terminal.
+On the Fabric client node.
 
-You can do this step from anywhere as it accesses the ELB DNS endpoint. Executing this from the SSH
-session is challenging as the SSH session will be outputting a range of INFO logs, which makes it
-challenging to edit files. So you can open another terminal window in Cloud9 and load the test data
-from Cloud9.
+Loading the test data uses cURL commands similar to those you used above to test the API. 
+This step outputs a lot of text as it is creating the test data, so if you prefer to run this from a new terminal, 
+you can open a new Cloud 9 terminal and SSH into the Fabric client node to create a new terminal session. If you do
+this, remember to rerun the statements under Pre-requisites above.
 
-Loading the test data uses cURL commands similar to those you used above to test the API. If you load
-the test data from Cloud9 you'll need to point to the AWS Elastic Load Balancer (ELB) that is used to 
-expose your REST API (if you load the test data from your Fabric client node you could use 'localhost'
-as the endpoint since the REST API server is running on the Fabric client node). To find the 
-DNS endpoint for the ELB, go to the CloudFormation stack created in [Part 1](../ngo-fabric/README.md)
-and look for ELBDNS in the Outputs. If you receive an error using the ELB it might be because the underlying EC2 
-instance has not moved to an 'InService' state. This will happen once the REST API server is running
-and the ELB is able to execute the desired number of health checks against it. You can check the 
-status in the EC2 console, under Load Balancers.
-
-```
-cd ~/non-profit-blockchain/ngo-rest-api
-vi ngo-load-workshop.sh
-```
-
-The line to be changed is this one. It should point to your ELB DNS. (it could point to `localhost` 
-if you run this on the Fabric client node. If you use `localhost` you also need to change the port to `3000`):
-
-```
-export ENDPOINT=ngo10-elb-2090058053.us-east-1.elb.amazonaws.com
-export PORT=80
-```
-
-After saving the changes, run the script:
+To run the script:
 
 ```
 cd ~/non-profit-blockchain/ngo-rest-api
@@ -236,4 +183,4 @@ The workshop instructions can be found in the README files in parts 1-4:
 * [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
 * [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network.
-* [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with AWS Lambda.
+* [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with Amazon API Gateway and AWS Lambda.
