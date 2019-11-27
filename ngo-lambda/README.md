@@ -48,7 +48,7 @@ This architecture diagram illustrates how the Lambda function and API Gateway yo
 ## Step 1 - Create the Fabric user
 On the Fabric client node.
 
-Register and enroll an identity with the Fabric Certificate Authority (CA). You will use this identity within the Lambda function.  In the example below you are creating a user named `lambdaUser` with a password of `Welcome123`.  The password is optional and one will be generated if not provided.  Enrolling the new user will download the credentials from Fabric CA and store them in the temporary folders `/tmp/certs/lambdaUser/keystore` and `/tmp/certs/lambdaUser/signcerts`. From there they will be written as secrets to AWS Secrets Manager.
+Register and enroll an identity with the Fabric Certificate Authority (CA). You will use this identity within the Lambda function. In the example below you are creating a user named `lambdaUser` with a password of `Welcome123`.  The password is optional and one will be generated if not provided.  Enrolling the new user will download the credentials from Fabric CA and store them in the temporary folders `/tmp/certs/lambdaUser/keystore` and `/tmp/certs/lambdaUser/signcerts`. From there they will be written as secrets to AWS Secrets Manager.
 
 Set environment variables for the username and password of the Fabric user you will be creating.
 
@@ -58,17 +58,18 @@ export FABRICUSERPASSWORD=Welcome123
 ```
 
 Execute this script to register and enroll the Fabric user, and upload the credentials to AWS Secrets Manager.
+
 ```
 ~/non-profit-blockchain/ngo-lambda/createFabricUser.sh
 ```
 
 ## Step 2 - Deploy the Lambda function and API Gateway
 
-The Lambda function will run within your VPC so it can access the VPC Endpoint to the Managed Blockchain service.  The Lambda function is designed to support calling any function that is exported from the blockchain.  In our examples below we will call several functions on the blockchain, and they will all be invoking this single Lambda.  This simplifies adding higher level interfaces like API Gateway to execute blockchain transactions.  The API Gateway will translate REST requests into Lambda function executions.
+The Lambda function will run within your VPC so it can access the VPC Endpoint to the Managed Blockchain service. The Lambda function is designed to support calling any function that is available in the chaincode installed on your Fabric peers. In the examples below you will call a single Lambda function which will invoke different chaincode functions depending on the arguments you pass to the Lambda. This simplifies adding higher level interfaces like API Gateway to execute blockchain transactions. The API Gateway will translate REST requests into Lambda function executions, and the Lambda function will invoke the appropriate chaincode function.
 
-We will also need to create a new VPC Endpoint to allow our VPC to communicate with Secrets Manager.  
+We will also need to create a new VPC Endpoint to allow the VPC hosting our Lambda to communicate with Secrets Manager.  
 
-Execute the following commands to create the Lambda function, VPC Endpoint and the API Gateway.  This script will create an S3 bucket to store the Lambda artifacts, and this bucket must be globally unique.  Modify the value of `BUCKETNAME` if you need to make it globally unique.
+Execute the following commands to create the Lambda function, VPC Endpoint and the API Gateway. CloudFormation will be used to create these resources. This script will create an S3 bucket to store the Lambda artifacts, and this bucket must be globally unique.  Modify the value of `BUCKETNAME` if you need to make it globally unique.
 
 ```
 export BUCKETNAME=`echo "$MEMBERNAME-fabric-lambda" | tr '[:upper:]' '[:lower:]'`
@@ -77,12 +78,13 @@ export LAMBDANAME=`echo "$NETWORKNAME-fabric-lambda" | tr '[:upper:]' '[:lower:]
 ```
 
 If this is successful you should see a message indicating:
+
 ```
 Lambda creation completed. API Gateway is active at:
 https://abcd12345.execute-api.us-east-1.amazonaws.com/dev
 ```
 
-The url is to the API Gateway which we will test with in step 4.  Copy the url and paste it in a local text editor to reference it later.
+The URL is to the API Gateway which we will test with in step 4. It is also available as an output of the CloudFormation stack created in this step (look for the name `fabric-lambda-stack`). Copy the URL and paste it in a local text editor to reference it later.
 
 ## Step 3 - Test the Lambda function
 
@@ -108,7 +110,7 @@ aws lambda invoke --function-name $LAMBDANAME --payload "{\"fabricUsername\":\"$
 cat /tmp/lambda-output-queryAllDonors.txt
 ```
 
-You have deployed a Lambda function that is invoking transactions on the blockchain.  Next we'll create an API Gateway that calls this Lambda for each of its routes.
+You have deployed a Lambda function that is invoking chaincode transactions and running queries in Managed Blockchain. Next we'll test using API Gateway to call this Lambda for each of its routes.
 
 ## Step 4 - Test the API Gateway
 
@@ -119,24 +121,25 @@ To test from the cli, you will execute the commands below.  The output of each c
 In the requests below, replace `<YOUR_API_GATEWAY_URL>` with the url that was output from running step 2.  You can also find this within the `dev` stage in the `Stages` of the API in the [API Gateway console](https://console.aws.amazon.com/apigateway).
 
 First, call the `POST /donors` endpoint which will execute the `createDonor` chaincode function to create the donor "thomas".
+
 ```
-curl -s -X POST "<YOUR_API_GATEWAY_URL>/donors" -H "content-type: application/json" -d '{"donorUserName":"rachel","email":"rachel@donor.org"}' > /tmp/apigateway-output-createDonor.txt
-cat /tmp/apigateway-output-createDonor.txt
+export APIURL=$(aws cloudformation describe-stacks --stack-name fabric-lambda-stack --query "Stacks[0].Outputs[?OutputKey=='APIGatewayURL'].OutputValue" --output text --region $REGION)
+curl -s -X POST "$APIURL/donors" -H "content-type: application/json" -d '{"donorUserName":"rachel","email":"rachel@donor.org"}'
 ```
 
 Second, call the `GET /donors/{donorName}` endpoint which will execute the `queryDonor` chaincode function to query the donor "thomas".
+
 ```
-curl -s -X GET "<YOUR_API_GATEWAY_URL>/donors/rachel" > /tmp/apigateway-output-queryDonor.txt
-cat /tmp/apigateway-output-queryDonor.txt
+curl -s -X GET "$APIURL/donors/rachel" 
 ```
 
 Finally, call the `GET /donors` endpoint which will execute the `queryAllDonors` chaincode function to view all the donors.
+
 ```
-curl -s -X GET "<YOUR_API_GATEWAY_URL>/donors" > /tmp/apigateway-output-queryAllDonors.txt
-cat /tmp/apigateway-output-queryAllDonors.txt
+curl -s -X GET "$APIURL/donors" 
 ```
 
-You now have a REST API running on API Gateway that is invoking a Lambda function to execute transactions on the blockchain.  To make more functions from the blockchain available within API Gateway, you would add API Gateway routes to support them, and continue using the same Lambda function.   
+You now have a REST API managed by API Gateway that is invoking a Lambda function to execute transactions on the blockchain.  To expose additional chaincode functions within API Gateway, you would add API Gateway routes to support them, and continue routing to the same Lambda function.   
 
 * [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
 * [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
