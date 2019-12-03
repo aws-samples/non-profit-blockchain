@@ -100,8 +100,11 @@ Answer 'yes' if prompted: `Are you sure you want to continue connecting (yes/no)
 
 ```
 cd ~
+export REGION=us-east-1
+export STACKNAME=$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[?Description==`Amazon Managed Blockchain. Creates network with a single member and peer node`] | [0].StackName' --output text)
+export NETWORKNAME=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkName`].OutputValue' --output text)
 export EC2URL=$(aws cloudformation describe-stacks --stack-name ngo-fabric-client-node --query "Stacks[0].Outputs[?OutputKey=='EC2URL'].OutputValue" --output text --region $REGION)
-ssh ec2-user@$EC2URL -i ~/{$NETWORKNAME}-keypair.pem
+ssh ec2-user@$EC2URL -i ~/$NETWORKNAME-keypair.pem
 ```
 
 Clone the repo:
