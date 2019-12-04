@@ -97,8 +97,15 @@ node app.js
 ## Step 5 - Test the REST API
 Open a new terminal pane within Cloud 9.  Click on Window -> New Terminal.
 
-From the new terminal, SSH into the Fabric cilent node.  Run the same SSH command you used earlier, using the 
-keypair in your home directory, and obtaining the DNS for the Fabric client node from the CloudFormation stack outputs.
+From the new terminal, SSH into the Fabric cilent node.  
+
+```
+export REGION=us-east-1
+export STACKNAME=$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[?Description==`Amazon Managed Blockchain. Creates network with a single member and peer node`] | [0].StackName' --output text)
+export NETWORKNAME=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkName`].OutputValue' --output text)
+export EC2URL=$(aws cloudformation describe-stacks --stack-name ngo-fabric-client-node --query "Stacks[0].Outputs[?OutputKey=='EC2URL'].OutputValue" --output text --region $REGION)
+ssh ec2-user@$EC2URL -i ~/$NETWORKNAME-keypair.pem
+```
 
 On the Fabric client node.
 
