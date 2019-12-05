@@ -116,18 +116,16 @@ You have deployed a Lambda function that is invoking chaincode transactions and 
 
 You can test the API Gateway from the [API Gateway console](https://console.aws.amazon.com/apigateway), or from the cli.  We will walk through testing it from the cli.
 
-To test from the cli, you will execute the commands below.  The output of each command is in the file specified in the last argument, and is displayed via `cat`.
+To test from the cli, you will execute the commands below.  
 
-In the requests below, replace `<YOUR_API_GATEWAY_URL>` with the url that was output from running step 2.  You can also find this within the `dev` stage in the `Stages` of the API in the [API Gateway console](https://console.aws.amazon.com/apigateway).
-
-First, call the `POST /donors` endpoint which will execute the `createDonor` chaincode function to create the donor "thomas".
+First, call the `POST /donors` endpoint which will execute the `createDonor` chaincode function to create the donor "rachel".
 
 ```
 export APIURL=$(aws cloudformation describe-stacks --stack-name fabric-lambda-stack --query "Stacks[0].Outputs[?OutputKey=='APIGatewayURL'].OutputValue" --output text --region $REGION)
 curl -s -X POST "$APIURL/donors" -H "content-type: application/json" -d '{"donorUserName":"rachel","email":"rachel@donor.org"}'
 ```
 
-Second, call the `GET /donors/{donorName}` endpoint which will execute the `queryDonor` chaincode function to query the donor "thomas".
+Second, call the `GET /donors/{donorName}` endpoint which will execute the `queryDonor` chaincode function to query the donor "rachel".
 
 ```
 curl -s -X GET "$APIURL/donors/rachel" 
