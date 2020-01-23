@@ -25,11 +25,11 @@ sed -i "s|/home/ec2-user/managedblockchain-tls-chain.pem|./certs/managedblockcha
 # Install the gcc compiler to be used when installing the npm dependencies
 sudo yum install gcc-c++ -y
 
-echo Install Node.js. We will use v8.x.
+echo Install Node.js. We will use v10.x.
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
 . ~/.nvm/nvm.sh
-nvm install lts/carbon
-nvm use lts/carbon
+nvm install lts/dubnium
+nvm use lts/dubnium
 cd src
 npm install
 cd ..
