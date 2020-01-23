@@ -24,8 +24,10 @@ const logger = require("./logging").getLogger("invoke");
 async function invokeChaincode(request) {
     logger.info("=== Invoke Function Start ===");
 
+    let error_message_displayable = null;
     let error_message = null;
     let transactionId = null;
+    let retriable = false;
 
     try {
         // first setup the client for this org
@@ -39,7 +41,9 @@ async function invokeChaincode(request) {
 
         // send proposal to endorsing peers
         logger.info('##### invokeChaincode - Invoke transaction request to Fabric');
-        let results = await channel.sendTransactionProposal(request);
+        let results = await channel.sendTransactionProposal(request).catch(err => {
+            throw err;
+        });
 
         // the returned object has both the endorsement results
         // and the actual proposal, the proposal will be needed
@@ -126,6 +130,7 @@ async function invokeChaincode(request) {
                 logger.info('##### invokeChaincode - Successfully sent transaction to the ordering service.');
             } else {
                 error_message = util.format('##### invokeChaincode - Failed to order the transaction. Error code: %s',response.status);
+                error_message_displayable = response.status;
                 logger.info(error_message);
             }
 
@@ -149,10 +154,13 @@ async function invokeChaincode(request) {
                 proposalResponses[0].message + '\n' +  
                 proposalResponses[0].stack);
             logger.info(error_message);
+            error_message_displayable = proposalResponses[0].message;
         }
     } catch (error) {
         logger.error('##### invokeChaincode - Failed to invoke due to error: ' + error.stack ? error.stack : error);
         error_message = error.toString();
+        error_message_displayable = error.toString();
+        retriable = true;
     }
 
     if (!error_message) {
@@ -167,7 +175,8 @@ async function invokeChaincode(request) {
     else {
         let message = util.format('##### invokeChaincode - Failed to invoke chaincode :%s', error_message);
         logger.error(message);
-        throw new Error(message);
+        let displayMessage = retriable ? error_message_displayable + "  Please retry your request." : error_message_displayable;
+        throw new Error(displayMessage);
     }
 };
 
