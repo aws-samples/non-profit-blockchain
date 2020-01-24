@@ -52,7 +52,7 @@ Resources:
           - "secretsmanager:GetSecretValue"
           - "secretsmanager:DescribeSecret"
           - "secretsmanager:ListSecretVersionIds"
-          "Resource": "*"
+          "Resource": !Sub 'arn:aws:secretsmanager:us-east-1:${AWS::AccountId}:secret:dev/fabricOrgs/${MEMBERNAME}/*'
   LambdaRole:
     Type: 'AWS::IAM::Role'
     Properties:
