@@ -1,0 +1,20 @@
+{
+    "name": "fabric-event-listener",
+    "version": "1.0.0",
+    "description": "Writes Fabric events to SQS",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node index.js"
+    },
+    "engines": {
+        "node": ">=10.0.0 <12",
+        "npm": ">=6.0.0"
+    },
+    "dependencies": {
+        "aws-sdk": "^2.597.0",
+        "fabric-client": "^1.4.4",
+        "log4js": "^3.0.6"
+    },
+    "license": "Apache-2.0"
+}

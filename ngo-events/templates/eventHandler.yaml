@@ -1,0 +1,166 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Resources:
+  SnsSubscription:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: NewDonation
+      Subscription: 
+        - Endpoint: !Ref PhoneNumber
+          Protocol: sms
+      TopicName: NGO Donation
+  EventQueueLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Description: Reads events from SQS and triggers SNS
+      Handler: index.handler
+      Runtime: nodejs12.x
+      FunctionName: SQSEventHandler
+      MemorySize: 512
+      Role: !GetAtt LambdaSQSHandlerRole.Arn
+      Timeout: 15
+      Environment:
+        Variables:
+          SNS_SUBSCRIPTION: !Ref SnsSubscription
+      Events:
+        SQSEventQueue:
+          Type: SQS
+          Properties:
+            Queue: !Ref SQSQueueArn
+            Enabled: true
+      InlineCode: |
+        const AWS = require('aws-sdk');
+
+        function getDynamoDBClient() {
+          return new AWS.DynamoDB({
+            region: "us-east-1",
+            apiVersion: '2012-08-10'
+          });
+        }
+
+        async function putEvent(eventData) {
+          const ddbClient = getDynamoDBClient();
+
+          /**
+            eventData.body {
+              type: event.event_name,
+              transactionId: event.tx_id,
+              locID: payloadJSON.locID,
+              data: payloadJSON.data,
+              createdByMSPID: payloadJSON.createdByMSPID,
+              createdByUser: payloadJSON.createdByUser,
+              createdAt: payloadJSON.createdAt,
+              createdByRole: payloadJSON.role,
+              createdByUserFullName: payloadJSON.fullname,
+              createdByOrganization: payloadJSON.affiliation,
+            }
+          */
+
+          const eventBody = JSON.parse(eventData.body);
+          const eventInfo = eventBody.type + "#" + eventBody.createdAt;
+          const params = {
+            Item: {
+              "locID": {
+                S: eventBody.locID
+              },
+              "eventInfo": {
+                S: eventInfo
+              },
+              "transactionId": {
+                S: eventBody.transactionId
+              },
+              "createdByMSPID": {
+                S: eventBody.createdByMSPID
+              },
+              "createdByUser": {
+                S: eventBody.createdByUser || "username_not_set"
+              },
+              "createdByRole": {
+                S: eventBody.createdByRole || "user_role_not_set"
+              },
+              "createdByUserFullName": {
+                S: eventBody.createdByUserFullName || "user_fullname_not_set"
+              },
+              "createdByOrganization": {
+                S: eventBody.createdByOrganization || "user_organization_not_set"
+              },
+              "data": {
+                S: JSON.stringify(eventBody.data)
+              },
+              "eventType": {
+                S: eventBody.type
+              },
+              "createdAt": {
+                N: "" + eventBody.createdAt
+              }
+            }, 
+            ReturnConsumedCapacity: "TOTAL",
+            ConditionExpression: "attribute_not_exists(eventInfo)",
+            TableName: TABLE_NAME
+          };
+             
+          let putResult = await ddbClient.putItem(params).promise();
+          return putResult;
+        }
+
+        /**
+         * event {
+            functionName: [getEvents, putEvent],
+            locID: 'abc123',
+            eventData: {} // for putEvent
+           }
+         */
+        exports.handler = async function(event) {
+          const Records = event.Records;
+          for (const Record of Records) {
+            await putEvent(Record);
+          }
+
+          const result = Records.length + " events processed";
+          const response = {
+            statusCode: 200,
+            body: result,
+            "headers": {
+              "Access-Control-Allow-Origin":"*",
+              "Access-Control-Allow-Methods":"OPTIONS,POST,PUT",
+              "Access-Control-Allow-Headers":"Content-Type,X-Amz-Date,Authorization,X-Api-Key"
+            }
+          };
+
+          return response;
+
+        };
+  LambdaSQSHandlerRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: SQSEventsReadWritePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: SQSEventsReadWrite
+                Effect: Allow
+                Action:
+                  - 'sqs:DeleteMessage'
+                  - 'sqs:ReceiveMessage'
+                  - 'sqs:SendMessage'
+                  - 'sqs:GetQueueAttributes'
+                Resource:
+                  - !Sub 'arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:fabricevents*'
+Parameters:
+  SQSQueueArn:
+    Type: String
+  PhoneNumber:
+    Type: String
+    Default: +15555555555

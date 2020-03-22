@@ -1,0 +1,453 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Metadata:
+  'AWS::CloudFormation::Designer':
+    40239b49-5f41-485c-968e-648cdbfbc425:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -80
+        'y': 250
+      z: 1
+      embeds: []
+    65d81a45-9323-4196-814b-c2856fc9f25a:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -30
+        'y': 150
+      z: 1
+      embeds: []
+    dc0c7a20-6f13-4003-ad24-6a4e327f3ef8:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -210
+        'y': 310
+      z: 1
+      embeds: []
+    3aa0010e-9f69-46d8-ba46-250bd842206f:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -90
+        'y': 370
+      z: 1
+      embeds: []
+      isassociatedwith:
+        - dc0c7a20-6f13-4003-ad24-6a4e327f3ef8
+        - 275de4e5-f223-46cd-9974-1bc525aac022
+    275de4e5-f223-46cd-9974-1bc525aac022:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 100
+        'y': 280
+      z: 1
+      embeds: []
+    45598e45-2a59-4644-a602-0f9a620f873e:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 190
+        'y': 320
+      z: 1
+      embeds: []
+    3878c2df-ad74-4fdf-83fb-1312b39892fe:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 110
+        'y': 100
+      z: 1
+      embeds: []
+    1dd19466-f56f-48b5-9c56-ea61bb63e0f9:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -160
+        'y': 130
+      z: 1
+      embeds: []
+    f7fa2261-6023-4820-a6cd-20d771d3e561:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -20
+        'y': 40
+      z: 1
+      embeds: []
+Resources:
+  ListenerCluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+      ClusterName: EventsListenerCluster
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: dc0c7a20-6f13-4003-ad24-6a4e327f3ef8
+  ListenerService:
+    Type: 'AWS::ECS::Service'
+    Properties:
+      ServiceName: !Ref ServiceName
+      Cluster: !Ref ListenerCluster
+      TaskDefinition: !Ref ListenerTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          SecurityGroups:
+            - !Ref PrivateSecurityGroupId
+          Subnets:
+            - !Ref PrivateSubnetId
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 3aa0010e-9f69-46d8-ba46-250bd842206f
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ['', [/ecs/, !Ref ServiceName, /, EventListener]]
+  ListenerTaskDefinition:
+    Type: 'AWS::ECS::TaskDefinition'
+    DependsOn: LogGroup
+    Properties:
+      Cpu: 1024
+      ExecutionRoleArn: !Ref RoleTaskDefinitionExecution
+      Memory: 2048
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn: !Ref RoleTaskDefinition
+      ContainerDefinitions:
+        - Environment:
+            - Name: CHAINCODE_NAME
+              Value: !Ref Chaincode
+            - Name: CHANNEL_NAME
+              Value: !Ref ChannelName
+            - Name: FABRIC_USERNAME
+              Value: !Ref FabricUser
+            - Name: LOG_LEVEL
+              Value: !Ref LogLevel
+            - Name: MEMBER_NAME
+              Value: !Ref MemberName
+            - Name: MSP
+              Value: !Ref MSP
+            - Name: ORDERER_ENDPOINT
+              Value: !Ref OrdererEndpoint
+            - Name: PEER_ENDPOINT
+              Value: !Ref PeerEndpoint
+            - Name: SQS_QUEUE_URL
+              Value: !Ref SQSEventsQueue
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+          Image: !Ref ContainerImage
+          Memory: 512
+          Name: EventListenerContainer
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 275de4e5-f223-46cd-9974-1bc525aac022
+  SnsSubscription:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: NewDonation
+      Subscription: 
+        - Endpoint: !Ref PhoneNumber
+          Protocol: sms
+  EventQueueLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Description: Reads events from SQS and triggers SNS
+      Handler: index.handler
+      Runtime: nodejs12.x
+      FunctionName: SQSEventHandler
+      MemorySize: 512
+      Role: !GetAtt LambdaSQSHandlerRole.Arn
+      Timeout: 15
+      Environment:
+        Variables:
+          SNS_SUBSCRIPTION: !Ref SnsSubscription
+      Events:
+        SQSEventQueue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt SQSEventsQueue.Arn
+            Enabled: true
+      InlineCode: |
+        const AWS = require('aws-sdk');
+
+        function getDynamoDBClient() {
+          return new AWS.DynamoDB({
+            region: "us-east-1",
+            apiVersion: '2012-08-10'
+          });
+        }
+
+        async function putEvent(eventData) {
+          const ddbClient = getDynamoDBClient();
+
+          /**
+            eventData.body {
+              type: event.event_name,
+              transactionId: event.tx_id,
+              locID: payloadJSON.locID,
+              data: payloadJSON.data,
+              createdByMSPID: payloadJSON.createdByMSPID,
+              createdByUser: payloadJSON.createdByUser,
+              createdAt: payloadJSON.createdAt,
+              createdByRole: payloadJSON.role,
+              createdByUserFullName: payloadJSON.fullname,
+              createdByOrganization: payloadJSON.affiliation,
+            }
+          */
+
+          const eventBody = JSON.parse(eventData.body);
+          const eventInfo = eventBody.type + "#" + eventBody.createdAt;
+          const params = {
+            Item: {
+              "locID": {
+                S: eventBody.locID
+              },
+              "eventInfo": {
+                S: eventInfo
+              },
+              "transactionId": {
+                S: eventBody.transactionId
+              },
+              "createdByMSPID": {
+                S: eventBody.createdByMSPID
+              },
+              "createdByUser": {
+                S: eventBody.createdByUser || "username_not_set"
+              },
+              "createdByRole": {
+                S: eventBody.createdByRole || "user_role_not_set"
+              },
+              "createdByUserFullName": {
+                S: eventBody.createdByUserFullName || "user_fullname_not_set"
+              },
+              "createdByOrganization": {
+                S: eventBody.createdByOrganization || "user_organization_not_set"
+              },
+              "data": {
+                S: JSON.stringify(eventBody.data)
+              },
+              "eventType": {
+                S: eventBody.type
+              },
+              "createdAt": {
+                N: "" + eventBody.createdAt
+              }
+            }, 
+            ReturnConsumedCapacity: "TOTAL",
+            ConditionExpression: "attribute_not_exists(eventInfo)",
+            TableName: TABLE_NAME
+          };
+             
+          let putResult = await ddbClient.putItem(params).promise();
+          return putResult;
+        }
+
+        /**
+         * event {
+            functionName: [getEvents, putEvent],
+            locID: 'abc123',
+            eventData: {} // for putEvent
+           }
+         */
+        exports.handler = async function(event) {
+          const Records = event.Records;
+          for (const Record of Records) {
+            await putEvent(Record);
+          }
+
+          const result = Records.length + " events processed";
+          const response = {
+            statusCode: 200,
+            body: result,
+            "headers": {
+              "Access-Control-Allow-Origin":"*",
+              "Access-Control-Allow-Methods":"OPTIONS,POST,PUT",
+              "Access-Control-Allow-Headers":"Content-Type,X-Amz-Date,Authorization,X-Api-Key"
+            }
+          };
+
+          return response;
+
+        };
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 65d81a45-9323-4196-814b-c2856fc9f25a
+  RoleTaskDefinitionExecution:
+    Type: 'AWS::IAM::Role'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 45598e45-2a59-4644-a602-0f9a620f873e
+    Properties:
+      RoleName: EventsTaskExecutionRole
+      Description: Role used by the task to pull image from ECR
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+        - 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly'
+        - 'arn:aws:iam::aws:policy/CloudWatchFullAccess'
+  RoleTaskDefinition:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: EventsContainerExecutionRole
+      Description: Role used by the container to execute the task
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: SecretsManagerGetSecretPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: SecretsManager
+                Effect: Allow
+                Action: 'secretsmanager:GetSecretValue'
+                Resource: !Sub >-
+                  arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:dev/fabricOrgs/${MemberName}/*
+        - PolicyName: SQSSendMessagePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: SQS
+                Effect: Allow
+                Action: 'sqs:SendMessage'
+                Resource: !Sub 'arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:fabricevents'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+        - 'arn:aws:iam::aws:policy/CloudWatchFullAccess'  
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 3878c2df-ad74-4fdf-83fb-1312b39892fe
+  SQSEventsDeadLetterQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: fabriceventsDLQ
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 1dd19466-f56f-48b5-9c56-ea61bb63e0f9
+  SQSEventsQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: fabricevents
+      RedrivePolicy:
+        deadLetterTargetArn:
+          'Fn::GetAtt':
+            - SQSEventsDeadLetterQueue
+            - Arn
+        maxReceiveCount: 1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 40239b49-5f41-485c-968e-648cdbfbc425
+  LambdaSQSHandlerRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: SQSEventsReadWritePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: SQSEventsReadWrite
+                Effect: Allow
+                Action:
+                  - 'sqs:DeleteMessage'
+                  - 'sqs:ReceiveMessage'
+                  - 'sqs:SendMessage'
+                  - 'sqs:GetQueueAttributes'
+                Resource:
+                  - !Sub 'arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:fabricevents*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: f7fa2261-6023-4820-a6cd-20d771d3e561
+Parameters:
+  Chaincode:
+    Type: String
+    Default: ngo
+  ChannelName:
+    Type: String
+    Default: mychannel
+  FabricUser:
+    Type: String
+    Default: lambdaUser
+  LogLevel:
+    Type: String
+    Default: info
+  MemberName:
+    Type: String
+    Default: DeviceManufacturer
+  MSP:
+    Type: String
+    Default: m-FGGVO572ANGZNABBTRPYZ5XVTM
+  OrdererEndpoint:
+    Type: String
+    Default: >-
+      grpcs://orderer.n-tb66ubgwtvdyrmmhmjw2il3jlq.managedblockchain.us-east-1.amazonaws.com:30001
+  PeerEndpoint:
+    Type: String
+    Default: >-
+      grpcs://nd-5edv2y2iyzak3aqdbuqkrye7we.m-fggvo572angznabbtrpyz5xvtm.n-tb66ubgwtvdyrmmhmjw2il3jlq.managedblockchain.us-east-1.amazonaws.com:30006
+  VpcId:
+    Type: String
+    Default: vpc-0608dc7958c00eda3
+  ServiceName:
+    Type: String
+    Default: EventListenerService
+  PhoneNumber:
+    Type: String
+    Default: +15555555555
+  ContainerImage:
+    Type: String
+    Default: 643292708081.dkr.ecr.us-east-1.amazonaws.com/ngo/fabric-event-listener:latest
+  PrivateSecurityGroupId:
+    Type: String
+    Default: sg-0fbf65d3507218e3b
+  PrivateSubnetId:
+    Type: String
+    Default: subnet-019edfa770a8dc0b8
+
+Outputs:
+  SQS_QUEUE_ARN:
+    Description: The SQS queue that holds the Fabric events
+    Value: !Ref SQSEventsQueue
