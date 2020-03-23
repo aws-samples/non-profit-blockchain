@@ -52,8 +52,9 @@ The blockchain listener is a Node.js application that is packaged into a Docker 
 
 The steps you will execute in this part are:
 
+0. Create a Fabric user to listen for the events
 1. Build the listener into a Docker image and put it on ECR
-2. Create a Fabric user to listen for the events
+
 2. Deploy an SQS queue
 3. Deploy an Elastic Container Service (ECS) Task that runs this image
 4. Deploy the ECS Task in a Fargate cluster
@@ -84,14 +85,14 @@ Create the Docker image and upload it to ECR by running the script:
 Create all the components by running the script: 
 
 ```
-~/non-profit-blockchain/ngo-events/deployListener.sh
+~/non-profit-blockchain/ngo-events/scripts/deployListener.sh
 ```
 
 ## Steps 5-6 Deploy SNS and Lambda
 Create all the components by running the script: 
 
 ```
-~/non-profit-blockchain/ngo-events/deployHandler.sh
+~/non-profit-blockchain/ngo-events/scripts/deployHandler.sh
 ```
 
 ## Step 6 - upgrade the NGO chaincode
