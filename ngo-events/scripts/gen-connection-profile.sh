@@ -1,8 +1,8 @@
 PROFILEDIR=../listener/src
-LOCALCA=/tmp/managedblockchain-tls-chain.pem
+LOCALCA=/usr/src/app/certs/managedblockchain-tls-chain.pem
 
 #copy the connection profiles
-cp ../templates/connection-profile-template.yaml $PROFILEDIR/connection-profile.yaml
+cp $PROFILEDIR/connection-profile-template.yaml $PROFILEDIR/connection-profile.yaml
 
 #update the connection profiles with endpoints and other information
 sed -i "s|%PEERNODEID%|$PEERNODEID|g" $PROFILEDIR/connection-profile.yaml

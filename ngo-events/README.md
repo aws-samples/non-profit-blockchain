@@ -100,8 +100,7 @@ We will use the docker cli image to upgrade the chaincode.
 
 Copy it.
 ```
-cd ~
-cp ./non-profit-blockchain/ngo-events/chaincode/src/* ./fabric-samples/chaincode/ngo
+cp ~/non-profit-blockchain/ngo-events/chaincode/src/* ./fabric-samples/chaincode/ngo
 ```
 
 Install it on the peer node.
@@ -111,17 +110,39 @@ docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt
 
 Upgrade it.
 ```
-docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER" cli peer chaincode upgrade -o $ORDERER -C mychannel -n ngo -v 2.0 -c '{"Args":[""]}' --cafile /opt/home/managedblockchain-tls-chain.pem --tls
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER" cli peer chaincode upgrade -o $ORDERER -C mychannel -n ngo -v v1 -c '{"Args":[""]}' --cafile /opt/home/managedblockchain-tls-chain.pem --tls
+```
+
+If this is successful you should see a message like this:
+```
+INFO 004 Installed remotely response:<status:200 payload:"OK" >
 ```
 
 # Testing
 
 ## Make a donation
 
+We'll first create an NGO to which we will donate:
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" -e "CORE_PEER_ADDRESS=$PEER2" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode invoke -C mychannel -n ngo -c  '{"Args":["createNGO","{\"ngoRegistrationNumber\": \"1234\", \"ngoName\": \"Animal Shelter\", \"ngoDescription\": \"We help pets in need\", \"address\": \"123 Pet street\", \"contactNumber\":\"55555555\", \"contactEmail\":\"animal@animals.com\"}"]}' -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls
+```
+If this is successful you should see a message like this:
+```
+INFO 001 Chaincode invoke successful. result: status:200
+```
 
+Next, we'll donate to this NGO by invoking the `createDonation` method on our chaincode:
 ```
-docker cli command that creates a donation
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode invoke -C mychannel -n ngo -c '{"Args":["createDonation","{\"donationId\": \"9999\", \"donationAmount\": \"100\", \"donationDate\": \"2020-03-22T11:52:20.182Z\", \"donorUserName\": \"edge\", \"ngoRegistrationNumber\":\"1234\"}"]}' -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls
 ```
+If this is successful you should see a message like this:
+```
+INFO 001 Chaincode invoke successful. result: status:200
+```
+
+
+
+
 
 If this is successful you should see a message indicating:
 

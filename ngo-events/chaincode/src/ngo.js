@@ -392,31 +392,16 @@ async function allocateSpend(stub, spend) {
 }
 
 /**
- * Helper function that returns an object of the calling identity
- */
-function getClientIdentity(stub) {
-  const ClientIdentity = shim.ClientIdentity;
-  let cid = new ClientIdentity(stub);
-  let result = {};
-  result['ID'] = cid.getID();
-  result['MSPID'] = cid.getMSPID();
-  result['X509Certificate'] = cid.getX509Certificate();
-  result['enrollmentID'] = cid.getAttributeValue("hf.EnrollmentID");
-  return result;
-}
-
-/**
  * Create a chaincode event
  */
 function createEvent(stub, data = {}) {
-  const clientIdentity = getClientIdentity(stub);
   const eventObject = {
       createdAt: (new Date()).getTime(),
-      createdBy: clientIdentity.enrollmentID,
-      createdByMSPID: clientIdentity.MSPID,
-      data
+      createdBy: data.donor,
+      donationAmount: data.amount,
+      ngoRegistrationNumber: data.ngo
   }
-  stub.setEvent(EVENT, Buffer.from(JSON.stringify(eventObject)));
+  stub.setEvent(data.eventName, Buffer.from(JSON.stringify(eventObject)));
 }
 
 /************************************************************************************************

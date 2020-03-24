@@ -16,8 +16,9 @@
 PHONENUMBER=+15555555555
 LISTENER_STACKNAME=fabric-event-listener
 STACKNAME=fabric-event-handler
-TEMPLATEFILE=../templates/eventHandler.yaml
-SQS_QUEUE_ARN=$(aws cloudformation describe-stacks --stack-name $LISTENER_STACKNAME --query "Stacks[0].Outputs[?OutputKey=='SQS_QUEUE_ARN'].OutputValue" --output text --region $REGION)
+ROOT_FOLDER=~/non-profit-blockchain/ngo-events/
+TEMPLATEFILE=$ROOT_FOLDER/templates/eventHandler.yaml
+SQS_QUEUE_ARN=$(aws cloudformation describe-stacks --stack-name $LISTENER_STACKNAME --query "Stacks[0].Outputs[?OutputKey=='SQSQUEUEARN'].OutputValue" --output text --region $REGION)
 
 echo Deploying Cloudformation template to provision the Lambda function and SNS subscription
 aws cloudformation deploy \

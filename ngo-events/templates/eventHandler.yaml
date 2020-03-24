@@ -8,7 +8,6 @@ Resources:
       Subscription: 
         - Endpoint: !Ref PhoneNumber
           Protocol: sms
-      TopicName: NGO Donation
   EventQueueLambda:
     Type: 'AWS::Serverless::Function'
     Properties:
@@ -158,6 +157,12 @@ Resources:
                   - 'sqs:GetQueueAttributes'
                 Resource:
                   - !Sub 'arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:fabricevents*'
+              - Sid: SNSPublish
+                Effect: Allow
+                Action:
+                  - 'sns:Publish'
+                Resource:
+                  - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:fabric-event-handler*'
 Parameters:
   SQSQueueArn:
     Type: String
