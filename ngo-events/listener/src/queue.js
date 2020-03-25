@@ -38,10 +38,9 @@ async function putEvent(event) {
   const MessageBody = {
     type: event.name,
     transactionId: event.transactionId,
-    locID: payloadJSON.locID,
-    data: payloadJSON.data,
-    createdByMSPID: payloadJSON.createdByMSPID,
-    createdByUser: payloadJSON.createdByUser,
+    donationAmount: payloadJSON.donationAmount,
+    ngoRegistrationNumber: payloadJSON.ngoRegistrationNumber,
+    createdBy: payloadJSON.createdBy,
     createdAt: payloadJSON.createdAt
   }
   params['MessageBody'] = JSON.stringify(MessageBody);

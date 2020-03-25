@@ -13,7 +13,9 @@
 # express or implied. See the License for the specific language governing 
 # permissions and limitations under the License.
 
-PHONENUMBER=+15555555555
+# This script assumes PHONENUMBER has been set in the calling environment.  If it hasn't, define it here:
+# PHONENUMBER=+15555555555
+
 LISTENER_STACKNAME=fabric-event-listener
 STACKNAME=fabric-event-handler
 ROOT_FOLDER=~/non-profit-blockchain/ngo-events/

@@ -1,6 +1,6 @@
-# Part 7: Blockchain events to notify users of new donations
+# Part 7: Trigger blockchain events to notify users of NGO donations
 
-In this part we will use blockchain events and Amazon Simple Notification Service to notify us when a donation has been made.  Blockchain events allow external applications to listen for and be notified of activity occurring within the smart contracts and the blockchain network.
+In this part we will use blockchain events and Amazon Simple Notification Service (SNS) to notify us when a donation has been made.  Blockchain events allow external applications to listen for and be notified of activity occurring within the smart contracts and the blockchain network.
 
 Hyperledger Fabric has three types of events (https://hyperledger.github.io/fabric-sdk-node/release-1.4/tutorial-channel-events.html) that allow us to monitor blockchain network activity.
 
@@ -8,10 +8,10 @@ Hyperledger Fabric has three types of events (https://hyperledger.github.io/fabr
 - Transaction events - these are triggered when a transaction has been committed to the ledger.
 - Chaincode events - these are custom events created by the chaincode developer and contained within the chaincode.  Chaincode events are triggered when the block containing the invoking transaction is committed to the ledger.
 
-In our NGO donation application we will be listening for a chaincode event indicating a donation has been has made.
+In our NGO donation application we will be listening for chaincode events that indicate a donation has been has made.  We will then send an SMS notifying the user of this donation.
 
 ## Pre-requisites
- There are multiple parts to the workshop.  Before starting on Part 7, you should have completed [Part 1](../ngo-fabric/README.md), [Part 2](../ngo-chaincode/README.md) and  [Part 6](../ngo-lambda/README.md).
+ There are multiple parts to the workshop.  Before starting on Part 7, you should have completed [Part 1](../ngo-fabric/README.md) and [Part 2](../ngo-chaincode/README.md).
 
  In the AWS account where you [created the Fabric network](../ngo-fabric/README.md), use Cloud9 to SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you created in [Part 1](../ngo-fabric/README.md).
 
@@ -46,69 +46,86 @@ This architecture diagram illustrates the solution you will be building.
 
 ![Architecture Diagram](./Architecture%20Diagram.png)
 
-The blockchain listener is a Node.js application that is packaged into a Docker image and runs in an Amazon Fargate cluster.  The Docker image is stored in Amazon Elastic Container Registry (ECR).  When an event is created, the listener will put this event on an Amazon Simple Queue Service (SQS) queue.  An Amazon Lambda function will process messages from this queue and will trigger SNS to send the notification.
+The blockchain listener is a Node.js application that is packaged into a Docker image and run in an Amazon Fargate cluster.  The Docker image is stored in Amazon Elastic Container Registry (ECR).  When an event is created, the listener puts this event on an Amazon Simple Queue Service (SQS) queue.  An Amazon Lambda function processes messages from this queue and triggers SNS to send the SMS.  The Fargate cluster is run within a private subnet, which we also create in this exercise.
+
+Lastly, we will upgrade our [Fabric chaincode](./chaincode/src/ngo.js) to emit a chaincode event when a donation has been made.  This is done using the Node.js Fabric SDK.  Here is a snippet of the function that handles this:
+
+```
+function createEvent(stub, data = {}) {
+  const eventObject = {
+      createdAt: (new Date()).getTime(),
+      createdBy: data.donor,
+      donationAmount: data.amount,
+      ngoRegistrationNumber: data.ngo
+  }
+  stub.setEvent(data.eventName, Buffer.from(JSON.stringify(eventObject)));
+}
+```
+
 
 ## Solution Steps 
 
 The steps you will execute in this part are:
 
-0. Create a Fabric user to listen for the events
-1. Build the listener into a Docker image and put it on ECR
-
-2. Deploy an SQS queue
-3. Deploy an Elastic Container Service (ECS) Task that runs this image
-4. Deploy the ECS Task in a Fargate cluster
-
-5. Deploy an SNS subscription and topic
-6. Deploy a Lambda function that calls SNS for each event
-7. Upgrade the chaincode to emit events when a donation has been made
+1. Create a Fabric user that we will use to listen for the events
+2. Build the Node.js listener into a Docker image and put it on ECR
+3. Deploy the SQS queue
+4. Deploy the Elastic Container Service (ECS) Task that runs this image
+5. Deploy the ECS Task in a Fargate cluster
+6. Create an SNS topic and subscription
+7. Deploy the Lambda function that calls SNS for each event
+8. Upgrade the chaincode
 
 Steps 1-5 will be deployed within a single script.
 Steps 2-5 will be deployed together within a single Cloudformation template.
 Step 6 will be done via the Fabric client node.
 
-## Step 0 - Create listener user
+## Step 1 - Create listener user
+On the Fabric client node.
+
+The listener will need to connect to the peer node to listen for events.  Execute this script to create a Fabric user called `listenerUser` that will be used by the listener.
+
 ```
 ~/non-profit-blockchain/ngo-events/scripts/createFabricUser.sh
 ```
 
-## Step 1 - Create and upload a Docker image for the listener
-On the Fabric client node.
+## Steps 2-5 - Create a private subnet, deploy the Docker image, SQS and Fargate cluster
+Our VPC contains a public subnet, but we want to run our Fargate cluster in a private subnet since it does not need to be accessible from the outside world.  The script we run in this step creates a private subnet, as well as creating the Docker image and uploading it to ECR, and creating the SQS queue and Fargate cluster.
 
-Create the Docker image and upload it to ECR by running the script: 
-
-```
-~/non-profit-blockchain/ngo-events/createImage.sh
-```
-
-## Steps 2-4 Deploy SQS, SNS and ECS Fargate
 Create all the components by running the script: 
-
 ```
 ~/non-profit-blockchain/ngo-events/scripts/deployListener.sh
 ```
 
-## Steps 5-6 Deploy SNS and Lambda
-Create all the components by running the script: 
+We now have set up a listener that is putting every blockchain event onto SQS.  This allows us to handle these events with a Lambda function and invoke virtually any other AWS service.
+
+For example, you could write this data into DynamoDB and S3 to deliver faster query times and drive Amazon Quicksight dashboards.  In this workshop, we'll use SNS to send an SMS notifying the recipient of the new donation.  
+
+
+## Steps 6-7 Create an SNS subscription and Lambda function
+Before we create the SNS subscription, let's set the phone number where we want to receive the SMS messages.  Set this environment variable to your mobile device, and include the country code.  For example, in the U.S. this would be like `+15555555555`.
+```
+PHONENUMBER=<your mobile number>
+```
+
+Create the SNS subscription and Lambda by running the script: 
 
 ```
 ~/non-profit-blockchain/ngo-events/scripts/deployHandler.sh
 ```
 
-## Step 6 - upgrade the NGO chaincode
-We will use the docker cli image to upgrade the chaincode.
-
-Copy it.
+## Step 8 - upgrade the NGO chaincode
+Copy the chaincode source code to where the Fabric CLI container has mounted its chaincode source folders.
 ```
 cp ~/non-profit-blockchain/ngo-events/chaincode/src/* ./fabric-samples/chaincode/ngo
 ```
 
-Install it on the peer node.
+Install the chaincode on the peer node.
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER" cli peer chaincode install -n ngo -l node -v v1 -p /opt/gopath/src/github.com/ngo
 ```
 
-Upgrade it.
+Next, upgrade the chaincode.
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" -e "CORE_PEER_ADDRESS=$PEER" cli peer chaincode upgrade -o $ORDERER -C mychannel -n ngo -v v1 -c '{"Args":[""]}' --cafile /opt/home/managedblockchain-tls-chain.pem --tls
 ```
@@ -121,90 +138,30 @@ INFO 004 Installed remotely response:<status:200 payload:"OK" >
 # Testing
 
 ## Make a donation
+Now that we've created everything, let's see it all in action.
 
-We'll first create an NGO to which we will donate:
+We'll begin by creating an NGO to which we will donate:
 ```
-docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" -e "CORE_PEER_ADDRESS=$PEER2" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode invoke -C mychannel -n ngo -c  '{"Args":["createNGO","{\"ngoRegistrationNumber\": \"1234\", \"ngoName\": \"Animal Shelter\", \"ngoDescription\": \"We help pets in need\", \"address\": \"123 Pet street\", \"contactNumber\":\"55555555\", \"contactEmail\":\"animal@animals.com\"}"]}' -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" -e "CORE_PEER_ADDRESS=$PEER2" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode invoke -C mychannel -n ngo -c  '{"Args":["createNGO","{\"ngoRegistrationNumber\": \"1234\", \"ngoName\": \"Animal Shelters\", \"ngoDescription\": \"We help pets in need\", \"address\": \"123 Pet Street\", \"contactNumber\":\"55555555\", \"contactEmail\":\"animal@animals.com\"}"]}' -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls
 ```
+
 If this is successful you should see a message like this:
 ```
 INFO 001 Chaincode invoke successful. result: status:200
 ```
 
-Next, we'll donate to this NGO by invoking the `createDonation` method on our chaincode:
+Next, we'll donate to this NGO by invoking the `createDonation` method of our chaincode:
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode invoke -C mychannel -n ngo -c '{"Args":["createDonation","{\"donationId\": \"9999\", \"donationAmount\": \"100\", \"donationDate\": \"2020-03-22T11:52:20.182Z\", \"donorUserName\": \"edge\", \"ngoRegistrationNumber\":\"1234\"}"]}' -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls
 ```
+
 If this is successful you should see a message like this:
 ```
 INFO 001 Chaincode invoke successful. result: status:200
 ```
 
 
-
-
-
-If this is successful you should see a message indicating:
-
-```
-Lambda creation completed. API Gateway is active at:
-https://abcd12345.execute-api.us-east-1.amazonaws.com/dev
-```
-
-The URL is to the API Gateway which we will test with in step 4. It is also available as an output of the CloudFormation stack created in this step (look for the name `fabric-lambda-stack`). Copy the URL and paste it in a local text editor to reference it later.
-
-## Step 3 - Test the Lambda function
-
-You can test the Lambda function from the [Lambda console](https://console.aws.amazon.com/lambda), or from the cli.
-
-To test from the cli, you will execute the commands below.  The output of each command is in the file specified in the last argument, and is displayed via `cat`.
-
-First, call the `createDonor` chaincode function to create the donor "melissa".
-```
-aws lambda invoke --function-name $LAMBDANAME --payload "{\"fabricUsername\":\"$FABRICUSER\",\"functionType\":\"invoke\",\"chaincodeFunction\":\"createDonor\",\"chaincodeFunctionArgs\":{\"donorUserName\":\"melissa\",\"email\":\"melissa@melissasngo.org\"}}" --region $REGION /tmp/lambda-output-createDonor.txt
-cat /tmp/lambda-output-createDonor.txt
-```
-
-Next, call the `queryDonor` function to view the details of the donor we just created.
-```
-aws lambda invoke --function-name $LAMBDANAME --payload "{\"fabricUsername\":\"$FABRICUSER\",\"functionType\":\"queryObject\",\"chaincodeFunction\":\"queryDonor\",\"chaincodeFunctionArgs\":{\"donorUserName\":\"melissa\"}}" --region $REGION /tmp/lambda-output-queryDonor.txt
-cat /tmp/lambda-output-queryDonor.txt
-```
-
-Finally, call the `queryAllDonors` function to view all the donors.
-```
-aws lambda invoke --function-name $LAMBDANAME --payload "{\"fabricUsername\":\"$FABRICUSER\",\"functionType\":\"queryObject\",\"chaincodeFunction\":\"queryAllDonors\",\"chaincodeFunctionArgs\":{}}" --region $REGION /tmp/lambda-output-queryAllDonors.txt
-cat /tmp/lambda-output-queryAllDonors.txt
-```
-
-You have deployed a Lambda function that is invoking chaincode transactions and running queries in Managed Blockchain. Next we'll test using API Gateway to call this Lambda for each of its routes.
-
-## Step 4 - Test the API Gateway
-
-You can test the API Gateway from the [API Gateway console](https://console.aws.amazon.com/apigateway), or from the cli.  We will walk through testing it from the cli.
-
-To test from the cli, you will execute the commands below.  
-
-First, call the `POST /donors` endpoint which will execute the `createDonor` chaincode function to create the donor "rachel".
-
-```
-export APIURL=$(aws cloudformation describe-stacks --stack-name fabric-lambda-stack --query "Stacks[0].Outputs[?OutputKey=='APIGatewayURL'].OutputValue" --output text --region $REGION)
-curl -s -X POST "$APIURL/donors" -H "content-type: application/json" -d '{"donorUserName":"rachel","email":"rachel@donor.org"}'
-```
-
-Second, call the `GET /donors/{donorName}` endpoint which will execute the `queryDonor` chaincode function to query the donor "rachel".
-
-```
-curl -s -X GET "$APIURL/donors/rachel" 
-```
-
-Finally, call the `GET /donors` endpoint which will execute the `queryAllDonors` chaincode function to view all the donors.
-
-```
-curl -s -X GET "$APIURL/donors" 
-```
-
-You now have a REST API managed by API Gateway that is invoking a Lambda function to execute transactions on the blockchain.  To expose additional chaincode functions within API Gateway, you would add API Gateway routes to support them, and continue routing to the same Lambda function.   
+You now have a Fabric event listener running as a Fargate cluster that puts Fabric events on SQS.  A Lambda function processes the SQS messages and triggers SNS notifcations to send SMS messages.
 
 * [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
 * [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
@@ -212,3 +169,4 @@ You now have a REST API managed by API Gateway that is invoking a Lambda functio
 * [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
 * [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with Amazon API Gateway and AWS Lambda.
+* [Part 7:](../ngo-events/README.md) Trigger blockchain events to notify users of NGO donations
