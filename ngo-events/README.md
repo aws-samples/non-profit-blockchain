@@ -105,7 +105,7 @@ For example, you could write this data into DynamoDB and S3 to deliver faster qu
 ## Steps 6-7 Create an SNS subscription and Lambda function
 Before we create the SNS subscription, let's set the phone number where we want to receive the SMS messages.  Set this environment variable to your mobile device, and include the country code.  For example, in the U.S. this would be like `+15555555555`.
 ```
-PHONENUMBER=<your mobile number>
+export PHONENUMBER=<your mobile number>
 ```
 
 Create the SNS subscription and Lambda by running the script: 
@@ -142,7 +142,7 @@ Now that we've created everything, let's see it all in action.
 
 We'll begin by creating an NGO to which we will donate:
 ```
-docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" -e "CORE_PEER_ADDRESS=$PEER2" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode invoke -C mychannel -n ngo -c  '{"Args":["createNGO","{\"ngoRegistrationNumber\": \"1234\", \"ngoName\": \"Animal Shelters\", \"ngoDescription\": \"We help pets in need\", \"address\": \"123 Pet Street\", \"contactNumber\":\"55555555\", \"contactEmail\":\"animal@animals.com\"}"]}' -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" cli peer chaincode invoke -C mychannel -n ngo -c  '{"Args":["createNGO","{\"ngoRegistrationNumber\": \"1234\", \"ngoName\": \"Animal Shelters\", \"ngoDescription\": \"We help pets in need\", \"address\": \"123 Pet Street\", \"contactNumber\":\"55555555\", \"contactEmail\":\"animal@animals.com\"}"]}' -o $ORDERER --cafile /opt/home/managedblockchain-tls-chain.pem --tls
 ```
 
 If this is successful you should see a message like this:
