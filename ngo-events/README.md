@@ -1,6 +1,7 @@
-# Part 7: Trigger blockchain events to notify users of NGO donations
+# Part 7: Use blockchain events to notify users of NGO donations
 
-In this part we will use blockchain events and Amazon Simple Notification Service (SNS) to notify us when a donation has been made.  Blockchain events allow external applications to listen for and be notified of activity occurring within the smart contracts and the blockchain network.
+Blockchain events allow us to build event-based applications that respond to changes in the smart contracts and the blockchain network.  These events can used for real time analytics with [Amazon Kinesis Data Streams](https://aws.amazon.com/kinesis/data-streams/), or can be sent to other AWS purpose built databases like [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) for faster query times or [Amazon Aurora](https://aws.amazon.com/rds/aurora/) for more complex querying.  In this workshop, we will use blockchain events and [Amazon Simple Notification Service (SNS)](https://aws.amazon.com/sns/) to notify us when a donation has been made.  
+
 
 Hyperledger Fabric has three types of events (https://hyperledger.github.io/fabric-sdk-node/release-1.4/tutorial-channel-events.html) that allow us to monitor blockchain network activity.
 
@@ -76,9 +77,6 @@ The steps you will execute in this part are:
 7. Deploy the Lambda function that calls SNS for each event
 8. Upgrade the chaincode
 
-Steps 1-5 will be deployed within a single script.
-Steps 2-5 will be deployed together within a single Cloudformation template.
-Step 6 will be done via the Fabric client node.
 
 ## Step 1 - Create listener user
 On the Fabric client node.
@@ -97,7 +95,7 @@ Create all the components by running the script:
 ~/non-profit-blockchain/ngo-events/scripts/deployListener.sh
 ```
 
-We now have set up a listener that is putting every blockchain event onto SQS.  This allows us to handle these events with a Lambda function and invoke virtually any other AWS service.
+We now have set up a listener that is putting every blockchain event onto SQS.  This allows us to handle these events with a Lambda function and invoke other AWS services.
 
 For example, you could write this data into DynamoDB and S3 to deliver faster query times and drive Amazon Quicksight dashboards.  In this workshop, we'll use SNS to send an SMS notifying the recipient of the new donation.  
 
@@ -169,4 +167,4 @@ You now have a Fabric event listener running as a Fargate cluster that puts Fabr
 * [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
 * [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with Amazon API Gateway and AWS Lambda.
-* [Part 7:](../ngo-events/README.md) Trigger blockchain events to notify users of NGO donations
+* [Part 7:](../ngo-events/README.md) Use blockchain events to notify users of NGO donations
