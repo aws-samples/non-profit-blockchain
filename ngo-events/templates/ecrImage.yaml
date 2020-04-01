@@ -1,0 +1,9 @@
+Parameters:
+  RepositoryName:
+    Type: String
+
+Resources:
+  EventListenerRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Ref RepositoryName

@@ -16,6 +16,7 @@
 # This script assumes PHONENUMBER has been set in the calling environment.  If it hasn't, define it here:
 # PHONENUMBER=+15555555555
 
+REGION=us-east-1
 LISTENER_STACKNAME=fabric-event-listener
 STACKNAME=fabric-event-handler
 ROOT_FOLDER=~/non-profit-blockchain/ngo-events/

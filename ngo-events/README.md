@@ -87,8 +87,16 @@ The listener will need to connect to the peer node to listen for events.  Execut
 ~/non-profit-blockchain/ngo-events/scripts/createFabricUser.sh
 ```
 
-## Steps 2-5 - Create a private subnet, deploy the Docker image, SQS and Fargate cluster
-Our VPC contains a public subnet, but we want to run our Fargate cluster in a private subnet since it does not need to be accessible from the outside world.  The script we run in this step creates a private subnet, as well as creating the Docker image and uploading it to ECR, and creating the SQS queue and Fargate cluster.
+## Step 2 - Upload a Docker image of the listener to ECR
+In this step we create a Docker image of the Node.js event listener and upload the image to ECR.  The Fargate ECS cluster will download and run this image.
+
+Create and upload the image to ECR by running the script:
+```
+~/non-profit-blockchain/ngo-events/scripts/deployImage.sh
+```
+
+## Steps 3-5 - Create a private subnet, the SQS queue and Fargate cluster
+Our VPC contains a public subnet, but we want to run our Fargate cluster in a private subnet since it does not need to be accessible from the outside world.  The script we run in this step creates a private subnet and creating the SQS queue and Fargate cluster.
 
 Create all the components by running the script: 
 ```
@@ -115,7 +123,7 @@ Create the SNS subscription and Lambda by running the script:
 ## Step 8 - upgrade the NGO chaincode
 Copy the chaincode source code to where the Fabric CLI container has mounted its chaincode source folders.
 ```
-cp ~/non-profit-blockchain/ngo-events/chaincode/src/* ./fabric-samples/chaincode/ngo
+cp ~/non-profit-blockchain/ngo-events/chaincode/src/* ~/fabric-samples/chaincode/ngo
 ```
 
 Install the chaincode on the peer node.

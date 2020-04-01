@@ -15,6 +15,7 @@
 
 
 # This script registers and enrolls the user within the Fabric CA.  It then uploads the generated credentials to AWS Secrets Manager.
+REGION=us-east-1
 FABRICUSER=eventListenerUser
 FABRICUSERPASSWORD=Welcome123
 CERTS_FOLDER=/tmp/certs

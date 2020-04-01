@@ -13,6 +13,7 @@
 # express or implied. See the License for the specific language governing 
 # permissions and limitations under the License.
 
+REGION=us-east-1
 AZ=us-east-1d
 STACKNAME=private-subnet
 TEMPLATEFILE=../templates/privateSubnet.yaml

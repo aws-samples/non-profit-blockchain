@@ -13,8 +13,8 @@
 # express or implied. See the License for the specific language governing 
 # permissions and limitations under the License.
 
+REGION=us-east-1
 ROOT_FOLDER=~/non-profit-blockchain/ngo-events/
-PHONENUMBER=+15555555555
 CHAINCODE=ngo
 STACKNAME=fabric-event-listener
 TEMPLATEFILE=$ROOT_FOLDER/templates/eventListener.yaml
@@ -25,38 +25,10 @@ VPCID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query 
 LISTENERSERVICENAME=EventListenerService
 AWSACCOUNTID=$(aws sts get-caller-identity --output text --query 'Account')
 
-echo Preparing the Docker image
-
-echo Installing Node.js. We will use v10.x.
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
-. ~/.nvm/nvm.sh
-nvm install lts/dubnium
-nvm use lts/dubnium
-cd $ROOT_FOLDER/listener/src
-npm install
-
-echo Generate the Fabric connection profile
-cd $ROOT_FOLDER/scripts
-./gen-connection-profile.sh
-sed -i "s|/home/ec2-user/managedblockchain-tls-chain.pem|/usr/src/app/certs/managedblockchain-tls-chain.pem|g" $ROOT_FOLDER/listener/src/connection-profile.yaml
-
-echo Creating the ECR repository
-aws ecr create-repository --repository-name $CHAINCODE/fabric-event-listener
-
-echo Building the Docker image
-aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $AWSACCOUNTID.dkr.ecr.us-east-1.amazonaws.com
-docker build -t $CHAINCODE/fabric-event-listener $ROOT_FOLDER/listener/src
-
-echo Tagging the Docker image
-docker tag $CHAINCODE/fabric-event-listener:latest $AWSACCOUNTID.dkr.ecr.us-east-1.amazonaws.com/$CHAINCODE/fabric-event-listener:latest
-
-echo Uploading the Docker image
-docker push $AWSACCOUNTID.dkr.ecr.us-east-1.amazonaws.com/$CHAINCODE/fabric-event-listener:latest
-
 echo Creating a private subnet
 $ROOT_FOLDER/scripts/deployPrivateSubnet.sh
 
-echo Deploying Cloudformation template to provision the Fargate cluster, SQS Queue
+echo Deploying Cloudformation template to provision the Fargate cluster and SQS Queue
 aws cloudformation deploy \
 --stack-name $STACKNAME \
 --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" "CAPABILITY_AUTO_EXPAND" \
@@ -65,6 +37,6 @@ aws cloudformation deploy \
 --parameter-overrides ContainerImage=$AWSACCOUNTID.dkr.ecr.us-east-1.amazonaws.com/$CHAINCODE/fabric-event-listener:latest \
 Chaincode=$CHAINCODE ChannelName=$CHANNEL FabricUser=$LISTENERUSER LogLevel=info MemberName=$MEMBERNAME \
 MSP=$MEMBERID OrdererEndpoint=grpcs://$ORDERINGSERVICEENDPOINT PeerEndpoint=grpcs://$PEERSERVICEENDPOINT \
-VpcId=$VPCID ServiceName=$LISTENERSERVICENAME PhoneNumber=$PHONENUMBER \
+VpcId=$VPCID ServiceName=$LISTENERSERVICENAME \
 PrivateSecurityGroupId=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='SecurityGroupID'].OutputValue" --output text --region $REGION ) \
 PrivateSubnetId=$(aws cloudformation describe-stacks --stack-name $PRIVATE_SUBNET_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='PrivateSubnetID'].OutputValue" --output text --region $REGION )
