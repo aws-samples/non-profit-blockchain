@@ -68,13 +68,13 @@ function createEvent(stub, data = {}) {
 
 The steps you will execute in this part are:
 
-1. Create a Fabric user that we will use to listen for the events
-2. Build the Node.js listener into a Docker image and put it on ECR
+1. Create a Fabric user to listen for peer events
+2. Deploy the Node.js listener in a Docker image to ECR
 3. Deploy the SQS queue
-4. Deploy the Elastic Container Service (ECS) Task that runs this image
-5. Deploy the ECS Task in a Fargate cluster
-6. Create an SNS topic and subscription
-7. Deploy the Lambda function that calls SNS for each event
+4. Deploy the Elastic Container Service (ECS) task to run this image
+5. Deploy the ECS with a Fargate cluster
+6. Create an SNS topic with an SMS subscription
+7. Deploy the Lambda function to call SNS with every event
 8. Upgrade the chaincode
 
 
