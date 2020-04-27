@@ -18,6 +18,9 @@
  * BROWSER POLYFILLS
  */
 
+import 'reflect-metadata';
+import 'core-js/es7/reflect';
+
 /** IE9, IE10 and IE11 requires all of the following polyfills. **/
 // import 'core-js/es6/symbol';
 // import 'core-js/es6/object';
