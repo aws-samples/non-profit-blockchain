@@ -30,6 +30,9 @@ nvm use lts/dubnium
 cd $ROOT_FOLDER/listener/src
 npm install
 
+echo Downloading Amazon Managed Blockchain public certificate
+aws s3 cp s3://us-east-1.managedblockchain/etc/managedblockchain-tls-chain.pem $ROOT_FOLDER/listener/src/certs/managedblockchain-tls-chain.pem
+
 echo Generate the Fabric connection profile
 cd $ROOT_FOLDER/scripts
 ./gen-connection-profile.sh
