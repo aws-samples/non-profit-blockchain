@@ -1,0 +1,114 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Resources:
+  SnsSubscription:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: NGO News
+      Subscription: 
+        - Endpoint: !Ref PhoneNumber
+          Protocol: sms
+  EventQueueLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Description: Reads events from SQS and triggers SNS
+      Handler: index.handler
+      Runtime: nodejs12.x
+      FunctionName: SQSEventHandler
+      MemorySize: 512
+      Role: !GetAtt LambdaSQSHandlerRole.Arn
+      Timeout: 15
+      Environment:
+        Variables:
+          SNS_SUBSCRIPTION: !Ref SnsSubscription
+      Events:
+        SQSEventQueue:
+          Type: SQS
+          Properties:
+            Queue: !Ref SQSQueueArn
+            Enabled: true
+      InlineCode: |
+        const AWS = require('aws-sdk');
+
+        function getSNSClient() {
+          return new AWS.SNS({
+            region: "us-east-1",
+            apiVersion: '2010-03-31'
+          });
+        }
+
+        async function sendNotification(eventData) {
+          const snsClient = getSNSClient();
+
+          const eventBody = JSON.parse(eventData.body);
+          const name = eventBody.createdBy;
+          const amount = eventBody.donationAmount;
+          const message = name + " just donated $" + amount + "!";
+          
+          const params = {
+            Message: message,
+            TopicArn: process.env.SNS_SUBSCRIPTION
+          };
+            
+          let result = await snsClient.publish(params).promise();
+          return result;
+        }
+
+        exports.handler = async function(event) {
+          const Records = event.Records || [];
+          for (const Record of Records) {
+            await sendNotification(Record);
+          }
+          const result = Records.length + " events processed";
+          const response = {
+            statusCode: 200,
+            body: result,
+            "headers": {
+              "Access-Control-Allow-Origin":"*",
+              "Access-Control-Allow-Methods":"OPTIONS,POST,PUT",
+              "Access-Control-Allow-Headers":"Content-Type,X-Amz-Date,Authorization,X-Api-Key"
+            }
+          };
+
+          return response;
+        };
+  LambdaSQSHandlerRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: SQSEventsReadWritePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: SQSEventsReadWrite
+                Effect: Allow
+                Action:
+                  - 'sqs:DeleteMessage'
+                  - 'sqs:ReceiveMessage'
+                  - 'sqs:SendMessage'
+                  - 'sqs:GetQueueAttributes'
+                Resource:
+                  - !Sub 'arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:fabricevents*'
+              - Sid: SNSPublish
+                Effect: Allow
+                Action:
+                  - 'sns:Publish'
+                Resource:
+                  - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:fabric-event-handler*'
+Parameters:
+  SQSQueueArn:
+    Type: String
+  PhoneNumber:
+    Type: String
+    Default: +15555555555

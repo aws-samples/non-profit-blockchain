@@ -1,0 +1,175 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Parameters:
+  Chaincode:
+    Type: String
+    Default: ngo
+  ChannelName:
+    Type: String
+    Default: mychannel
+  FabricUser:
+    Type: String
+    Default: listenerUser
+  LogLevel:
+    Type: String
+    Default: info
+  ServiceName:
+    Type: String
+    Default: EventListenerService
+  MemberName:
+    Type: String
+  MSP:
+    Type: String
+  OrdererEndpoint:
+    Type: String
+  PeerEndpoint:
+    Type: String
+  VpcId:
+    Type: String
+  ContainerImage:
+    Type: String
+  PrivateSecurityGroupId:
+    Type: String
+  PrivateSubnetId:
+    Type: String
+
+Resources:
+  ListenerCluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+      ClusterName: EventsListenerCluster
+  ListenerService:
+    Type: 'AWS::ECS::Service'
+    Properties:
+      ServiceName: !Ref ServiceName
+      Cluster: !Ref ListenerCluster
+      TaskDefinition: !Ref ListenerTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          SecurityGroups:
+            - !Ref PrivateSecurityGroupId
+          Subnets:
+            - !Ref PrivateSubnetId
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ['', [/ecs/, !Ref ServiceName, /, EventListener]]
+  ListenerTaskDefinition:
+    Type: 'AWS::ECS::TaskDefinition'
+    DependsOn: LogGroup
+    Properties:
+      Cpu: 1024
+      ExecutionRoleArn: !Ref RoleTaskDefinitionExecution
+      Memory: 2048
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn: !Ref RoleTaskDefinition
+      ContainerDefinitions:
+        - Environment:
+            - Name: CHAINCODE_NAME
+              Value: !Ref Chaincode
+            - Name: CHANNEL_NAME
+              Value: !Ref ChannelName
+            - Name: FABRIC_USERNAME
+              Value: !Ref FabricUser
+            - Name: LOG_LEVEL
+              Value: !Ref LogLevel
+            - Name: MEMBER_NAME
+              Value: !Ref MemberName
+            - Name: MSP
+              Value: !Ref MSP
+            - Name: ORDERER_ENDPOINT
+              Value: !Ref OrdererEndpoint
+            - Name: PEER_ENDPOINT
+              Value: !Ref PeerEndpoint
+            - Name: SQS_QUEUE_URL
+              Value: !Ref SQSEventsQueue
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+          Image: !Ref ContainerImage
+          Memory: 512
+          Name: EventListenerContainer
+  RoleTaskDefinitionExecution:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: EventsTaskExecutionRole
+      Description: Role used by the task to pull image from ECR
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+        - 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly'
+        - 'arn:aws:iam::aws:policy/CloudWatchFullAccess'
+  RoleTaskDefinition:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: EventsContainerExecutionRole
+      Description: Role used by the container to execute the task
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: SecretsManagerGetSecretPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: SecretsManager
+                Effect: Allow
+                Action: 'secretsmanager:GetSecretValue'
+                Resource: !Sub >-
+                  arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:dev/fabricOrgs/${MemberName}/*
+        - PolicyName: SQSSendMessagePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: SQS
+                Effect: Allow
+                Action: 'sqs:SendMessage'
+                Resource: !Sub 'arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:fabricevents'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+        - 'arn:aws:iam::aws:policy/CloudWatchFullAccess'
+  SQSEventsDeadLetterQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: fabriceventsDLQ
+  SQSEventsQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: fabricevents
+      RedrivePolicy:
+        deadLetterTargetArn:
+          'Fn::GetAtt':
+            - SQSEventsDeadLetterQueue
+            - Arn
+        maxReceiveCount: 1
+
+Outputs:
+  SQSQUEUEARN:
+    Description: The SQS queue that holds the Fabric events
+    Value:
+      Fn::GetAtt: 
+        - SQSEventsQueue
+        - Arn

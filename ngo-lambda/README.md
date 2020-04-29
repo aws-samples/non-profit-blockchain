@@ -145,3 +145,4 @@ You now have a REST API managed by API Gateway that is invoking a Lambda functio
 * [Part 4:](../ngo-ui/README.md) Run the application. 
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
 * [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with Amazon API Gateway and AWS Lambda.
+* [Part 7:](../ngo-events/README.md) Use blockchain events to notify users of NGO donations.
