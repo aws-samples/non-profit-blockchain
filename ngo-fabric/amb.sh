@@ -15,5 +15,6 @@
 
 echo Creating Amazon Managed Blockchain network, member and peer node
 aws cloudformation deploy --stack-name $STACKNAME --template-file amb.yaml \
+--parameter-overrides PeerNodeAvailabilityZone=${REGION}a \
 --capabilities CAPABILITY_NAMED_IAM \
 --region $REGION
