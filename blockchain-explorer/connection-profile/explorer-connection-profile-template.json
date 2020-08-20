@@ -1,0 +1,92 @@
+{
+    "network-configs": {
+      "network-1": {
+        "version": "1.0",
+        "clients": {
+          "client-1": {
+            "tlsEnable": true,
+            "organization": "%MEMBERID%",
+            "channel": "mychannel",
+            "credentialStore": {
+              "path": "./tmp/%MEMBERID%/credential",
+              "cryptoStore": {
+                "path": "./tmp/%MEMBERID%/crypto"
+              }
+            }
+          }
+        },
+        "channels": {
+          "mychannel": {
+            "orderers": [
+              "orderer"
+            ],
+            "peers": {
+              "%PEERSERVICEENDPOINTNOPORT%": {}
+            },
+            "connection": {
+              "timeout": {
+                "peer": {
+                  "endorser": "6000",
+                  "eventHub": "6000",
+                  "eventReg": "6000"
+                }
+              }
+            }
+          }
+        },
+        "organizations": {
+          "%MEMBERID%": {
+            "mspid": "%MEMBERID%",
+            "fullpath": false,
+            "adminPrivateKey": {
+              "path": "/home/ec2-user/admin-msp/keystore"
+            },
+            "signedCert": {
+              "path": "/home/ec2-user/admin-msp/signcerts"
+            },
+            "certificateAuthorities": ["ca-org1"],
+            "peers": ["%PEERSERVICEENDPOINTNOPORT%"]
+          }
+        },
+        "peers": {
+          "%PEERSERVICEENDPOINTNOPORT%": {
+            "tlsCACerts": {
+              "path": "%CAFILE%"
+            },
+            "url": "grpcs://%PEERSERVICEENDPOINT%",
+            "eventUrl": "grpcs://%PEEREVENTENDPOINT%",
+            "grpcOptions": {
+              "ssl-target-name-override": "%PEERSERVICEENDPOINTNOPORT%",
+              "discovery-as-localhost": "false"
+            }
+          }
+        },
+        "orderers": {
+          "orderer": {
+            "tlsCACerts": {
+              "path": "%CAFILE%"
+            },
+            "url": "grpcs://%ORDERINGSERVICEENDPOINT%",
+            "grpcOptions": {
+              "ssl-target-name-override": "%ORDERINGSERVICEENDPOINTNOPORT%"
+            }
+          }
+        },
+        "certificateAuthorities": {
+          "ca-org1": {
+            "url": "https://%CASERVICEENDPOINT%",
+            "httpOptions": {
+              "verify": false
+            },
+            "tlsCACerts": {
+              "path": "%CAFILE%"
+            },
+            "caName": "%MEMBERID%"
+          }
+        }
+      }
+    },
+    "configtxgenToolPath": "/fabric-path/fabric-samples/bin",
+    "license": "Apache-2.0"
+}
+  
