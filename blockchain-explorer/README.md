@@ -127,6 +127,10 @@ Update the config file. I suggest you simply replace all the contents with the s
     "type": "local",
     "platform": "fabric",
     "blocksSyncTime": "3"
+  },
+  "jwt": {
+      "secret": "a secret phrase!!",
+      "expiresIn": "2h"
   }
 }
 ```
@@ -156,7 +160,7 @@ psql -X -h $HOSTNAME -d $DATABASE --username=$USER -v dbname=$DATABASE -v user=$
 psql -X -h $HOSTNAME -d $DATABASE --username=$USER -v dbname=$DATABASE -v user=$USER -v passwd=$PASSWD -f ./updatepg.sql ;
 ```
 
-Now create the database tables. You will need to enter the password for the 'master' user, the same as you entered up above when editing 'explorerconfig.json'. You will need to enter this password for two different steps:
+Now create the database tables. You will need to enter the password for the 'master' user. This is the same as you entered up above when editing 'explorerconfig.json'; it will also be printed out for you when you execute the command below. You will need to enter this password for two different steps, and you'll need to type it, not copy and paste:
 
 ```
 cd ~/blockchain-explorer/app/persistence/fabric/postgreSQL/db
@@ -201,16 +205,9 @@ Update the config file:
 Now build Hyperledger Explorer:
 
 ```
-nvm use lts/carbon
+nvm use 12
 cd ~/blockchain-explorer
-npm install
-cd ~/blockchain-explorer/app/test
-npm install
-npm run test
-cd ~/blockchain-explorer/client/
-npm install
-npm test -- -u --coverage
-npm run build
+./main.sh install
 ```
 
 ## Step 5 - Run Hyperledger Explorer and view the dashboard
@@ -220,13 +217,19 @@ Run Hyperledger Explorer.
 NOTE: depending on the version of Hyperledger Explorer you are using, you might need to use the ENV variable exported below (export DISCOVERY_AS_LOCALHOST=false), otherwise explorer uses the discovery service and assumes that all your Fabric components are being run in docker containers on localhost. 
 
 ```
-nvm use lts/carbon
+nvm use 12
 cd ~/blockchain-explorer/
 export DISCOVERY_AS_LOCALHOST=false
 ./start.sh
 ```
 
 The Hyperledger Explorer client starts on port 8080. You already have an ELB that routes traffic to this port. The ELB was created for you by the AWS CloudFormation template in step 2. Once the health checks on the ELB succeed, you can access the Hyperledger Explorer client using the DNS of the ELB. You can find the ELB endpoint using the key `BlockchainExplorerELBDNS` in the outputs tab of the CloudFormation stack.
+
+Logs can be found in these locations in the blockchain-explorer repo folder, `~/blockchain-explorer/`:
+
+* ./logs/console folder to view the logs relating to console
+* ./logs/app to view the application logs
+* ./logs/db to view the database logs
 
 ## Step 6 - Use the Swagger Open API Specification UI to interact with Hyperledger Explorer
 Hyperledger Explorer provides a RESTful API that you can use to interact with the Fabric network. Appending ‘api-docs’ to the same ELB endpoint you used in step 5 will display the Swagger home page for the API.
