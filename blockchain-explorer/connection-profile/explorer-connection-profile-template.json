@@ -6,6 +6,7 @@
     "tlsEnable": true,
     "adminCredential": {
       "id": "exploreradmin",
+      "password": "exploreradminpw",
       "affiliation": "org1.department1"
     },
     "enableAuthentication": false,
