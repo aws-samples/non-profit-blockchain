@@ -39,11 +39,11 @@ sed -i "s|%ADMINUSER%|$ADMINUSER|g" $EXPLORERPROFILE
 sed -i "s|%ADMINPWD%|$ADMINPWD|g" $EXPLORERPROFILE
 
 #get the key files
-files=( $MSPDIR/keystore )
+files=( $MSPDIR/keystore/* )
 echo "${files[0]}"
 sed -i "s|%KEYSTOREFILENAME%|${files[0]}|g" $EXPLORERPROFILE
 
-files=( $MSPDIR/signcerts )
+files=( $MSPDIR/signcerts/* )
 echo "${files[0]}"
 sed -i "s|%SIGNEDCERTSFILENAME%|${files[0]}|g" $EXPLORERPROFILE
 

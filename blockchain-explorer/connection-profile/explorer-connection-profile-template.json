@@ -48,10 +48,10 @@
       "mspid": "%MEMBERID%",
       "fullpath": false,
       "adminPrivateKey": {
-        "path": "/home/ec2-user/admin-msp/keystore/%KEYSTOREFILENAME%"
+        "path": "%KEYSTOREFILENAME%"
       },
       "signedCert": {
-        "path": "/home/ec2-user/admin-msp/signcerts/%SIGNEDCERTSFILENAME%"
+        "path": "%SIGNEDCERTSFILENAME%"
       },
       "certificateAuthorities": [
         "ca-org1"
