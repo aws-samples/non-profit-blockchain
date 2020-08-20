@@ -4,6 +4,10 @@
   "license": "Apache-2.0",
   "client": {
     "tlsEnable": true,
+    "caCredential": {
+      "id": "%ADMINUSER%",
+      "password": "%ADMINPWD%"
+    },
     "adminCredential": {
       "id": "exploreradmin",
       "password": "exploreradminpw",
@@ -44,10 +48,10 @@
       "mspid": "%MEMBERID%",
       "fullpath": false,
       "adminPrivateKey": {
-        "path": "/home/ec2-user/admin-msp/keystore"
+        "path": "/home/ec2-user/admin-msp/keystore/%KEYSTOREFILENAME%"
       },
       "signedCert": {
-        "path": "/home/ec2-user/admin-msp/signcerts"
+        "path": "/home/ec2-user/admin-msp/signcerts/%SIGNEDCERTSFILENAME%"
       },
       "certificateAuthorities": [
         "ca-org1"

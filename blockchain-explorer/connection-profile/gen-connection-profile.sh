@@ -17,6 +17,7 @@
 # LOCALCA points to the location of the TLS cert
 REPODIR=~/non-profit-blockchain
 LOCALCA=/home/ec2-user/managedblockchain-tls-chain.pem 
+MSPDIR=/home/ec2-user/admin-msp 
 EXPLORERCONFIG=~/blockchain-explorer/app/platform/fabric/config.json
 EXPLORERPROFILE=~/blockchain-explorer/app/platform/fabric/amb-network.json
 
@@ -34,5 +35,16 @@ sed -i "s|%PEERSERVICEENDPOINT%|$PEERSERVICEENDPOINT|g" $EXPLORERPROFILE
 sed -i "s|%PEERSERVICEENDPOINTNOPORT%|$PEERSERVICEENDPOINTNOPORT|g" $EXPLORERPROFILE
 sed -i "s|%PEEREVENTENDPOINT%|$PEEREVENTENDPOINT|g" $EXPLORERPROFILE
 sed -i "s|%CASERVICEENDPOINT%|$CASERVICEENDPOINT|g" $EXPLORERPROFILE
+sed -i "s|%ADMINUSER%|$ADMINUSER|g" $EXPLORERPROFILE
+sed -i "s|%ADMINPWD%|$ADMINPWD|g" $EXPLORERPROFILE
+
+#get the key files
+files=( $MSPDIR/keystore )
+echo "${files[0]}"
+sed -i "s|%KEYSTOREFILENAME%|${files[0]}|g" $EXPLORERPROFILE
+
+files=( $MSPDIR/signcerts )
+echo "${files[0]}"
+sed -i "s|%SIGNEDCERTSFILENAME%|${files[0]}|g" $EXPLORERPROFILE
 
 ls -lR $EXPLORERPROFILE
