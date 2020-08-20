@@ -4,6 +4,10 @@
   "license": "Apache-2.0",
   "client": {
     "tlsEnable": true,
+    "adminCredential": {
+      "id": "exploreradmin",
+      "affiliation": "org1.department1"
+    },
     "enableAuthentication": false,
     "organization": "%MEMBERID%",
     "connection": {

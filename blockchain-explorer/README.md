@@ -180,7 +180,7 @@ Hyperledger Explorer uses a connection profile to connect to the Fabric network.
 ```
 cd ~/non-profit-blockchain/blockchain-explorer/connection-profile
 ./gen-connection-profile.sh
-more ~/blockchain-explorer/app/platform/fabric/config.json
+more ~/blockchain-explorer/app/platform/fabric/amb-network.json
 ```
 
 One difference between the connection profile used by Hyperledger Explorer compared to the profile used by the REST API, is that Hyperledger Explorer expects the peer name in the profile to be the full name of the peer, such as 'nd-mj2vophcizasdg5ssehagqe3n4.m-733fj7siwjavhmyj5z273dz7te.n-erwbh4ou2bhbzfbgnepspy3u5m.managedblockchain.us-east-1.amazonaws.com'. It's not just an ID that you choose. If you do not use the matching peer name you may see an error message when starting the Explorer, that looks like this: 'ReferenceError: host_port is not defined'
