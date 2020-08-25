@@ -9,8 +9,8 @@
       "password": "%ADMINPWD%"
     },
     "adminCredential": {
-      "id": "exploreradmin",
-      "password": "exploreradminpw",
+      "id": "%ADMINUSER%",
+      "password": "%ADMINPWD%",
       "affiliation": "org1.department1"
     },
     "enableAuthentication": false,

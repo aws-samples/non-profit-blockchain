@@ -16,11 +16,11 @@ The instructions below are complete. You can refer to the instructions in the [H
 
 ## Pre-requisites
 
-An Amazon Managed Blockchain network provisioned based on the steps in [Part 1](../ngo-fabric/README.md) is a pre-requisite. The CIDR range of the subnet used by the Fabric client node has been changed to accommodate the additional subnets required by Hyperledger Explorer, so you will either need to recreate your Fabric client node VPC (i.e. delete the CloudFormation stack you created in step 3 of [Part 1](../ngo-fabric/README.md)), or you can simply create a new Fabric network starting from step 1 of [Part 1](../ngo-fabric/README.md).
+An Amazon Managed Blockchain network provisioned based on the steps in [Part 1](../ngo-fabric/README.md) is a pre-requisite. The CIDR range of the subnet used by the Fabric client node has been changed to accommodate the additional subnets required by Hyperledger Explorer (see the [CloudFormation template](../ngo-fabric/fabric-client-node.yaml)), so you will either need to recreate your Fabric client node VPC (i.e. delete the CloudFormation stack you created in step 3 of [Part 1](../ngo-fabric/README.md)), or you can simply create a new Fabric network starting from step 1 of [Part 1](../ngo-fabric/README.md).
 
 If you have multiple peer nodes for your member, the Fabric discovery service will discover them and display them in the Explorer dashboard.
 
-If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found in the Fabric docs (note this is for v2.2 as there is no corresponding info in the v1.4 docs): https://hyperledger-fabric.readthedocs.io/en/release-2.2/create_channel/create_channel.html?highlight=anchor#set-anchor-peers
+If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found in the Fabric docs. Instructions for v1.4 are [here](https://hyperledger-fabric.readthedocs.io/en/release-1.4/channel_update_tutorial.html#updating-the-channel-config-to-include-an-org3-anchor-peer-optional). A clearer set of instructions appear in the [v2.2 docs](https://hyperledger-fabric.readthedocs.io/en/release-2.2/create_channel/create_channel.html?highlight=anchor#set-anchor-peers); these will work on v1.4.
 
 On the Fabric client node.
 
@@ -198,7 +198,7 @@ Fabric uses a discovery service to discover details of the Fabric network, and E
 
 * If you have multiple peer nodes for your member, the Fabric discovery service will discover them and display them in the Explorer dashboard.
 
-* If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found in the Fabric docs (note this is for v2.2 as there is no corresponding info in the v1.4 docs): https://hyperledger-fabric.readthedocs.io/en/release-2.2/create_channel/create_channel.html?highlight=anchor#set-anchor-peers
+* If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found in the Fabric docs. Instructions for v1.4 are [here](https://hyperledger-fabric.readthedocs.io/en/release-1.4/channel_update_tutorial.html#updating-the-channel-config-to-include-an-org3-anchor-peer-optional). A clearer set of instructions appear in the [v2.2 docs](https://hyperledger-fabric.readthedocs.io/en/release-2.2/create_channel/create_channel.html?highlight=anchor#set-anchor-peers); these will work on v1.4.
 
 ```
 cd ~/non-profit-blockchain/blockchain-explorer/connection-profile
