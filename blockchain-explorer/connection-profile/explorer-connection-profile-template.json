@@ -18,17 +18,14 @@
     "connection": {
       "timeout": {
         "peer": {
-          "endorser": "300"
+          "endorser": "6000"
         },
-        "orderer": "300"
+        "orderer": "6000"
       }
     }
   },
   "channels": {
     "mychannel": {
-      "orderers": [
-        "orderer"
-      ],
       "peers": {
         "%PEERSERVICEENDPOINTNOPORT%": {}
       },

@@ -1,6 +1,6 @@
 # Running Hyperledger Explorer on Amazon Managed Blockchain
 
-Customers want to visualise their Fabric networks on Amazon Managed Blockchain. Hyperledger Explorer is an open source browser for viewing activity on the underlying Fabric network. It offers a web application that provides a view into the configuration of the Fabric network (channels, chaincodes, peers, orderers, etc.), as well as the activity taking place on the network (transactions, blocks, etc.). It can be used with Amazon Managed Blockchain though it requires a few tweaks to get it working.
+Customers want to visualise their Fabric networks on Amazon Managed Blockchain. Hyperledger Explorer is an open source browser for viewing activity on the underlying Fabric network. It offers a web application that provides a view into the configuration of the Fabric network (channels, chaincodes, peers, orderers, etc.), as well as the activity taking place on the network (transactions, blocks, etc.). With a few tweaks, it can easily be used with Amazon Managed Blockchain.
 
 An Amazon Managed Blockchain network provisioned based on the steps in [Part 1](../ngo-fabric/README.md) is a pre-requisite. The steps in this README will provision and run the Hyperledger Explorer sync & web app components on the Fabric client node you created in [Part 1](../ngo-fabric/README.md).
 
@@ -12,11 +12,15 @@ Hyperledger Explorer consists of a few components:
 
 We will configure Hyperledger Explorer to use an Amazon RDS PostgreSQL instance so we can benefit from a managed database service, rather than running PostgreSQL locally. 
 
-The instructions below are complete. You can refer to the instructions in the Hyperledger Explorer GitHub repo for reference, but you do not need to use them.
+The instructions below are complete. You can refer to the instructions in the [Hyperledger Explorer GitHub repo](https://github.com/hyperledger/blockchain-explorer) for reference, but you do not need to use them.
 
 ## Pre-requisites
 
-An Amazon Managed Blockchain network provisioned based on the steps in [Part 1](../ngo-fabric/README.md) is a pre-requisite. The CIDR range of the subnet used by the Fabric client node has been changed to accommodate the additional subnets required by Hyperledger Explorer, so you will either need to recreate your Fabric client node VPC (i.e. delete the CloudFormation stack you created in step 3 of [Part 1](../ngo-fabric/README.md), or you can simply create a new Fabric network starting from step 1 of [Part 1](../ngo-fabric/README.md) .
+An Amazon Managed Blockchain network provisioned based on the steps in [Part 1](../ngo-fabric/README.md) is a pre-requisite. The CIDR range of the subnet used by the Fabric client node has been changed to accommodate the additional subnets required by Hyperledger Explorer, so you will either need to recreate your Fabric client node VPC (i.e. delete the CloudFormation stack you created in step 3 of [Part 1](../ngo-fabric/README.md)), or you can simply create a new Fabric network starting from step 1 of [Part 1](../ngo-fabric/README.md).
+
+If you have multiple peer nodes for your member, the Fabric discovery service will discover them and display them in the Explorer dashboard.
+
+If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found in the Fabric docs (note this is for v2.2 as there is no corresponding info in the v1.4 docs): https://hyperledger-fabric.readthedocs.io/en/release-2.2/create_channel/create_channel.html?highlight=anchor#set-anchor-peers
 
 On the Fabric client node.
 
@@ -28,7 +32,28 @@ created in [Part 1](../ngo-fabric/README.md)
 ssh ec2-user@<dns of EC2 instance> -i ~/<Fabric network name>-keypair.pem
 ```
 
-Install Node.js. You may have already done this, if you are running the REST API on the Fabric client node.
+You should have already cloned this repo in [Part 1](../ngo-fabric/README.md)
+
+```
+cd ~
+git clone https://github.com/aws-samples/non-profit-blockchain.git
+```
+
+You will need to set the context before carrying out any Fabric CLI commands. We do this 
+using the export files that were generated for us in [Part 1](../ngo-fabric/README.md)
+
+Source the file, so the exports are applied to your current session. If you exit the SSH 
+session and re-connect, you'll need to source the file again. The `source` command below
+will print out the values of the key ENV variables. Make sure they are all populated. If
+they are not, follow Step 4 in [Part 1](../ngo-fabric/README.md) to repopulate them.
+
+```
+cd ~/non-profit-blockchain/ngo-fabric
+source fabric-exports.sh
+source ~/peer-exports.sh 
+```
+
+Install Node.js. You may have already done this, if you are running the REST API on the Fabric client node. However, the versions of Node.js supported by Hyperledger Explorer may differ from the one your installed earlier: 
 
 We will use Node.js v12.x.
 
@@ -53,14 +78,6 @@ Install jq and PostgreSQL. We only really need the PostgreSQL client, but I inst
 ```
 sudo yum install -y jq
 sudo yum install -y postgresql postgresql-server postgresql-devel postgresql-contrib postgresql-docs
-```
-
-You will need to export a number of environment variables. The easiest way to do this is by simply sourcing the 
-fabric-exports.sh file that you previously configured in Step 4 in [Part 1](../ngo-fabric/README.md):
-
-```
-cd ~/non-profit-blockchain/ngo-fabric
-source fabric-exports.sh
 ```
 
 ## Step 1 - Clone the appropriate version of the Hyperledger Explorer repository
@@ -126,7 +143,7 @@ Update the config file. I suggest you simply replace all the contents with the s
   "sync": {
     "type": "local",
     "platform": "fabric",
-    "blocksSyncTime": "3"
+    "blocksSyncTime": "1"
   },
   "jwt": {
       "secret": "a secret phrase!!",
@@ -177,6 +194,12 @@ psql -X -h sd1erq6vwko24hx.ce2rsaaq7nas.us-east-1.rds.amazonaws.com -d fabricexp
 
 Hyperledger Explorer uses a connection profile to connect to the Fabric network. If you have worked through Part 3 of this series you will have used connection profiles to connect the REST API to the Fabric network. As in part 3, I generate the connection profile here automatically, based on the ENV variables you populated in the pre-requisites section above (when you sourced fabric-exports.sh). The connection profile does assume that the MSP directory containing the keys and certificates is /home/ec2-user/admin-msp. If you are using a different directory you will need to update the connection profile.
 
+Fabric uses a discovery service to discover details of the Fabric network, and Explorer depends on this to reflect the network in the dashboard. The connection profile only needs to connect to one peer in order to discover the state of the network via the Gossip protocol. However, take note of the following information, copied from the pre-requisites section:
+
+* If you have multiple peer nodes for your member, the Fabric discovery service will discover them and display them in the Explorer dashboard.
+
+* If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found in the Fabric docs (note this is for v2.2 as there is no corresponding info in the v1.4 docs): https://hyperledger-fabric.readthedocs.io/en/release-2.2/create_channel/create_channel.html?highlight=anchor#set-anchor-peers
+
 ```
 cd ~/non-profit-blockchain/blockchain-explorer/connection-profile
 ./gen-connection-profile.sh
@@ -184,23 +207,6 @@ more ~/blockchain-explorer/app/platform/fabric/amb-network.json
 ```
 
 One difference between the connection profile used by Hyperledger Explorer compared to the profile used by the REST API, is that Hyperledger Explorer expects the peer name in the profile to be the full name of the peer, such as 'nd-mj2vophcizasdg5ssehagqe3n4.m-733fj7siwjavhmyj5z273dz7te.n-erwbh4ou2bhbzfbgnepspy3u5m.managedblockchain.us-east-1.amazonaws.com'. It's not just an ID that you choose. If you do not use the matching peer name you may see an error message when starting the Explorer, that looks like this: 'ReferenceError: host_port is not defined'
-
-Depending on the version of Hyperledger Explorer you are using, you may have to update the config_ca.json file also. If the file does not exist, create it:
-
-```
-vi ~/blockchain-explorer/app/platform/fabric/config_ca.json
-```
-
-Update the config file:
-
-```
-{
-  "enroll-id": "hlbeuser",
-  "enroll-affiliation": ".department1",
-  "admin-username": "admin",
-  "admin-secret": "Adminpwd1!"
-}
-```
 
 Now build Hyperledger Explorer:
 
@@ -225,7 +231,7 @@ export DISCOVERY_AS_LOCALHOST=false
 
 The Hyperledger Explorer client starts on port 8080. You already have an ELB that routes traffic to this port. The ELB was created for you by the AWS CloudFormation template in step 2. Once the health checks on the ELB succeed, you can access the Hyperledger Explorer client using the DNS of the ELB. You can find the ELB endpoint using the key `BlockchainExplorerELBDNS` in the outputs tab of the CloudFormation stack.
 
-Logs can be found in these locations in the blockchain-explorer repo folder, `~/blockchain-explorer/`:
+If you are unable to access the Explorer dashboard, check the logs. Logs can be found in these locations in the blockchain-explorer repo folder, `~/blockchain-explorer/`:
 
 * ./logs/console folder to view the logs relating to console
 * ./logs/app to view the application logs
@@ -244,78 +250,71 @@ To use Swagger for live testing of the API, you will need to update the host pro
 vi ~/blockchain-explorer/swagger.json
 ```
 
-Update the 'host' property, using the same DNS as in step 5:
+Update the 'servers' property, using the same DNS as in step 5:
 
 ```
 {
-  "swagger": "2.0",
-  "info": {
-    "title": "Hyperledger Explorer REST API Swagger",
-    "description": "Rest API for fabric .",
-    "version": "1.0.0",
-    "contact": {
-      "name": "Hyperledger Team"
-    }
-  },
-  "host": "ngo-hyper-Blockcha-1O59LKQ979CAF-726033826.us-east-1.elb.amazonaws.com",
+        "openapi": "3.0.1",
+        "info": {
+                "title": "Hyperledger Explorer REST API Swagger",
+                "description": "Rest API for fabric",
+                "termsOfService": "http://swagger.io/terms/",
+                "contact": {
+                        "name": "Hyperledger Team"
+                },
+                "license": {
+                        "name": "Apache 2.0",
+                        "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+                },
+                "version": "1.0.0"
+        },
+        "servers": [
+                {
+                        "url": "http://ngo-hyper-Blockcha-1O59LKQ979CAF-726033826.us-east-1.elb.amazonaws.com"
+                },
+                {
+                        "url": "https://ngo-hyper-Blockcha-1O59LKQ979CAF-726033826.us-east-1.elb.amazonaws.com"
+                }
+        ],
 ```
 
 After updating the file, restart Hyperledger Explorer, then navigate to the Swagger URL.
 
 *If the Swagger UI is still pointing to localhost after you update swagger.json, you may need to rebuild Hyperledger Explorer, by following the build instructions in step 4*
 
-## Step 7 - Keeping Hyperledger Explorer Running
-Hyperledger Explorer runs on the Fabric client node. If you exit the SSH session on the Fabric client node, 
-Hyperledger Explorer will automatically exit. You would need to restart it after SSH'ing back into 
-the Fabric client node.
-
-If you need to keep Hyperledger Explorer running after exiting the SSH session, you can use various methods to do this. I use `PM2`, using a command such as `pm2 start main.js`, which will keep the app running and restart it if it fails. The documentation for PM2 can be found here: http://pm2.keymetrics.io/docs/usage/quick-start/ 
-
-Install PM2 as follows:
+You will need to authenticate before using the API. In the Swagger UI, select `/auth/login`. Enter the payload below (this assumes you are using the default username/password for Hyperledger Explorer)
 
 ```
-npm install pm2@latest -g
+{
+  "user": "exploreradmin",
+  "password": "exploreradminpw",
+  "network": "amb-network"
+}
 ```
 
-Then start Hyperledger Explorer:
+After clicking 'Execute', you should see a response similar to this:
 
 ```
-nvm use lts/carbon
-cd ~/blockchain-explorer/
-export DISCOVERY_AS_LOCALHOST=false
-rm -rf /tmp/fabric-client-kvs_peerOrg*
-rm -rf ./tmp
-pm2 start main.js
+{
+  "success": true,
+  "message": "You have successfully logged in!",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZXhwbG9yZXJhZG1pbiIsIm5ldHdvcmsiOiJhbWItbmV0d29yayIsImlhdCI6MTU5Nzk5ODYxNSwiZXhwIjoxNTk4MDA1ODE1fQ.SWwNpvTM8TddaqW6tPVzpRSvow-iVJiRBtLplykfzjU",
+  "user": {
+    "message": "logged in",
+    "name": "exploreradmin"
+  }
+}
 ```
 
-The PM2 logs can be found in `~/.pm2/logs`.
+Copy the value of 'token', then click the 'Authorize' link at the top of the Swagger UI. Enter the token into the 'bearer' field and authorize. Once authorized you'll be able to interact with the API.
 
-To restart Hyperledger Explorer after making changes:
+You now have Hyperledger Explorer running and are able to use this to view the configuration and activity in your Fabric network. You also have access to the Explorer REST API.   
 
-```
-nvm use lts/carbon
-cd ~/blockchain-explorer/
-export DISCOVERY_AS_LOCALHOST=false
-rm -rf /tmp/fabric-client-kvs_peerOrg*
-rm -rf ./tmp
-pm2 restart main.js
-```
-
-To stop Hyperledger Explorer:
-
-```
-nvm use lts/carbon
-cd ~/blockchain-explorer/
-export DISCOVERY_AS_LOCALHOST=false
-rm -rf /tmp/fabric-client-kvs_peerOrg*
-rm -rf ./tmp
-pm2 stop main.js
-```
-
-To remove the PM2 and Hyperledger Explorer logs:
-
-```
-rm ~/.pm2/logs/main*
-rm ~/.pm2/logs/sync*
-rm -rf ./logs
-```
+* [Part 1:](../ngo-fabric/README.md) Start the workshop by building the Hyperledger Fabric blockchain network using Amazon Managed Blockchain.
+* [Part 2:](../ngo-chaincode/README.md) Deploy the non-profit chaincode. 
+* [Part 3:](../ngo-rest-api/README.md) Run the RESTful API server. 
+* [Part 4:](../ngo-ui/README.md) Run the application. 
+* [Part 5:](../new-member/README.md) Add a new member to the network. 
+* [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with Amazon API Gateway and AWS Lambda.
+* [Part 7:](../ngo-events/README.md) Use blockchain events to notify users of NGO donations.
+* [Part 9:](../blockchain-explorer/README.md) Deploy Hyperledger Explorer. 
