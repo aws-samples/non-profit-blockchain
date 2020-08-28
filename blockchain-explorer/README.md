@@ -237,6 +237,14 @@ If you are unable to access the Explorer dashboard, check the logs. Logs can be 
 * ./logs/app to view the application logs
 * ./logs/db to view the database logs
 
+To stop Hyperledger Explorer:
+
+```
+cd ~/blockchain-explorer/
+./stop.sh
+```
+
+
 ## Step 6 - Use the Swagger Open API Specification UI to interact with Hyperledger Explorer
 Hyperledger Explorer provides a RESTful API that you can use to interact with the Fabric network. Appending ‘api-docs’ to the same ELB endpoint you used in step 5 will display the Swagger home page for the API.
 

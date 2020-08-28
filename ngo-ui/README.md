@@ -104,6 +104,10 @@ execute queries against the Fabric network. You can register a new user in the U
 'Sign up' link on the login page. You can then login as that user and explore the application. Note that
 user names should be 4 characters or more.
 
+If you see an error during registration stating that HTTPS and not HTTP should be used, try the following. The console (F12) may show a CORS issue. Both of these errors are misleading. The issue is usually caused by:
+* the URL of the ELB not being updated in src/environments/environment.ts. See step 3 above
+* the REST API server is not running, or not accessible
+
 ## Step 6 - Exploring the application
 
 The application allows you to view non-profit organisations and see their details, the causes they support,
