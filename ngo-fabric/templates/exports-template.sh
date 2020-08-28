@@ -13,8 +13,6 @@
 # express or implied. See the License for the specific language governing 
 # permissions and limitations under the License.
 
-echo Updating AWS CLI to the latest version
-sudo pip install awscli --upgrade
 cd ~
 
 export REGION=us-east-1

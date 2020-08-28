@@ -100,12 +100,6 @@ cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
-Update your AWS CLI to the latest version.
-
-```
-sudo pip install awscli --upgrade
-```
-
 ## Step 1: Account A invites Account B to join the Fabric network
 In the Amazon Managed Blockchain Console: https://console.aws.amazon.com/managedblockchain
 

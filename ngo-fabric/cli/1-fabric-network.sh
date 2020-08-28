@@ -17,9 +17,6 @@ echo Pre-requisities
 echo installing jq
 sudo yum -y install jq
 
-echo Updating AWS CLI to the latest version
-sudo pip install awscli --upgrade
-
 token=$(uuidgen)
 echo Creating Fabric network $NETWORKNAME
 echo Executing command: aws managedblockchain create-network --region $REGION \
