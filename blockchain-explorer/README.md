@@ -118,66 +118,29 @@ Once step 2 has completed and your PostgreSQL instance is running, you will crea
 sed -i "s/varchar(64)/varchar(256)/g" ~/blockchain-explorer/app/persistence/fabric/postgreSQL/db/explorerpg.sql
 ```
 
-Update the Hyperledger Explorer database connection config with the Amazon RDS connection details. Replace the host, username and password with those you used when you created your PostgreSQL instance. These values can be obtained from the following:
+Update the Hyperledger Explorer database connection config with the Amazon RDS connection details. We will do this automatically below, but if you'd like to do it manually, you'll need to replace the host, username and password with those you used when you created your PostgreSQL instance. These values can be obtained from the following:
 
 * host: from the CloudFormation stack you created in step 2. See the output field: RDSHost, in the CloudFormation console.
 * username & password: you either passed these into the creation of the stack in step 2, or you used the defaults. See the default values in hyperledger-explorer-cfn.yaml.
 
-```
-vi ~/blockchain-explorer/app/explorerconfig.json
-```
-
-Update the config file. I suggest you simply replace all the contents with the snippet below, then replace the 'host' property with your own:
+Let's update the config automatically using the statements below. We will query the CloudFormation stack to obtain the RDS endpoint, then replace this in the config file:
 
 ```
-{
-  "persistence": "postgreSQL",
-  "platforms": ["fabric"],
-  "postgreSQL": {
-    "host": "sd1erq6vwko24hx.ce2rsaaq7nas.us-east-1.rds.amazonaws.com",
-    "port": "5432",
-    "database": "fabricexplorer",
-    "username": "master",
-    "passwd": "master1234"
-  },
-  "sync": {
-    "type": "local",
-    "platform": "fabric",
-    "blocksSyncTime": "1"
-  },
-  "jwt": {
-      "secret": "a secret phrase!!",
-      "expiresIn": "2h"
-  }
-}
+export REGION=us-east-1
+export FABRICSTACK=ngo-hyperledger-explorer-rds
+export RDSHOST=$(aws cloudformation --region $REGION describe-stacks --stack-name $FABRICSTACK --query "Stacks[0].Outputs[?OutputKey=='RDSHost'].OutputValue" --output text)
+cp ~/non-profit-blockchain/blockchain-explorer/explorerconfig.json ~/blockchain-explorer/app/explorerconfig.json
+sed -i "s|%RDSHOST%|$RDSHOST|g" ~/blockchain-explorer/app/explorerconfig.json
+cat ~/blockchain-explorer/app/explorerconfig.json
 ```
 
-Replace the contents of the table creation script so it looks as follows. You can simply replace all the contents with those below:
+Replace the contents of the table creation script:
 
 ```
-vi ~/blockchain-explorer/app/persistence/fabric/postgreSQL/db/createdb.sh
+cp ~/non-profit-blockchain/blockchain-explorer/createdb.sh ~/blockchain-explorer/app/persistence/fabric/postgreSQL/db/createdb.sh
 ```
 
-Update the script file:
-
-```
-#!/bin/bash
-export CONN=$( jq -r .postgreSQL.conn ../../../../explorerconfig.json )
-export HOSTNAME=$( jq -r .postgreSQL.host ../../../../explorerconfig.json )
-export USER=$( jq -r .postgreSQL.username ../../../../explorerconfig.json )
-export DATABASE=$(jq -r .postgreSQL.database ../../../../explorerconfig.json )
-export PASSWD=$(jq .postgreSQL.passwd ../../../../explorerconfig.json | sed "y/\"/'/")
-echo "USER=${USER}"
-echo "DATABASE=${DATABASE}"
-echo "PASSWD=${PASSWD}"
-echo "CONN=${CONN}"
-echo "HOSTNAME=${HOSTNAME}"
-echo "Executing SQL scripts..."
-psql -X -h $HOSTNAME -d $DATABASE --username=$USER -v dbname=$DATABASE -v user=$USER -v passwd=$PASSWD -f ./explorerpg.sql ;
-psql -X -h $HOSTNAME -d $DATABASE --username=$USER -v dbname=$DATABASE -v user=$USER -v passwd=$PASSWD -f ./updatepg.sql ;
-```
-
-Now create the database tables. You will need to enter the password for the 'master' user. This is the same as you entered up above when editing 'explorerconfig.json'; it will also be printed out for you when you execute the command below. You will need to enter this password for two different steps, and you'll need to type it, not copy and paste:
+Now create the database tables. You will need to enter the password for the 'master' user. The password can be found in  'explorerconfig.json', the file we updated a minute ago; it will also be printed out for you when you execute the command below. You will need to enter this password for two different steps, and you'll need to type it, not copy and paste:
 
 ```
 cd ~/blockchain-explorer/app/persistence/fabric/postgreSQL/db
@@ -244,7 +207,6 @@ cd ~/blockchain-explorer/
 ./stop.sh
 ```
 
-
 ## Step 6 - Use the Swagger Open API Specification UI to interact with Hyperledger Explorer
 Hyperledger Explorer provides a RESTful API that you can use to interact with the Fabric network. Appending ‘api-docs’ to the same ELB endpoint you used in step 5 will display the Swagger home page for the API.
 
@@ -258,7 +220,7 @@ To use Swagger for live testing of the API, you will need to update the host pro
 vi ~/blockchain-explorer/swagger.json
 ```
 
-Update the 'servers' property, using the same DNS as in step 5:
+Update the 'servers' property, using the same DNS as in step 5. Make sure you remove the port 8080 from the URL:
 
 ```
 {
@@ -288,9 +250,9 @@ Update the 'servers' property, using the same DNS as in step 5:
 
 After updating the file, restart Hyperledger Explorer, then navigate to the Swagger URL.
 
-*If the Swagger UI is still pointing to localhost after you update swagger.json, you may need to rebuild Hyperledger Explorer, by following the build instructions in step 4*
+*If the Swagger UI is still pointing to localhost after you update swagger.json, you may need to clear your browser cache*
 
-You will need to authenticate before using the API. In the Swagger UI, select `/auth/login`. Enter the payload below (this assumes you are using the default username/password for Hyperledger Explorer)
+You will need to authenticate before using the API. In the Swagger UI, select `/auth/login` and then 'Try it out'. Enter the payload below (this assumes you are using the default username/password for Hyperledger Explorer)
 
 ```
 {
