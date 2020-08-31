@@ -2,7 +2,7 @@
 
 ![Amazon Managed Blockchain](images/AmazonManagedBlockchain.png "Amazon Managed Blockchain")
 
-Updated to support Fabric v1.4x
+> Updated to support Fabric v1.4x
 
 ## Building and deploying an application for Hyperledger Fabric on Amazon Managed Blockchain
 
