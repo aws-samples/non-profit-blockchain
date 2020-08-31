@@ -10,11 +10,23 @@ create a new channel, please follow the steps in [Getting Started Tutorial](http
     To install `jq` tool, run the following command on your EC2 instance: `sudo yum install jq`
 
 ## Usage
+
+```
     ./configureAnchorPeer.sh \
     --channelName "<CHANNEL_NAME>" \
     --memberId "<AMB_MEMBER_ID>" \
     --peerAddress "<PEER_ENDPOINT>" \
     --ordererAddress "<ORDERING_SERVICE_ENDPOINT>"
+```
+
+If you are using ngo workshop setup please set an optional parameter `--mspPath MSP_PATH`
     
 ### Usage example:
-    ./configureAnchorPeer.sh --channelName "mychannel" --memberId "m-JNF6WTCRZJEPTBF6FXLD44KVEM" --peerAddress "nd-veqmnn7wfffbhazm4mg4i3fbz4.m-jnf6wtcrzjeptbf6fxld44kvem.n-roc33c2uibfnnbmowgpyi74lfe.managedblockchain.us-east-1.amazonaws.com:30003" --ordererAddress "orderer.n-roc33c2uibfnnbmowgpyi74lfe.managedblockchain.us-east-1.amazonaws.com:30001"
+
+- Using EC instance with Hyperledger Fabric client CLI docker container from documentation:
+  
+    `./configureAnchorPeer.sh --channelName "mychannel" --memberId "m-JNF6WTCRZJEPTBF6FXLD44KVEM" --peerAddress "nd-veqmnn7wfffbhazm4mg4i3fbz4.m-jnf6wtcrzjeptbf6fxld44kvem.n-roc33c2uibfnnbmowgpyi74lfe.managedblockchain.us-east-1.amazonaws.com:30003" --ordererAddress "orderer.n-roc33c2uibfnnbmowgpyi74lfe.managedblockchain.us-east-1.amazonaws.com:30001"`
+
+- Using setup form NGO workshop:
+
+    `./configureAnchorPeer.sh --channelName "mychannel" --memberId "m-JNF6WTCRZJEPTBF6FXLD44KVEM" --peerAddress "nd-veqmnn7wfffbhazm4mg4i3fbz4.m-jnf6wtcrzjeptbf6fxld44kvem.n-roc33c2uibfnnbmowgpyi74lfe.managedblockchain.us-east-1.amazonaws.com:30003" --ordererAddress "orderer.n-roc33c2uibfnnbmowgpyi74lfe.managedblockchain.us-east-1.amazonaws.com:30001" --mspPath "/opt/home/admin-msp"`
