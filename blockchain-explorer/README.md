@@ -20,7 +20,7 @@ An Amazon Managed Blockchain network provisioned based on the steps in [Part 1](
 
 If you have multiple peer nodes for your member, the Fabric discovery service will discover them and display them in the Explorer dashboard.
 
-If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found in the Fabric docs. Instructions for v1.4 are [here](https://hyperledger-fabric.readthedocs.io/en/release-1.4/channel_update_tutorial.html#updating-the-channel-config-to-include-an-org3-anchor-peer-optional). A clearer set of instructions appear in the [v2.2 docs](https://hyperledger-fabric.readthedocs.io/en/release-2.2/create_channel/create_channel.html?highlight=anchor#set-anchor-peers); these will work on v1.4.
+If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found [here](../anchor-peer/README.md).
 
 On the Fabric client node.
 
@@ -161,7 +161,7 @@ Fabric uses a discovery service to discover details of the Fabric network, and E
 
 * If you have multiple peer nodes for your member, the Fabric discovery service will discover them and display them in the Explorer dashboard.
 
-* If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found in the Fabric docs. Instructions for v1.4 are [here](https://hyperledger-fabric.readthedocs.io/en/release-1.4/channel_update_tutorial.html#updating-the-channel-config-to-include-an-org3-anchor-peer-optional). A clearer set of instructions appear in the [v2.2 docs](https://hyperledger-fabric.readthedocs.io/en/release-2.2/create_channel/create_channel.html?highlight=anchor#set-anchor-peers); these will work on v1.4.
+* If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found [here](../anchor-peer/README.md).
 
 ```
 cd ~/non-profit-blockchain/blockchain-explorer/connection-profile
@@ -192,7 +192,9 @@ export DISCOVERY_AS_LOCALHOST=false
 ./start.sh
 ```
 
-The Hyperledger Explorer client starts on port 8080. You already have an ELB that routes traffic to this port. The ELB was created for you by the AWS CloudFormation template in step 2. Once the health checks on the ELB succeed, you can access the Hyperledger Explorer client using the DNS of the ELB. You can find the ELB endpoint using the key `BlockchainExplorerELBDNS` in the outputs tab of the CloudFormation stack.
+The Hyperledger Explorer client starts on port 8080. You may see some warnings and errors appearing in the console, such as those related to [this issue](https://jira.hyperledger.org/browse/BE-797).
+
+You already have an ELB that routes traffic to port 8080. The ELB was created for you by the AWS CloudFormation template in step 2. Once the health checks on the ELB succeed, you can access the Hyperledger Explorer client using the DNS of the ELB. You can find the ELB endpoint using the key `BlockchainExplorerELBDNS` in the outputs tab of the CloudFormation stack.
 
 If you are unable to access the Explorer dashboard, check the logs. Logs can be found in these locations in the blockchain-explorer repo folder, `~/blockchain-explorer/`:
 
@@ -220,7 +222,7 @@ To use Swagger for live testing of the API, you will need to update the host pro
 vi ~/blockchain-explorer/swagger.json
 ```
 
-Update the 'servers' property, using the same DNS as in step 5. Make sure you remove the port 8080 from the URL:
+Update the 'servers' property, using the same ELB DNS as in step 5. Make sure you remove the port 8080 from the URL:
 
 ```
 {
