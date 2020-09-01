@@ -28,7 +28,7 @@ while test $# -gt 0; do
             ;;
         --peerAddress)
             shift
-            export PEER_ADDRESS=$1
+            export PEER=$1
             shift
             ;;
         --ordererAddress)
