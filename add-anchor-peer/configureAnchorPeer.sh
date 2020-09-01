@@ -88,7 +88,7 @@ echo "ORDERER          : $ORDERER";
 
 cd /home/ec2-user
 
-rm-rf ./channel-artifacts && mkdir ./channel-artifacts
+rm -rf ./channel-artifacts && mkdir ./channel-artifacts
 
 if [ -z "$MSP_PATH" ]
     then
