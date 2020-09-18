@@ -24,6 +24,12 @@ cd ~
 git clone https://github.com/aws-samples/non-profit-blockchain.git
 ```
 
+Update your AWS CLI to the latest version.
+
+```
+sudo pip install awscli --upgrade
+```
+
 ## Step 1 - Create the Hyperledger Fabric blockchain network
 Use Cloud9 to create a Fabric network using the provided CloudFormation template.
 
