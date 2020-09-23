@@ -1,4 +1,4 @@
-PROFILEDIR=../templates
+PROFILEDIR=~/non-profit-blockchain/ngo-identity/templates
 LOCALCA=/var/task/certs/managedblockchain-tls-chain.pem
 
 #copy the connection profiles
