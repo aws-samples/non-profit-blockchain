@@ -169,7 +169,7 @@ docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt
 
 Now that we've created everything, let's see it all in action.
 
-We'll set a couple environment variables which will allow us to retrieve the API endpoint and the Cognito App Client ID from our Cloudformation stacks.
+First, we'll set a few environment variables which will allow us to retrieve the API endpoint and the Cognito App Client ID from our Cloudformation stacks. Run the following commands to set the environment variables.
 
 ```
 REGION=us-east-1
