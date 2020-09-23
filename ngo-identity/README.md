@@ -101,7 +101,9 @@ On our Certificate Authority, we will create two users, one for the donor, and o
 ~/non-profit-blockchain/ngo-identity/scripts/createFabricUsers.sh
 ```
 
-Within this script, we define various attributes that identify this user. These attributes are available within the smart contract and can be used to enforce attribute-based access.  You can find more detail on creating Fabric users in the [Fabric documentation](https://hyperledger-fabric-ca.readthedocs.io/en/release-1.4/users-guide.html#fabric-ca-client).
+Within this script, we define various attributes on the users' certificates. These attributes are available within the smart contract and can be used to enforce attribute-based access.  You can find more detail on creating Fabric users in the [Fabric documentation](https://hyperledger-fabric-ca.readthedocs.io/en/release-1.4/users-guide.html#fabric-ca-client).
+
+In this example, we define two attributes named `fullname` and `role`.
 
 ```
 --id.attrs "fullname='Bob D Donor':ecert,role=ngo_donor:ecert"
