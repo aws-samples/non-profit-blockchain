@@ -27,7 +27,7 @@ SUBNETID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --que
 
 echo Checking existing VPC Endpoints to Secrets Manager...
 
-VPCE_SECRETS_MANAGER=$(aws ec2 describe-vpc-endpoints --region $REGION --filters Name=service-name,Values=com.amazonaws.$REGION.secretsmanager --query 'VpcEndpoints' --output text)
+VPCE_SECRETS_MANAGER=$(aws ec2 describe-vpc-endpoints --region $REGION --filters Name=service-name,Values=com.amazonaws.$REGION.secretsmanager  Name=vpc-id,Values=$VPCID --query 'VpcEndpoints' --output text)
 
 if  [[ "$VPCE_SECRETS_MANAGER" == "" ]]; then
     echo Secrets Manager VPC Endpoint does not exist.  Creating...
@@ -47,7 +47,7 @@ fi
 echo 
 echo Checking existing VPC Endpoints to Systems Manager...
 
-VPCE_SYSTEMS_MANAGER=$(aws ec2 describe-vpc-endpoints --region $REGION --filters Name=service-name,Values=com.amazonaws.$REGION.ssm --query 'VpcEndpoints' --output text)
+VPCE_SYSTEMS_MANAGER=$(aws ec2 describe-vpc-endpoints --region $REGION --filters Name=service-name,Values=com.amazonaws.$REGION.ssm Name=vpc-id,Values=$VPCID --query 'VpcEndpoints' --output text)
 
 if  [[ "$VPCE_SYSTEMS_MANAGER" == "" ]]; then
     
