@@ -19,14 +19,14 @@ LAMBDA_ROOT_FOLDER=${PROJECT_ROOT_FOLDER}/fabricLambda
 CLOUDFORMATION_TEMPLATE=${PROJECT_ROOT_FOLDER}/templates/cognito-apig-lambda-template.yaml
 CONNECTION_PROFILE_LOCAL_PATH=${PROJECT_ROOT_FOLDER}/templates/connection-profile.yaml
 CONNECTION_PROFILE_PS_PATH=/amb/${NETWORKID}/${MEMBERID}/connection-profile
-
+CONNECTION_PROFILE_SCRIPT=${PROJECT_ROOT_FOLDER}/scripts/gen-connection-profile.sh
 
 
 echo Downloading Amazon Managed Blockchain public certificate
 aws s3 cp s3://us-east-1.managedblockchain/etc/managedblockchain-tls-chain.pem $LAMBDA_ROOT_FOLDER/src/certs/managedblockchain-tls-chain.pem
 
 echo Generating the Fabric connection profile
-./gen-connection-profile.sh
+$CONNECTION_PROFILE_SCRIPT
 sed -i "s|/home/ec2-user/managedblockchain-tls-chain.pem|/usr/src/app/certs/managedblockchain-tls-chain.pem|g" $CONNECTION_PROFILE_LOCAL_PATH
 
 echo Putting the connection profile on Parameter Store
