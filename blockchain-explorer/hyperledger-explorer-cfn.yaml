@@ -66,7 +66,7 @@ Resources:
     Type:                                         AWS::RDS::DBParameterGroup
     Properties:
       Description:                                Database Parameter Group
-      Family:                                     postgres11
+      Family:                                     postgres12
       Parameters:
         shared_preload_libraries:                 pg_stat_statements
   DBPrivateSubnetA:

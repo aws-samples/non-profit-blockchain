@@ -16,11 +16,33 @@ The instructions below are complete. You can refer to the instructions in the [H
 
 ## Pre-requisites
 
-An Amazon Managed Blockchain network provisioned based on the steps in [Part 1](../ngo-fabric/README.md) is a pre-requisite. The CIDR range of the subnet used by the Fabric client node has been changed to accommodate the additional subnets required by Hyperledger Explorer (see the [CloudFormation template](../ngo-fabric/fabric-client-node.yaml)), so you will either need to recreate your Fabric client node VPC (i.e. delete the CloudFormation stack you created in step 3 of [Part 1](../ngo-fabric/README.md)), or you can simply create a new Fabric network starting from step 1 of [Part 1](../ngo-fabric/README.md).
+An Amazon Managed Blockchain network provisioned based on the steps in [Part 1](../ngo-fabric/README.md) is a pre-requisite. The CIDR range of the subnet used by the Fabric client node has been changed to accommodate the additional subnets required by Hyperledger Explorer (see the [CloudFormation template](../ngo-fabric/fabric-client-node.yaml)), so if you previously completed [Part 1](../ngo-fabric/README.md) you will either need to recreate your Fabric client node VPC (i.e. delete the CloudFormation stack you created in step 3 of [Part 1](../ngo-fabric/README.md)), or you can simply create a new Fabric network starting from step 1 of [Part 1](../ngo-fabric/README.md).
 
 If you have multiple peer nodes for your member, the Fabric discovery service will discover them and display them in the Explorer dashboard.
 
-If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found [here](../anchor-peer/README.md).
+If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found [here](https://docs.aws.amazon.com/managed-blockchain/latest/managementguide/hyperledger-anchor-peers.html). Carry out these instructions from the Fabric client node.
+
+However, note that these instructions assume you created a Managed Blockchain network following the instructions in the 'Getting Started' guide, which builds a Fabric client node from scratch. This repo uses a pre-built AMI. You will need to add additional environment variables to the 'docker' commands to get them to work here. For example, where the 'Getting Started' guide uses a command such as this:
+
+```
+docker exec cli peer channel fetch config \ 
+/opt/home/channel-artifacts/ourchannelCfg.pb \
+-c ourchannel -o $ORDERER \
+--cafile /opt/home/managedblockchain-tls-chain.pem --tls
+```
+
+you will need to supplement this with additional environment variables:
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer channel fetch config \
+    /opt/home/channel-artifacts/ourchannelCfg.pb \
+    -c ourchannel -o $ORDERER \
+    --cafile /opt/home/managedblockchain-tls-chain.pem --tls
+```
+
+Supplementing the 'docker' commands is not required for 'configtxlator'.
 
 On the Fabric client node.
 
