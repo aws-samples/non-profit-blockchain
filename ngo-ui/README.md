@@ -104,6 +104,10 @@ execute queries against the Fabric network. You can register a new user in the U
 'Sign up' link on the login page. You can then login as that user and explore the application. Note that
 user names should be 4 characters or more.
 
+If you see an error during registration stating that HTTPS and not HTTP should be used, try the following. The console (F12) may show a CORS issue. Both of these errors are misleading. The issue is usually caused by:
+* the URL of the ELB not being updated in src/environments/environment.ts. See step 3 above
+* the REST API server is not running, or not accessible
+
 ## Step 6 - Exploring the application
 
 The application allows you to view non-profit organisations and see their details, the causes they support,
@@ -174,3 +178,4 @@ The workshop instructions can be found in the README files in parts 1-4:
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
 * [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with Amazon API Gateway and AWS Lambda.
 * [Part 7:](../ngo-events/README.md) Use blockchain events to notify users of NGO donations.
+* [Part 8:](../blockchain-explorer/README.md) Deploy Hyperledger Explorer. 

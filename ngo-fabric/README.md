@@ -67,10 +67,10 @@ In your Cloud9 terminal window.
 Create the Fabric client node, which will host the Fabric CLI. You will use the CLI to administer
 the Fabric network. The Fabric client node will be created in its own VPC in your AWS account, with VPC endpoints 
 pointing to the Fabric network you created in Step 1 above. AWS CloudFormation will be used to create the Fabric 
-client node, the VPC and the VPC endpoints.
+client node, the VPC and the VPC endpoints. Note that the CloudFormation template includes an AMI that is available in us-east-1 only. If you want to run this workshop in a different AWS region, you will need to copy the AMI to your region and replace the AMI ID in the CloudFormation template. 
 
 The AWS CloudFormation template requires a number of parameter values. The script you run below will make sure these 
-are available as export variables before calling CloudFormation.
+are available as export variables before calling CloudFormation. 
 
 If you see the following error when running the script below: `An error occurred (InvalidKeyPair.NotFound)`, ignore it.
 This is caused by the script creating a keypair, and ensuring it does not overwrite it if it does exist.
@@ -395,3 +395,4 @@ The workshop instructions can be found in the README files in parts 1-4:
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
 * [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with AWS Lambda.
 * [Part 7:](../ngo-events/README.md) Use blockchain events to notify users of NGO donations.
+* [Part 8:](../blockchain-explorer/README.md) Deploy Hyperledger Explorer. 

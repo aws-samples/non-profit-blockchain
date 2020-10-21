@@ -1,0 +1,181 @@
+# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License.
+# A copy of the License is located at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# or in the "license" file accompanying this file. This file is distributed
+# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+# express or implied. See the License for the specific language governing
+# permissions and limitations under the License.
+ 
+AWSTemplateFormatVersion:                         '2010-09-09'
+Description:                                      >
+  This template creates a Postgres RDS instance for Hyperledger Explorer.
+Parameters:
+  BlockchainVPC:
+    Type:                                         String
+    Description:                                  Name of the VPC that contains the Fabric client node
+  BlockchainEC2:
+    Type:                                         String
+    Description:                                  EC2 instance used as the Fabric client node
+  BlockchainSecurityGroup:
+    Type:                                         String
+    Description:                                  Security group of the Fabric client node
+  BlockchainPublicSubnet:
+    Type:                                         String
+    Description:                                  Subnet of the Fabric client node
+  DBName:
+    Type:                                         String
+    Default:                                      fabricexplorer
+    NoEcho:                                       'true'
+    Description:                                  The database name
+  DBUsername:
+    Type:                                         String
+    Default:                                      master
+    NoEcho:                                       'true'
+    Description:                                  The database admin account username
+  DBPassword:
+    Type:                                         String
+    Default:                                      master1234
+    NoEcho:                                       'true'
+    Description:                                  The database admin account password
+  DBClass:
+    Type:                                         String
+    Default:                                      db.t2.micro
+    Description:                                  Database instance class
+  DBStorage:
+    Type:                                         Number
+    Default:                                      '5'
+    Description:                                  The size of the database (Gb)
+ 
+Resources:
+  DBEC2SecurityGroup:
+    Type:                                         AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription:                           Hyperledger Explorer RDS Access
+      VpcId:                                      !Ref BlockchainVPC
+      SecurityGroupIngress:
+      - IpProtocol:                               tcp
+        FromPort:                                 5432
+        ToPort:                                   5432
+        SourceSecurityGroupId:                    !Ref BlockchainSecurityGroup
+  DBParamGroup:
+    Type:                                         AWS::RDS::DBParameterGroup
+    Properties:
+      Description:                                Database Parameter Group
+      Family:                                     postgres12
+      Parameters:
+        shared_preload_libraries:                 pg_stat_statements
+  DBPrivateSubnetA:
+    Type:                                         AWS::EC2::Subnet
+    Properties:
+        AvailabilityZone: !Select
+          - 0
+          - !GetAZs
+            Ref: AWS::Region
+        VpcId:                                    !Ref BlockchainVPC
+        MapPublicIpOnLaunch:                      false
+        CidrBlock:                                10.0.64.0/18
+        Tags:
+        - Key:                                    FabricExplorer
+          Value:                                  PrivateSubnetA
+  DBPrivateSubnetB:
+    Type:                                         AWS::EC2::Subnet
+    Properties:
+        AvailabilityZone: !Select
+          - 1
+          - !GetAZs
+            Ref: AWS::Region
+        VpcId:                                    !Ref BlockchainVPC
+        MapPublicIpOnLaunch:                      false
+        CidrBlock:                                10.0.128.0/18
+        Tags:
+        - Key:                                    FabricExplorer
+          Value:                                  PrivateSubnetB
+  DBSubnetGroup:
+    Type:                                         AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription:                   DB Private Subnet
+      SubnetIds:
+      - !Ref DBPrivateSubnetA
+      - !Ref DBPrivateSubnetB
+  DBRouteTable:
+    Type:                                         AWS::EC2::RouteTable
+    Properties:
+        VpcId:                                    !Ref BlockchainVPC
+        Tags:
+          - Key:                                  FabricExplorer
+            Value:                                DBRouteTable
+  DBSubnetRouteTableAssociation:
+    Type:                                         AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+        SubnetId:                                 !Ref DBPrivateSubnetA
+        RouteTableId:                             !Ref DBRouteTable
+  DBSubnetRouteTableAssociation:
+    Type:                                         AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+        SubnetId:                                 !Ref DBPrivateSubnetB
+        RouteTableId:                             !Ref DBRouteTable
+  DB:
+    Type:                                         AWS::RDS::DBInstance
+    Properties:
+      DBName:                                     !Ref DBName
+      AllocatedStorage:                           !Ref DBStorage
+      DBInstanceClass:                            !Ref DBClass
+      Engine:                                     postgres
+      MasterUsername:                             !Ref DBUsername
+      MasterUserPassword:                         !Ref DBPassword
+      DBSubnetGroupName:                          !Ref DBSubnetGroup
+      DBParameterGroupName:                       !Ref DBParamGroup
+      VPCSecurityGroups:
+      - Fn::GetAtt:
+        - DBEC2SecurityGroup
+        - GroupId
+  BlockchainExplorerELB:
+    Type:                                         AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      SecurityGroups:                             [!Ref BlockchainSecurityGroup]
+      Subnets:                                    [!Ref BlockchainPublicSubnet]
+      Instances:
+        - !Ref                                    BlockchainEC2
+      Listeners:
+        - LoadBalancerPort:                       '80'
+          InstancePort:                           '8080'
+          Protocol:                               TCP
+      HealthCheck:
+        Target:                                   HTTP:8080/
+        HealthyThreshold:                         '3'
+        UnhealthyThreshold:                       '5'
+        Interval:                                 '10'
+        Timeout:                                  '5'
+      Tags:
+        - Key:                                    Name
+          Value:                                  BlockchainExplorerELB
+ 
+Outputs:
+  BlockchainExplorerELBDNS:
+    Description:                                  Public DNS of the Hyperledger Explorer ELB
+    Value:
+      !GetAtt                                     BlockchainExplorerELB.DNSName
+  RDSHost:
+    Description: Host string of the Hyperledger Explorer Postgres database instance
+    Value:
+      !GetAtt                                     DB.Endpoint.Address
+  JDBCConnectionString:
+    Description: JDBC connection string for Hyperledger Explorer Postgres database
+    Value:
+      Fn::Join:
+      - ''
+      - - jdbc:postgresql://
+        - Fn::GetAtt:
+          - DB
+          - Endpoint.Address
+        - ":"
+        - Fn::GetAtt:
+          - DB
+          - Endpoint.Port
+        - "/"
+        - Ref: DBName
