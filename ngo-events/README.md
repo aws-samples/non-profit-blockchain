@@ -184,4 +184,4 @@ You now have a Fabric event listener running as a Fargate task in ECS that publi
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
 * [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with Amazon API Gateway and AWS Lambda.
 * [Part 7:](../ngo-events/README.md) Use blockchain events to notify users of NGO donations.
-* [Part 9:](../blockchain-explorer/README.md) Deploy Hyperledger Explorer. 
+* [Part 8:](../blockchain-explorer/README.md) Deploy Hyperledger Explorer. 
