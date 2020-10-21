@@ -1,0 +1,97 @@
+{
+  "name": "amb-network",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "client": {
+    "tlsEnable": true,
+    "caCredential": {
+      "id": "%ADMINUSER%",
+      "password": "%ADMINPWD%"
+    },
+    "adminCredential": {
+      "id": "%ADMINUSER%",
+      "password": "%ADMINPWD%",
+      "affiliation": "org1.department1"
+    },
+    "enableAuthentication": false,
+    "organization": "%MEMBERID%",
+    "connection": {
+      "timeout": {
+        "peer": {
+          "endorser": "6000"
+        },
+        "orderer": "6000"
+      }
+    }
+  },
+  "channels": {
+    "mychannel": {
+      "peers": {
+        "%PEERSERVICEENDPOINTNOPORT%": {}
+      },
+      "connection": {
+        "timeout": {
+          "peer": {
+            "endorser": "6000",
+            "eventHub": "6000",
+            "eventReg": "6000"
+          }
+        }
+      }
+    }
+  },
+  "organizations": {
+    "%MEMBERID%": {
+      "mspid": "%MEMBERID%",
+      "fullpath": false,
+      "adminPrivateKey": {
+        "path": "%KEYSTOREFILENAME%"
+      },
+      "signedCert": {
+        "path": "%SIGNEDCERTSFILENAME%"
+      },
+      "certificateAuthorities": [
+        "ca-org1"
+      ],
+      "peers": [
+        "%PEERSERVICEENDPOINTNOPORT%"
+      ]
+    }
+  },
+  "peers": {
+    "%PEERSERVICEENDPOINTNOPORT%": {
+      "tlsCACerts": {
+        "path": "%CAFILE%"
+      },
+      "url": "grpcs://%PEERSERVICEENDPOINT%",
+      "eventUrl": "grpcs://%PEEREVENTENDPOINT%",
+      "grpcOptions": {
+        "ssl-target-name-override": "%PEERSERVICEENDPOINTNOPORT%",
+        "discovery-as-localhost": "false"
+      }
+    }
+  },
+  "orderers": {
+    "orderer": {
+      "tlsCACerts": {
+        "path": "%CAFILE%"
+      },
+      "url": "grpcs://%ORDERINGSERVICEENDPOINT%",
+      "grpcOptions": {
+        "ssl-target-name-override": "%ORDERINGSERVICEENDPOINTNOPORT%"
+      }
+    }
+  },
+  "certificateAuthorities": {
+    "ca-org1": {
+      "url": "https://%CASERVICEENDPOINT%",
+      "httpOptions": {
+        "verify": false
+      },
+      "tlsCACerts": {
+        "path": "%CAFILE%"
+      },
+      "caName": "%MEMBERID%"
+    }
+  }
+}

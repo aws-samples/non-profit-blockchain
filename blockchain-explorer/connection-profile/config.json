@@ -1,0 +1,10 @@
+{
+	"network-configs": {
+		"amb-network": {
+			"name": "amb-network",
+			"profile": "./amb-network.json",
+            "enableAuthentication": false
+		}
+	},
+	"license": "Apache-2.0"
+}
