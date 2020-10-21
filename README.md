@@ -2,6 +2,8 @@
 
 ![Amazon Managed Blockchain](images/AmazonManagedBlockchain.png "Amazon Managed Blockchain")
 
+> Updated to support Fabric v1.4x
+
 ## Building and deploying an application for Hyperledger Fabric on Amazon Managed Blockchain
 
 This workshop builds a Hyperledger Fabric blockchain network using Amazon Managed Blockchain. Once the Fabric network has been created, you will deploy a 3-tier application that uses the Fabric network to track donations to a non-profit organisation, and track how those donations are spent by the non-profit. Donations 

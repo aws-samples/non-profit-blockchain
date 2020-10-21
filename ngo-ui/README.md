@@ -40,16 +40,16 @@ git clone https://github.com/aws-samples/non-profit-blockchain.git
 ## Step 1 - Install Node
 On Cloud9.
 
-Install Node.js. We will use v8.x.
+Install Node.js. We will use v14.x.
 
 ```
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.35.3/install.sh | bash
 ```
 
 ```
 . ~/.nvm/nvm.sh
-nvm install lts/carbon
-nvm use lts/carbon
+nvm install 14
+nvm use 14
 ```
 
 ## Step 2 - Install dependencies
@@ -77,7 +77,7 @@ sed -i "s|__ELBURL__|$ELBURL|g" src/environments/environment.ts
 
 ```
 cd ~/non-profit-blockchain/ngo-ui
-nvm use lts/carbon
+nvm use 14
 npm start &
 ```
 
