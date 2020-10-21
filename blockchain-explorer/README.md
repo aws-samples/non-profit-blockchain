@@ -67,7 +67,7 @@ using the export files that were generated for us in [Part 1](../ngo-fabric/READ
 Source the file, so the exports are applied to your current session. If you exit the SSH 
 session and re-connect, you'll need to source the file again. The `source` command below
 will print out the values of the key ENV variables. Make sure they are all populated. If
-they are not, follow Step 4 in [Part 1](../ngo-fabric/README.md) to repopulate them.
+they are not, follow step 4 in [Part 1](../ngo-fabric/README.md) to repopulate them.
 
 ```
 cd ~/non-profit-blockchain/ngo-fabric
@@ -75,7 +75,7 @@ source fabric-exports.sh
 source ~/peer-exports.sh 
 ```
 
-Install Node.js. You may have already done this, if you are running the REST API on the Fabric client node. However, the versions of Node.js supported by Hyperledger Explorer may differ from the one your installed earlier: 
+Install Node.js. You may have already done this if you are running the REST API on the Fabric client node. However, the versions of Node.js supported by Hyperledger Explorer may differ from the one you installed earlier: 
 
 We will use Node.js v12.x.
 
@@ -149,7 +149,7 @@ Let's update the config automatically using the statements below. We will query 
 
 ```
 export REGION=us-east-1
-export FABRICSTACK=ngo-hyperledger-explorer-rds
+export FABRICSTACK=$NETWORKNAME-hyperledger-explorer-rds
 export RDSHOST=$(aws cloudformation --region $REGION describe-stacks --stack-name $FABRICSTACK --query "Stacks[0].Outputs[?OutputKey=='RDSHost'].OutputValue" --output text)
 cp ~/non-profit-blockchain/blockchain-explorer/explorerconfig.json ~/blockchain-explorer/app/explorerconfig.json
 sed -i "s|%RDSHOST%|$RDSHOST|g" ~/blockchain-explorer/app/explorerconfig.json
@@ -183,7 +183,7 @@ Fabric uses a discovery service to discover details of the Fabric network, and E
 
 * If you have multiple peer nodes for your member, the Fabric discovery service will discover them and display them in the Explorer dashboard.
 
-* If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found [here](../anchor-peer/README.md).
+* If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. See the pre-requisites section at the top of this page for more details.
 
 ```
 cd ~/non-profit-blockchain/blockchain-explorer/connection-profile
