@@ -20,9 +20,7 @@ An Amazon Managed Blockchain network provisioned based on the steps in [Part 1](
 
 If you have multiple peer nodes for your member, the Fabric discovery service will discover them and display them in the Explorer dashboard.
 
-If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found [here](https://docs.aws.amazon.com/managed-blockchain/latest/managementguide/hyperledger-anchor-peers.html). Carry out these instructions from the Fabric client node.
-
-However, note that these instructions assume you created a Managed Blockchain network following the instructions in the 'Getting Started' guide, which builds a Fabric client node from scratch. This repo uses a pre-built AMI. You will need to add additional environment variables to the 'docker' commands to get them to work here. For example, where the 'Getting Started' guide uses a command such as this:
+If you have a multi-member Fabric network, you must configure anchor peers for the member(s), otherwise the Fabric discovery service will be unable to discover peers belonging to other members. Instructions on how to do this can be found [here](https://docs.aws.amazon.com/managed-blockchain/latest/managementguide/hyperledger-anchor-peers.html). Carry out these instructions from the Fabric client node. However, note that the instructions in the AWS docs assume you created a Managed Blockchain network following the instructions in the 'Getting Started' guide, which builds a Fabric client node from scratch. In contrast, this repo uses a pre-built AMI. You will need to add additional environment variables to the 'docker' commands used in the AWS docs to get them to work here. For example, where the 'Getting Started' guide uses a command such as this:
 
 ```
 docker exec cli peer channel fetch config \ 
@@ -103,6 +101,8 @@ sudo yum install -y postgresql postgresql-server postgresql-devel postgresql-con
 ```
 
 ## Step 1 - Clone the appropriate version of the Hyperledger Explorer repository
+
+On the Fabric client node.
 
 The GitHub repo for Hyperledger Explorer is here:
 
