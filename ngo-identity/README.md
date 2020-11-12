@@ -1,4 +1,4 @@
-# Part 8: Integrating blockchain users with Amazon Cognito
+# Part 9: Integrating blockchain users with Amazon Cognito
 
 A Hyperledger Fabric blockchain network is comprised of multiple members, each of whom is responsible for managing their own users.  They do this with a Certificate Authority (CA). The CA serves two primary purposes:
 
@@ -9,14 +9,14 @@ Enrollment credentials are used when issuing blockchain transactions.  Blockchai
 
 ### Using blockchain credentials as part of web application authentication
 
-Most web applications require users to authenticate with a username and password.  The users are authenticated against a user database, such as Amazon Cognito.  In this workshop we will look at how we can continue providing a username and password authentication scheme while not requiring the user to maintain their private keys.
+Web applications commonly require users to authenticate with a username and password.  Users are authenticated against a user database, such as Amazon Cognito.  In this workshop we will look at how we can continue providing a username and password authentication scheme while not requiring the user to maintain their private keys.
 
 In previous parts of this workshop, we created a transparent NGO donation application that allows donors to see how their NGO donations are being spent.  In the application, all users, such as donors and NGO organization members, are able to access all of the smart contract functions.  In this part, we will continue building on this application and restrict certain smart contract functions to only be available to NGO organization managers.  We will do this using Hyperledger Fabric's native [attribute-based access control](https://hyperledger-fabric-ca.readthedocs.io/en/release-1.4/users-guide.html#attribute-based-access-control).
 
 We will also create a Cognito user pool with users corresponding to the the blockchain identities (donors and managers), and use this Cognito user pool to provide authentication to an API Gateway.  For more details on how API Gateway uses Cognito user pools for authorization, please refer to [this guide](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html), 
 
 ## Pre-requisites
- There are multiple parts to the workshop.  Before starting on Part 8, you should have completed [Part 1](../ngo-fabric/README.md) and [Part 2](../ngo-chaincode/README.md).
+ There are multiple parts to the workshop.  Before starting on Part 8, you should have completed [Part 1](../ngo-fabric/README.md), [Part 2](../ngo-chaincode/README.md), and [Part 6](../ngo-lambda/README.md).
 
  In the AWS account where you [created the Fabric network](../ngo-fabric/README.md), use Cloud9 to SSH into the Fabric client node. The key (i.e. the .PEM file) should be in your home directory. The DNS of the Fabric client node EC2 instance can be found in the output of the CloudFormation stack you created in [Part 1](../ngo-fabric/README.md).
 
@@ -86,11 +86,9 @@ The steps you will execute in this part are:
 
 1. Create Fabric users in the Certificate Authority
 2. Deploy a Cognito User Pool
-3. Deploy a Fabric Lambda function
-4. Deploy an API Gateway that uses the Cognito pool and Lambda function
-5. Create users in the Cognito User Pool
-6. Create VPC Endpoints to Secrets Manager and Systems Manager
-7. Upgrade chaincode
+3. Deploy API Gateway routes that require Cognito authentication
+4. Create users in the Cognito User Pool
+5. Upgrade chaincode
 
 ## Step 1 - Create Fabric users in the Certificate Authority
 On the Fabric client node.
@@ -109,8 +107,8 @@ In this example, we define two attributes named `fullname` and `role`.
 --id.attrs "fullname='Bob D Donor':ecert,role=ngo_donor:ecert"
 ```
 
-## Steps 2-4 - Deploy a Cognito User Pool, Lambda and API Gateway
-In this step we deploy the Cognito User Pool, API Gateway and the Lambda function that will invoke transactions on the blockchain network.  The API Gateway defines three routes:
+## Steps 2-3 - Deploy a Cognito User Pool, and API Gateway routes
+In this step we deploy the Cognito User Pool, and API Gateway routes that require authentication with the Cognito User Pool.  API Gateway will fulfill these routes using the Lambda function that was deployed in [Part 6](../ngo-lambda/README.md).  The new API Gateway routes are:
 
 * /donors - returns information about all donors.  This route is available to all authenticated users
 * /donorsmanager - same as the above route, but restricted to authenticated users with the necessary attributes
@@ -119,10 +117,10 @@ In this step we deploy the Cognito User Pool, API Gateway and the Lambda functio
 Create these assets by running the script (this will take a few minutes):
 
 ```
-~/non-profit-blockchain/ngo-identity/scripts/deployCognitoLambdaAPIG.sh
+~/non-profit-blockchain/ngo-identity/scripts/deployCognitoAPIGatewayRoutes.sh
 ```
 
-## Step 5 - Create users in the Cognito User Pool
+## Step 4 - Create users in the Cognito User Pool
 In this step we create two users within the Cognito user pool.  One user represents a donor, and the other represents a manager, who will have elevated access. 
 
 Create the users by running the script: 
@@ -131,16 +129,7 @@ Create the users by running the script:
 ~/non-profit-blockchain/ngo-identity/scripts/createCognitoUsers.sh
 ```
 
-## Step 6 - Create VPC Endpoints to Secrets Manager and Systems Manager
-Our Lambda function will run within our VPC, which by default can not access Secrets Manager or Systems Manager.  In this step, we create VPC Endpoints to provide access to those services for resources within the VPC.
-
-Create the VPC Endpoints by running the script (this will take a few minutes): 
-
-```
-~/non-profit-blockchain/ngo-identity/scripts/deployVPCEndpoints.sh
-```
-
-## Step 7 - Upgrade the NGO chaincode
+## Step 5 - Upgrade the NGO chaincode
 The final step is to upgrade the NGO chaincode with the new methods we will need to support our application. Copy the chaincode to the directory where the Fabric CLI container expects to find the chaincode source code.
 
 ```
@@ -293,4 +282,5 @@ Congratulations on completing this part of the workshop.  You now have an API Ga
 * [Part 5:](../new-member/README.md) Add a new member to the network. 
 * [Part 6:](../ngo-lambda/README.md) Read and write to the blockchain with Amazon API Gateway and AWS Lambda.
 * [Part 7:](../ngo-events/README.md) Use blockchain events to notify users of NGO donations.
-* [Part 8:](../ngo-identity/README.md) Integrating blockchain users with Amazon Cognito.
+* [Part 8:](../blockchain-explorer/README.md) Deploy Hyperledger Explorer.
+* [Part 9:](../ngo-identity/README.md) Integrating blockchain users with Amazon Cognito.
