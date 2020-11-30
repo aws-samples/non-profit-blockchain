@@ -26,13 +26,14 @@ CHANNEL=mychannel
 COGNITO_APIG_LAMBDA_STACK_NAME=cognito-apig-lambda-stack
 PRIVATE_SUBNET_STACK_NAME=private-subnet
 VPC_STACK_NAME=$NETWORKNAME-fabric-client-node
+APINAME=DonorsAPI
 
 ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
 VPCID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='VPCID'].OutputValue" --output text --region $REGION)
 
 aws cloudformation deploy --stack-name $COGNITO_APIG_LAMBDA_STACK_NAME --template-file $CLOUDFORMATION_TEMPLATE \
 --region $REGION --capabilities CAPABILITY_NAMED_IAM  \
---parameter-overrides NETWORKID=$NETWORKID MEMBERID=$MEMBERID LAMBDANAME=$LAMBDANAME \
+--parameter-overrides NETWORKID=$NETWORKID MEMBERID=$MEMBERID LAMBDANAME=$LAMBDANAME APINAME=$APINAME \
 CHAINCODEID=$CHAINCODEID MEMBERNAME=$MEMBERNAME VPCID=$VPCID CHANNELNAME=$CHANNEL \
 SECURITYGROUPID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='SecurityGroupID'].OutputValue" --output text --region $REGION ) \
 SUBNETID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='PublicSubnetID'].OutputValue" --output text --region $REGION )
