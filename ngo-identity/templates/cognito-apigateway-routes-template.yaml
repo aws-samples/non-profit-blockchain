@@ -52,6 +52,15 @@ Resources:
         - ALLOW_REFRESH_TOKEN_AUTH
       GenerateSecret: False
       UserPoolId: !Ref CognitoUserPool
+  Permission:
+    Type: AWS::Lambda::Permission
+    Properties:
+        FunctionName:
+          Fn::Sub: "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${LAMBDANAME}/invocations"
+        Action: "lambda:InvokeFunction"
+        Principal: "apigateway.amazonaws.com"
+        SourceArn:
+          Fn::Sub: "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${DonorsAPIGateway}/*/*/*"
   DonorsAPIGateway:
     Type: 'AWS::Serverless::Api'
     Properties:
@@ -210,3 +219,6 @@ Outputs:
   CognitoAppClientID:
     Description: "Cognito App Client ID"
     Value: !Ref CognitoAppClient
+  APIGatewayURL:
+    Description: "API Gateway endpoint URL for Dev stage"
+    Value: !Sub "https://${DonorsAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/dev"

@@ -164,7 +164,7 @@ First, we'll set a few environment variables which will allow us to retrieve the
 REGION=us-east-1
 COGNITO_APIG_LAMBDA_STACK_NAME=cognito-apig-lambda-stack
 
-API_URL=$(aws cloudformation describe-stacks --stack-name $COGNITO_APIG_LAMBDA_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='DonorsAPIGatewayURL'].OutputValue" --output text --region $REGION )
+API_URL=$(aws cloudformation describe-stacks --stack-name $COGNITO_APIG_LAMBDA_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='APIGatewayURL'].OutputValue" --output text --region $REGION )
 
 COGNITO_APP_CLIENT_ID=$(aws cloudformation describe-stacks --stack-name $COGNITO_APIG_LAMBDA_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='CognitoAppClientID'].OutputValue" --output text --region $REGION )
 

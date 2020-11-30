@@ -28,9 +28,7 @@ PRIVATE_SUBNET_STACK_NAME=private-subnet
 VPC_STACK_NAME=$NETWORKNAME-fabric-client-node
 
 ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
-echo ACCOUNT_ID is $ACCOUNT_ID
 VPCID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='VPCID'].OutputValue" --output text --region $REGION)
-echo VPCID is $VPCID
 
 aws cloudformation deploy --stack-name $COGNITO_APIG_LAMBDA_STACK_NAME --template-file $CLOUDFORMATION_TEMPLATE \
 --region $REGION --capabilities CAPABILITY_NAMED_IAM  \
