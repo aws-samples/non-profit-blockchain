@@ -34,8 +34,6 @@ Parameters:
     Type:                                         String
   LAMBDANAME:
     Type:                                         String
-  APINAME:
-    Type:                                         String
 Resources:
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
@@ -62,7 +60,7 @@ Resources:
         Action: "lambda:InvokeFunction"
         Principal: "apigateway.amazonaws.com"
         SourceArn:
-          Fn::Sub: "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APINAME}/*/*/*"
+          Fn::Sub: "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${DonorsAPIGateway}/*/*/*"
   DonorsAPIGateway:
     Type: 'AWS::Serverless::Api'
     Properties:

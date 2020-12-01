@@ -20,14 +20,11 @@ PATH=$PATH:/home/ec2-user/go/src/github.com/hyperledger/fabric-ca/bin
 
 # NGO Donor user variables
 FABRIC_USERNAME_NGO_DONOR=ngoDonor
-PRIVATE_KEY_SM_PATH_NGO_DONOR=/amb/${NETWORKID}/${MEMBERID}/users/${FABRIC_USERNAME_NGO_DONOR}-priv
-PUBLIC_CERT_PS_PATH_NGO_DONOR=/amb/${NETWORKID}/${MEMBERID}/users/${FABRIC_USERNAME_NGO_DONOR}
 
 # NGO Manager user variables
 FABRIC_USERNAME_NGO_MANAGER=ngoManager
-PRIVATE_KEY_SM_PATH_NGO_MANAGER=/amb/${NETWORKID}/${MEMBERID}/users/${FABRIC_USERNAME_NGO_MANAGER}-priv
-PUBLIC_CERT_PS_PATH_NGO_MANAGER=/amb/${NETWORKID}/${MEMBERID}/users/${FABRIC_USERNAME_NGO_MANAGER}
 
+# Users' password
 FABRICUSERPASSWORD=changeme
 
 # Register and enroll NGO Donor
@@ -38,10 +35,9 @@ echo Enrolling user 'ngoDonor'
 fabric-ca-client enroll -u https://$FABRIC_USERNAME_NGO_DONOR:$FABRICUSERPASSWORD@$CASERVICEENDPOINT --tls.certfiles /home/ec2-user/managedblockchain-tls-chain.pem -M $CERTS_FOLDER/$FABRIC_USERNAME_NGO_DONOR --enrollment.attrs "role,fullname,hf.EnrollmentID,hf.Affiliation"
 
 # Put the credentials on Secrets Manager
-echo Putting user 'ngoDonor' private key on Secrets Manager
-aws secretsmanager create-secret --name $PRIVATE_KEY_SM_PATH_NGO_DONOR --secret-string "`cat $CERTS_FOLDER/$FABRIC_USERNAME_NGO_DONOR/keystore/*`" --region $REGION
-echo Putting user 'ngoDonor' public certificate on Parameter Store
-aws ssm put-parameter --name $PUBLIC_CERT_PS_PATH_NGO_DONOR --type "String" --value "`cat $CERTS_FOLDER/$FABRIC_USERNAME_NGO_DONOR/signcerts/*`" --region $REGION --overwrite
+echo Putting user 'ngoDonor' private key and certificate on Secrets Manager
+aws secretsmanager create-secret --name "dev/fabricOrgs/$MEMBERNAME/$FABRIC_USERNAME_NGO_DONOR/pk" --secret-string "`cat $CERTS_FOLDER/$FABRIC_USERNAME_NGO_DONOR/keystore/*`" --region $REGION
+aws secretsmanager create-secret --name "dev/fabricOrgs/$MEMBERNAME/$FABRIC_USERNAME_NGO_DONOR/signcert" --secret-string "`cat $CERTS_FOLDER/$FABRIC_USERNAME_NGO_DONOR/signcerts/*`" --region $REGION
 
 # Register and enroll NGO Manager
 echo Registering user 'ngoManager'
@@ -51,7 +47,6 @@ echo Enrolling user 'ngoManager'
 fabric-ca-client enroll -u https://$FABRIC_USERNAME_NGO_MANAGER:$FABRICUSERPASSWORD@$CASERVICEENDPOINT --tls.certfiles /home/ec2-user/managedblockchain-tls-chain.pem -M $CERTS_FOLDER/$FABRIC_USERNAME_NGO_MANAGER --enrollment.attrs "role,fullname,hf.EnrollmentID,hf.Affiliation"
 
 # Put the credentials on Secrets Manager
-echo Putting user 'ngoManager' private key on Secrets Manager
-aws secretsmanager create-secret --name $PRIVATE_KEY_SM_PATH_NGO_MANAGER --secret-string "`cat $CERTS_FOLDER/$FABRIC_USERNAME_NGO_MANAGER/keystore/*`" --region $REGION
-echo Putting user 'ngoManager' public certificate on Parameter Store
-aws ssm put-parameter --name $PUBLIC_CERT_PS_PATH_NGO_MANAGER --type "String" --value "`cat $CERTS_FOLDER/$FABRIC_USERNAME_NGO_MANAGER/signcerts/*`" --region $REGION --overwrite
+echo Putting user 'ngoManager' private key and certificate on Secrets Manager
+aws secretsmanager create-secret --name "dev/fabricOrgs/$MEMBERNAME/$FABRIC_USERNAME_NGO_MANAGER/pk" --secret-string "`cat $CERTS_FOLDER/$FABRIC_USERNAME_NGO_MANAGER/keystore/*`" --region $REGION
+aws secretsmanager create-secret --name "dev/fabricOrgs/$MEMBERNAME/$FABRIC_USERNAME_NGO_MANAGER/signcert" --secret-string "`cat $CERTS_FOLDER/$FABRIC_USERNAME_NGO_MANAGER/signcerts/*`" --region $REGION
