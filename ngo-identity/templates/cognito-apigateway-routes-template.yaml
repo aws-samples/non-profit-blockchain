@@ -34,6 +34,8 @@ Parameters:
     Type:                                         String
   LAMBDANAME:
     Type:                                         String
+  APINAME:
+    Type:                                         String
 Resources:
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
