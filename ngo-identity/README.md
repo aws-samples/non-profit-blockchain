@@ -13,7 +13,7 @@ Web applications commonly require users to authenticate with a username and pass
 
 In previous parts of this workshop, we created a transparent NGO donation application that allows donors to see how their NGO donations are being spent.  In the application, all users, such as donors and NGO organization members, are able to access all of the smart contract functions.  In this part, we will continue building on this application and restrict certain smart contract functions to only be available to NGO organization managers.  We will do this using Hyperledger Fabric's native [attribute-based access control](https://hyperledger-fabric-ca.readthedocs.io/en/release-1.4/users-guide.html#attribute-based-access-control).
 
-We will also create a Cognito user pool with users corresponding to the the blockchain identities (donors and managers), and use this Cognito user pool to provide authentication to an API Gateway.  For more details on how API Gateway uses Cognito user pools for authorization, please refer to [this guide](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html), 
+We will also create a Cognito user pool with users corresponding to the blockchain identities (donors and managers), and use this Cognito user pool to provide authentication to an API Gateway.  For more details on how API Gateway uses Cognito user pools for authorization, please refer to [this guide](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html).
 
 ## Pre-requisites
  There are multiple parts to the workshop.  Before starting on Part 8, you should have completed [Part 1](../ngo-fabric/README.md), [Part 2](../ngo-chaincode/README.md), and [Part 6](../ngo-lambda/README.md).
@@ -265,10 +265,27 @@ Next, we'll call the restricted endpoint, sending the JWT as an authorization he
 curl -H "Authorization: $ID_TOKEN" -s -X GET "$API_URL_DONORSMANAGER"
 ```
 
-We can see the user attributes available to the smart contract by calling this route.
+You should see a response showing all donors.
+
+## Viewing the calling user's attributes
+It can be helpful during debugging to know what attributes are available within the smart contract. When we upgraded our chaincode, we included a method that returns the attributes associated with the caller. We can see these attributes by calling this route.
 
 ```
 curl -H "Authorization: $ID_TOKEN" -s -X GET "$API_URL_USER"
+```
+
+Which returns this result:
+
+```
+{
+   "getID":"x509::/C=US/ST=North Carolina/O=Hyperledger/OU=user+OU=member/CN=ngoManager::/C=US/ST=Washington/L=Seattle/O=Amazon Web Services, Inc./OU=Amazon Managed Blockchain/CN=member Amazon Managed Blockchain Root CA",
+   "getMSPID":"m-abc123...",
+   "getX509Certificate":{...},
+   "role":"ngo_manager",
+   "affiliation":"member",
+   "enrollmentID":"ngoManager",
+   "fullname":"'Alice Manager'"
+}
 ```
 
 # Summary
