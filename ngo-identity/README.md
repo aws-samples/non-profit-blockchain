@@ -200,13 +200,13 @@ The id token is a JSON Web Token (JWT) which contains various information about 
 
 ```
 {
-  "sub": "e6add7b3-1454-48c4-b3b9-c3c1e794a02c",
-  "aud": "3q0bn8592ipuu1dneqv0mmod82",
-  "event_id": "d41d634a-01f5-4736-ab12-8cbcd8b16955",
+  "sub": "e6add7b3-xxxxx",
+  "aud": "3q0bnxxxxx",
+  "event_id": "d41d634a-xxxxx",
   "token_use": "id",
   "custom:fabricUsername": "ngoDonor",
   "auth_time": 1597273756,
-  "iss": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_KyEtVK8c2",
+  "iss": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_xxxxx",
   "cognito:username": "bobdonor",
   "exp": 1597277356,
   "iat": 1597273757

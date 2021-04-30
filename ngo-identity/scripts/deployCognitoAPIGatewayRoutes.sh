@@ -15,27 +15,23 @@
 
 REGION=us-east-1
 PROJECT_ROOT_FOLDER=~/non-profit-blockchain/ngo-identity
-LAMBDA_ROOT_FOLDER=${PROJECT_ROOT_FOLDER}/fabricLambda
 CLOUDFORMATION_TEMPLATE=${PROJECT_ROOT_FOLDER}/templates/cognito-apigateway-routes-template.yaml
 
 echo Deploying the Cloudformation stack
-LAMBDA_STACK_NAME=fabric-lambda-stack
 LAMBDANAME=ngo-fabric-lambda
 CHAINCODEID=ngo
 CHANNEL=mychannel
 COGNITO_APIG_LAMBDA_STACK_NAME=cognito-apig-lambda-stack
-PRIVATE_SUBNET_STACK_NAME=private-subnet
 VPC_STACK_NAME=$NETWORKNAME-fabric-client-node
 API_NAME=identity-enabled-api
 
-ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
-VPCID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='VPCID'].OutputValue" --output text --region $REGION)
+VPCID=$(aws cloudformation describe-stacks --stack-name "$VPC_STACK_NAME" --query "Stacks[0].Outputs[?OutputKey=='VPCID'].OutputValue" --output text --region "$REGION")
 
-aws cloudformation deploy --stack-name $COGNITO_APIG_LAMBDA_STACK_NAME --template-file $CLOUDFORMATION_TEMPLATE \
---region $REGION --capabilities CAPABILITY_NAMED_IAM  \
---parameter-overrides NETWORKID=$NETWORKID MEMBERID=$MEMBERID LAMBDANAME=$LAMBDANAME \
-CHAINCODEID=$CHAINCODEID MEMBERNAME=$MEMBERNAME VPCID=$VPCID CHANNELNAME=$CHANNEL \
-SECURITYGROUPID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='SecurityGroupID'].OutputValue" --output text --region $REGION ) \
-SUBNETID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='PublicSubnetID'].OutputValue" --output text --region $REGION ) APINAME=$API_NAME
+aws cloudformation deploy --stack-name "$COGNITO_APIG_LAMBDA_STACK_NAME" --template-file "$CLOUDFORMATION_TEMPLATE" \
+--region "$REGION" --capabilities CAPABILITY_NAMED_IAM  \
+--parameter-overrides NETWORKID="$NETWORKID" MEMBERID="$MEMBERID" LAMBDANAME="$LAMBDANAME" \
+CHAINCODEID="$CHAINCODEID" MEMBERNAME="$MEMBERNAME" VPCID="$VPCID" CHANNELNAME="$CHANNEL" \
+SECURITYGROUPID=$(aws cloudformation describe-stacks --stack-name "$VPC_STACK_NAME" --query "Stacks[0].Outputs[?OutputKey=='SecurityGroupID'].OutputValue" --output "text" --region "$REGION" ) \
+SUBNETID=$(aws cloudformation describe-stacks --stack-name "$VPC_STACK_NAME" --query "Stacks[0].Outputs[?OutputKey=='PublicSubnetID'].OutputValue" --output "text" --region "$REGION" ) APINAME="$API_NAME"
 
 echo Cognito and APIGateway routes successfully created.
