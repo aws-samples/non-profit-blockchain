@@ -37,7 +37,7 @@ async function setupChannel() {
     if (!peer) {
         let peerEndpoints = config.peerEndpoint.split(",");
         for (let i in peerEndpoints) {
-            channel.addPeer(client.newPeer(peerEndpoint[i], {pem:pemfile}));
+            channel.addPeer(client.newPeer(peerEndpoints[i], {pem:pemfile}));
             // Additional peer settings: https://fabric-sdk-node.github.io/Channel.html#addPeer__anchor
         }
     }
