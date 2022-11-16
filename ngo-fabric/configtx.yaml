@@ -28,6 +28,23 @@ Organizations:
 
         MSPDir: /opt/home/admin-msp
 
+       # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('SimbaMSP.admin', 'SimbaMSP.peer', 'SimbaMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('SimbaMSP.admin', 'SimbaMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('SimbaMSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('SimbaMSP.peer')"
+
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
@@ -49,6 +66,62 @@ Application: &ApplicationDefaults
     # the application side of the network
     Organizations:
 
+    # Policies defines the set of policies at this level of the config tree
+    # For Application policies, their canonical path is
+    #   /Channel/Application/<PolicyName>
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        LifecycleEndorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+        Endorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+
+    #Capabilities:
+    #    <<: *ApplicationCapabilities
+
+################################################################################
+#
+#   CHANNEL
+#
+#   This section defines the values to encode into a config transaction or
+#   genesis block for channel related parameters.
+#
+################################################################################
+Channel: &ChannelDefaults
+    # Policies defines the set of policies at this level of the config tree
+    # For Channel policies, their canonical path is
+    #   /Channel/<PolicyName>
+    Policies:
+        # Who may invoke the 'Deliver' API
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        # Who may invoke the 'Broadcast' API
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        # By default, who may modify elements at this config level
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    # Capabilities describes the channel level capabilities, see the
+    # dedicated Capabilities section elsewhere in this file for a full
+    # description
+    # Capabilities:
+    #    <<: *ChannelCapabilities
+
+
 ################################################################################
 #
 #   Profile
@@ -60,6 +133,7 @@ Application: &ApplicationDefaults
 Profiles:
 
     OneOrgChannel:
+        <<: *ChannelDefaults
         Consortium: AWSSystemConsortium
         Application:
             <<: *ApplicationDefaults
