@@ -170,7 +170,24 @@ cp ~/admin-msp/signcerts/* ~/admin-msp/admincerts/
 cd ~/non-profit-blockchain/ngo-fabric
 ```
 
-## Step 5 - Update the configtx channel configuration
+## Step 5 - Upgrade the Peer CLI from 1.2 to 2.2
+
+```
+cd
+sed -i "s|1.2|2.2|g" ~/docker-compose-cli.yaml
+docker-compose -f docker-compose-cli.yaml up -d
+cd ~/fabric-samples
+git checkout release-2.2
+```
+
+Upgrade go version to latest
+```
+sudo rm -rf /usr/local/go
+curl -L https://go.dev/dl/go1.19.3.linux-amd64.tar.gz -o go1.19.3.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.19.3.linux-amd64.tar.gz
+```
+
+## Step 6 - Update the configtx channel configuration
 On the Fabric client node.
 
 Update the configtx channel configuration. The Name and ID fields should be updated with the member ID from Managed Blockchain.
@@ -271,7 +288,7 @@ You should see:
 2018-11-26 21:41:41.022 UTC [channelCmd] executeJoin -> INFO 002 Successfully submitted proposal to join channel
 ```
 
-## Step 8 - Install chaincode on your peer node
+## Step 8 - Install Vendor Dependencies
 On the Fabric client node.
 
 Install chaincode on Fabric peer.
@@ -279,110 +296,135 @@ Install chaincode on Fabric peer.
 Execute the following script:
 
 ```
+cd ~
+sudo chown -R ec2-user:ec2-user fabric-samples/
+cd fabric-samples/chaincode/abstore/go/
+GO111MODULE=on go mod vendor
+cd
+```
+
+## Step 9 - Create the Chaincode Package
+Run the following command to create the example chaincode package.
+
+```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
     -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
-    cli peer chaincode install -n $CHAINCODENAME -v $CHAINCODEVERSION -p $CHAINCODEDIR
+    cli peer lifecycle chaincode package ./abstore.tar.gz \
+    --path /opt/home/fabric-samples/chaincode/abstore/go/ \
+    --label abstore_1
 ```
 
-You should see:
-
-```
-2018-11-26 21:41:46.585 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
-2018-11-26 21:41:46.585 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
-2018-11-26 21:41:48.004 UTC [chaincodeCmd] install -> INFO 003 Installed remotely response:<status:200 payload:"OK" > 
-```
-
-## Step 9 - Instantiate the chaincode on the channel
-On the Fabric client node.
-
-Instantiate chaincode on Fabric channel. This statement may take around 30 seconds, and you
-won't see a specific success response.
+## Step 10 - Install the Package
 
 Execute the following script:
 
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
     -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
-    cli peer chaincode instantiate -o $ORDERER -C $CHANNEL -n $CHAINCODENAME -v $CHAINCODEVERSION \
-    -c '{"Args":["init","a","100","b","200"]}' --cafile $CAFILE --tls
+    cli peer lifecycle chaincode install abstore.tar.gz
 ```
 
 You should see:
 
 ```
-2018-11-26 21:41:53.738 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
-2018-11-26 21:41:53.738 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
+2022-11-22 17:12:57.054 UTC [cli.lifecycle.chaincode] submitInstallProposal -> INFO 003 Installed remotely: response:<status:200 payload:"\nJabstore_1:3918d0438fd2ebe48ed1bde01533513a14f788846fd2d72ef054482760e73409\022\tabstore_1" >
+2022-11-22 17:12:57.054 UTC [cli.lifecycle.chaincode] submitInstallProposal -> INFO 004 Chaincode code package identifier: abstore_1:3918d0438fd2ebe48ed1bde01533513a14f788846fd2d72ef054482760e73409
+[ec2-user@ip-10-0-7-183 go]$ export CC_PACKAGE_ID=abstore_1:3918d0438fd2ebe48ed1bde01533513a14f788846fd2d72ef054482760e73409
 ```
 
-## Step 10 - Query the chaincode
-On the Fabric client node.
-
-Query the chaincode on Fabric peer.
+## Step 11 - Verify the Package
 
 Execute the following script:
 
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
     -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
-    cli peer chaincode query -C $CHANNEL -n $CHAINCODENAME -c '{"Args":["query","a"]}' 
+    cli peer lifecycle chaincode queryinstalled
 ```
 
 You should see:
 
 ```
-100
+Installed chaincodes on peer:
+Package ID: MyPackageID, Label: abstore_1
 ```
 
-## Step 11 - Invoke a transaction
-On the Fabric client node.
-
-Invoke a Fabric transaction.
+## Step 12 - Approve the Chaincode
+Run the following commands to approve the chaincode definition for your organization. Replace `MyPackageID` with the Package ID value returned in the previous step
 
 Execute the following script:
 
 ```
+export CC_PACKAGE_ID=MyPackageID
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
     -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
-    cli peer chaincode invoke -o $ORDERER -C $CHANNEL -n $CHAINCODENAME \
-    -c '{"Args":["invoke","a","b","10"]}' --cafile $CAFILE --tls
+    cli peer lifecycle chaincode approveformyorg \
+    --orderer $ORDERER --tls --cafile /opt/home/managedblockchain-tls-chain.pem \
+    --channelID $CHANNEL --name abstore --version v0 --sequence 1 --package-id $CC_PACKAGE_ID
+```
+
+## Step 13 - Check Commit Readiness
+Run the following command to check whether the chaincode definition is ready to be committed on the channel.
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer lifecycle chaincode checkcommitreadiness \
+    --orderer $ORDERER --tls --cafile /opt/home/managedblockchain-tls-chain.pem \
+    --channelID $CHANNEL --name abstore --version v0 --sequence 1
 ```
 
 You should see:
 
 ```
-2018-11-26 21:45:20.935 UTC [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 001 Chaincode invoke successful. result: status:200 
+Chaincode definition for chaincode 'mycc', version 'v0', sequence '1' on channel 'mychannel' approval status by org:
+m-LVQMIJ75CNCUZATGHLDP24HUHM: true
 ```
 
-## Step 12 - Query the chaincode again and check the change in value
-On the Fabric client node.
-
-Query the chaincode on the Fabric peer and check the change in value. This proves the success of the invoke
-transaction. If you execute the query immediately after the invoke, you may notice that the data hasn't changed.
-Any idea why? There should be a gap of (roughly) 2 seconds between the invoke and query.
-
-Invoking a transaction in Fabric involves a number of steps, including:
-
-* Sending the transaction to the endorsing peers for simulation and endorsement
-* Packaging the endorsements from the peers
-* Sending the packaged endorsements to the ordering service for ordering
-* The ordering service grouping the transactions into blocks (which are created every 2 seconds, by default)
-* The ordering service sending the blocks to all peer nodes for validating and committing to the ledger
-
-Only after the transactions in the block have been committed to the ledger can you read the
-new value from the ledger (or more specifically, from the world state key-value store).
-
-Execute the following script:
+## Step 14 - Commit the Chaincode
+Commit the Chaincode
 
 ```
 docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
     -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
-    cli peer chaincode query -C $CHANNEL -n $CHAINCODENAME -c '{"Args":["query","a"]}' 
+    cli peer lifecycle chaincode commit \
+    --orderer $ORDERER --tls --cafile /opt/home/managedblockchain-tls-chain.pem \
+    --channelID $CHANNEL --name abstore --version v0 --sequence 1
+```
+
+## Step 15 - Verify the Chaincode
+You might have to wait a minute or two for the commit to propagate to the peer node. Run the following command to verify that the chaincode is committed.
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+    cli peer lifecycle chaincode querycommitted \
+    --channelID $CHANNEL
 ```
 
 You should see:
 
 ```
-90
+Committed chaincode definitions on channel 'mychannel':
+Name: mycc, Version: v0, Sequence: 1, Endorsement Plugin: escc, Validation Plugin: vscc
+```
+
+## Step 16 - Initialize the Chaincode
+Run the following command to initialize the chaincode.
+
+```
+docker exec -e "CORE_PEER_TLS_ENABLED=true" -e "CORE_PEER_TLS_ROOTCERT_FILE=/opt/home/managedblockchain-tls-chain.pem" \
+    -e "CORE_PEER_ADDRESS=$PEER" -e "CORE_PEER_LOCALMSPID=$MSP" -e "CORE_PEER_MSPCONFIGPATH=$MSP_PATH" \
+     cli peer chaincode invoke \
+    --tls --cafile /opt/home/managedblockchain-tls-chain.pem \
+    --channelID $CHANNEL \
+    --name mycc -c '{"Args":["init", "a", "100", "b", "200"]}'
+```
+
+You should see:
+
+```
+2021-12-20 19:23:05.434 UTC [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 0ad Chaincode invoke successful. result: status:200
 ```
 
 ## Move on to Part 2
