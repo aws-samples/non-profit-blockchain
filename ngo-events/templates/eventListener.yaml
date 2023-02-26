@@ -159,6 +159,7 @@ Resources:
     Type: 'AWS::SQS::Queue'
     Properties:
       QueueName: fabricevents
+      SqsManagedSseEnabled: true
       RedrivePolicy:
         deadLetterTargetArn:
           'Fn::GetAtt':
