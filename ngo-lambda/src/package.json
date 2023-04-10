@@ -9,7 +9,7 @@
     },
     "license": "Apache-2.0",
     "dependencies": {
-        "aws-sdk": "^2.494.0",
+        "aws-sdk": "^2.1354.0",
         "fabric-client": "~1.4.0",
         "log4js": "^6.1.2"
     },
