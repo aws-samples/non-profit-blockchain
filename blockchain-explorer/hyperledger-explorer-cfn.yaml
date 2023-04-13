@@ -126,6 +126,7 @@ Resources:
       AllocatedStorage:                           !Ref DBStorage
       DBInstanceClass:                            !Ref DBClass
       Engine:                                     postgres
+      EngineVersion:                              12
       MasterUsername:                             !Ref DBUsername
       MasterUserPassword:                         !Ref DBPassword
       DBSubnetGroupName:                          !Ref DBSubnetGroup
