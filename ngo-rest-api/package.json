@@ -20,7 +20,7 @@
     "fabric-ca-client": "^1.4.10",
     "fabric-client": "^1.4.10",
     "fs-extra": "^2.0.0",
-    "log4js": "^6.1.2",
+    "log4js": "^6.4.0",
     "uuid": "^3.3.2",
     "ws": "^6.2.2"
   }
