@@ -5,6 +5,7 @@ Resources:
     Type: AWS::SNS::Topic
     Properties: 
       DisplayName: NGO News
+      KmsMasterKeyId: alias/aws/sns
       Subscription: 
         - Endpoint: !Ref PhoneNumber
           Protocol: sms
