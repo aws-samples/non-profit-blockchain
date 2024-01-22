@@ -15,12 +15,12 @@
     "body-parser": "^1.17.1",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.3",
-    "express": "^4.15.2",
+    "express": "^4.17.3",
     "express-session": "^1.15.2",
-    "fabric-ca-client": "^1.4.10",
+    "fabric-ca-client": "^1.4.20",
     "fabric-client": "^1.4.20",
     "fs-extra": "^2.0.0",
-    "log4js": "^6.1.2",
+    "log4js": "^6.4.0",
     "uuid": "^3.3.2",
     "ws": "^6.2.2"
   }
