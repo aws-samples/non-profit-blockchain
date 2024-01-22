@@ -11,7 +11,7 @@
     "dependencies": {
         "aws-sdk": "^2.494.0",
         "fabric-client": "~1.4.0",
-        "log4js": "^6.1.2"
+        "log4js": "^6.4.0"
     },
     "author": "Emile Baizel",
     "scripts": {
