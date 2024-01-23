@@ -1,6 +1,6 @@
-# Amazon Managed Blockchain Workshop
+# [ARCHIVED] Amazon Managed Blockchain Workshop
 
-![Amazon Managed Blockchain](images/AmazonManagedBlockchain.png "Amazon Managed Blockchain")
+### This repository is now archived. For hands-on experience use [one of our official workshops](https://workshops.aws/categories/Blockchain).
 
 > Updated to support Fabric v1.4x
 
