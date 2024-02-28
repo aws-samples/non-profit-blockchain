@@ -71,7 +71,7 @@ Parameters:
   FrameworkVersion:
     Description: The version of the blockchain protocol to use
     Type: String
-    Default: 1.4
+    Default: 2.2
   Edition:
     Description: Setting that determines the number of peer nodes per member and the selection of instance types that can be used for them.
     ConstraintDescription: Must be STARTER or STANDARD
